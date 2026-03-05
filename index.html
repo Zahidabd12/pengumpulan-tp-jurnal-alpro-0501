@@ -8,13 +8,17 @@
     <style>
         :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --border: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
         .container { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; }
+        
         .header { text-align: center; margin-bottom: 30px; }
         .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
         .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        
         .alert-box { background: #fef2f2; border-left: 4px solid var(--danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 13px; color: #991b1b; }
         .alert-box strong { display: block; margin-bottom: 4px; color: var(--danger); }
+        
         .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
         .stepper::before { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: var(--border); z-index: 1; }
         .step { position: relative; z-index: 2; background: var(--card-bg); padding: 0 10px; text-align: center; color: var(--text-muted); font-weight: 500; font-size: 14px; transition: 0.3s;}
@@ -22,17 +26,21 @@
         .step.active .circle { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); }
         .step.active { color: var(--primary); }
         .step.completed .circle { background: var(--success); color: white; }
+        
         .form-section { display: none; animation: slideIn 0.4s ease forwards; }
         .form-section.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        
         .form-group { margin-bottom: 20px; text-align: left; }
         label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
         select, input[type="text"], input[type="file"] { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; }
         select:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
+        
         input[type="file"] { padding: 10px; border: 1.5px dashed var(--primary); background: #eef2ff; color: var(--primary); cursor: pointer; }
         input[type="file"]::file-selector-button { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; margin-right: 15px; font-family: 'Poppins', sans-serif;}
         input[type="file"]::file-selector-button:hover { background: var(--primary-hover); }
+        
         .btn-group { display: flex; gap: 12px; margin-top: 30px; }
         button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
@@ -40,6 +48,14 @@
         .btn-secondary { background: var(--border); color: var(--text-main); }
         .btn-secondary:hover { background: #cbd5e1; }
         button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; background: #94a3b8; }
+        
+        .cp-container { margin-top: 20px; background: var(--card-bg); padding: 15px 25px; border-radius: 15px; box-shadow: 0 4px 15px -5px rgba(0,0,0,0.05); text-align: center; width: 100%; max-width: 550px; }
+        .cp-container p { color: var(--text-muted); margin-bottom: 12px; font-size: 13px; font-weight: 500;}
+        .cp-list { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .cp-item { background: #eef2ff; color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; border: 1px solid #c7d2fe; transition: 0.2s; }
+        .cp-item:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); cursor: default; }
+        
+        /* Modal Style */
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal { background: white; padding: 40px 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -52,9 +68,41 @@
         .btn-close-modal { margin-top: 20px; width: 100%; background: var(--primary); color: white; display: none; }
         
         #sysStatus { text-align: center; font-size: 13px; color: var(--primary); margin-top: 15px; font-weight: 500;}
+
+        /* CSS TOAST NOTIFICATION BARU */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            background: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 5px solid var(--danger);
+            width: max-content;
+            max-width: 90%;
+        }
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast-icon { font-size: 20px; }
+        .toast-message { font-size: 14px; font-weight: 500; color: var(--text-main); }
     </style>
 </head>
 <body>
+
+<div class="toast-container" id="toastBox">
+    <span class="toast-icon">⚠️</span>
+    <span class="toast-message" id="toastMessage">Pesan error di sini</span>
+</div>
 
 <div class="container">
     <div class="header">
@@ -131,6 +179,14 @@
     </form>
 </div>
 
+<div class="cp-container">
+    <p>Ada kendala upload? Hubungi Asisten Praktikum:</p>
+    <div class="cp-list">
+        <a href="https://wa.me/6285869678984" target="_blank" class="cp-item" style="text-decoration: none;">👨‍💻 <B>Zahid</B> Abdullah</a>
+        <a href="https://wa.me/6285156223386" target="_blank" class="cp-item" style="text-decoration: none;">👨‍💻 Nur Fattah Ham<b>Dani</b></a>
+    </div>
+</div>
+
 <div class="overlay" id="modalOverlay">
     <div class="modal">
         <div id="loadingState">
@@ -152,9 +208,23 @@
     const webAppUrl = "https://script.google.com/macros/s/AKfycbwwoPrkU414Cr3MAnDlFA0b4eNVKn16frBIOtBvYJDTHOx6d6kApcuFtniiAFKBU1F1/exec"; 
     
     let dbMahasiswa = {}; 
-    let dbConfig = {}; // Menyimpan tanggal dari spreadsheet
+    let dbConfig = {}; 
+    let toastTimeout;
 
-    // KETIKA WEBSITE DIBUKA, AMBIL DATA
+    // FUNGSI UNTUK MENAMPILKAN TOAST NOTIFICATION
+    function showToast(message) {
+        const toast = document.getElementById('toastBox');
+        document.getElementById('toastMessage').innerText = message;
+        
+        toast.classList.add('show');
+        
+        // Reset timer kalau diklik berkali-kali
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500); // Hilang otomatis setelah 3.5 detik
+    }
+
     window.onload = function() {
         fetch(webAppUrl)
         .then(res => res.json())
@@ -162,7 +232,6 @@
             if(data.status === "success") {
                 dbConfig = data.config;
 
-                // Tampilkan Pertemuan yang disetting di Spreadsheet
                 const selectPertemuan = document.getElementById("pertemuan");
                 selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
                 Object.keys(dbConfig).forEach(week => {
@@ -175,7 +244,6 @@
                 document.getElementById("jenisTugas").disabled = false;
                 document.getElementById("btnNext1").disabled = false;
 
-                // Populate Dropdown Nama
                 const selectNama = document.getElementById("nama");
                 data.mahasiswa.forEach(mhs => {
                     dbMahasiswa[mhs.nama] = mhs.nim;
@@ -208,16 +276,15 @@
         });
     }
 
-    // FUNGSI CEK DEADLINE SECARA REALTIME SAAT TOMBOL NEXT DITEKAN
     function nextSection(current) {
         if (current === 1) {
             const pert = document.getElementById('pertemuan').value;
             const jenis = document.getElementById('jenisTugas').value;
             
-            if (!pert) return alert("Pilih pertemuan dulu!");
-            if (!jenis) return alert("Pilih Jenis Tugas dulu!");
+            // Mengganti alert dengan showToast
+            if (!pert) return showToast("Pilih pertemuan dulu ya!");
+            if (!jenis) return showToast("Pilih Jenis Tugas dulu ya!");
 
-            // Validasi Deadline Front-End
             const now = new Date().getTime();
             let targetDeadline = null;
 
@@ -225,10 +292,12 @@
             if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
 
             if (now > targetDeadline) {
-                return alert("⚠️ Maaf, batas waktu pengumpulan " + jenis + " untuk Pertemuan " + pert + " sudah lewat. Hubungi asisten lab.");
+                return showToast("Maaf, batas waktu " + jenis + " untuk Pertemuan " + pert + " sudah lewat.");
             }
         }
-        if (current === 2 && !document.getElementById('nama').value) return alert("Biodata belum lengkap!");
+        
+        // Mengganti alert dengan showToast
+        if (current === 2 && !document.getElementById('nama').value) return showToast("Biodata belum lengkap!");
         
         document.getElementById('section' + current).classList.remove('active');
         document.getElementById('section' + (current + 1)).classList.add('active');
@@ -267,8 +336,9 @@
         e.preventDefault();
         const fileInput = document.getElementById('file').files[0];
         
-        if (fileInput.type !== "application/pdf") return alert("Wajib file PDF!");
-        if (fileInput.size > 10485760) return alert("Ukuran file terlalu besar! Maksimal 10 MB.");
+        // Mengganti alert dengan showToast
+        if (fileInput.type !== "application/pdf") return showToast("File wajib berformat PDF!");
+        if (fileInput.size > 10485760) return showToast("Ukuran file terlalu besar! Maksimal 10 MB.");
 
         overlay.classList.add('active');
         loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
