@@ -8,7 +8,16 @@
     <style>
         :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --border: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        body { 
+            /* Anti-Select Text (Cegah Block/Copy Text) */
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            
+            background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; 
+        }
         
         .container { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; }
         
@@ -213,7 +222,7 @@
 </div>
 
 <script>
-    // PASTE WEB APP URL KAMU DI SINI
+    // URL Web App Google Apps Script
     const webAppUrl = "https://script.google.com/macros/s/AKfycbwwoPrkU414Cr3MAnDlFA0b4eNVKn16frBIOtBvYJDTHOx6d6kApcuFtniiAFKBU1F1/exec"; 
     
     let dbMahasiswa = {}; 
@@ -227,11 +236,10 @@
         
         toast.classList.add('show');
         
-        // Reset timer kalau diklik berkali-kali
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
             toast.classList.remove('show');
-        }, 3500); // Hilang otomatis setelah 3.5 detik
+        }, 3500); 
     }
 
     window.onload = function() {
@@ -290,7 +298,6 @@
             const pert = document.getElementById('pertemuan').value;
             const jenis = document.getElementById('jenisTugas').value;
             
-            // Mengganti alert dengan showToast
             if (!pert) return showToast("Pilih pertemuan dulu ya!");
             if (!jenis) return showToast("Pilih Jenis Tugas dulu ya!");
 
@@ -305,7 +312,6 @@
             }
         }
         
-        // Mengganti alert dengan showToast
         if (current === 2 && !document.getElementById('nama').value) return showToast("Biodata belum lengkap!");
         
         document.getElementById('section' + current).classList.remove('active');
@@ -345,7 +351,6 @@
         e.preventDefault();
         const fileInput = document.getElementById('file').files[0];
         
-        // Mengganti alert dengan showToast
         if (fileInput.type !== "application/pdf") return showToast("File wajib berformat PDF!");
         if (fileInput.size > 10485760) return showToast("Ukuran file terlalu besar! Maksimal 10 MB.");
 
@@ -372,6 +377,41 @@
         };
         reader.readAsDataURL(fileInput);
     });
+
+    // ==========================================
+    // SCRIPT ANTI INSPECT & KLIK KANAN
+    // ==========================================
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya.");
+    });
+
+    document.onkeydown = function(e) {
+        // F12
+        if(e.keyCode == 123) {
+            showToast("⚠️ F12 dikunci, jangan coba-coba inspect!");
+            return false;
+        }
+        // Ctrl+Shift+I (Inspect)
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+            showToast("⚠️ Inspect element dilarang!");
+            return false;
+        }
+        // Ctrl+Shift+C (Inspect Element)
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+            return false;
+        }
+        // Ctrl+Shift+J (Console)
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+            showToast("⚠️ Console dilarang!");
+            return false;
+        }
+        // Ctrl+U (View Source)
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+            showToast("⚠️ View Source dilarang!");
+            return false;
+        }
+    };
 </script>
 </body>
 </html>
