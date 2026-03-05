@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumpulan Praktikum Alpro 05-01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --border: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        .alert-box { background: #fef2f2; border-left: 4px solid var(--danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 13px; color: #991b1b; }
+        .alert-box strong { display: block; margin-bottom: 4px; color: var(--danger); }
+        .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .stepper::before { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: var(--border); z-index: 1; }
+        .step { position: relative; z-index: 2; background: var(--card-bg); padding: 0 10px; text-align: center; color: var(--text-muted); font-weight: 500; font-size: 14px; transition: 0.3s;}
+        .step .circle { width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; font-weight: 600; transition: 0.3s; }
+        .step.active .circle { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); }
+        .step.active { color: var(--primary); }
+        .step.completed .circle { background: var(--success); color: white; }
+        .form-section { display: none; animation: slideIn 0.4s ease forwards; }
+        .form-section.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
+        select, input[type="text"], input[type="file"] { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; }
+        select:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
+        input[type="file"] { padding: 10px; border: 1.5px dashed var(--primary); background: #eef2ff; color: var(--primary); cursor: pointer; }
+        input[type="file"]::file-selector-button { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; margin-right: 15px; font-family: 'Poppins', sans-serif;}
+        input[type="file"]::file-selector-button:hover { background: var(--primary-hover); }
+        .btn-group { display: flex; gap: 12px; margin-top: 30px; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
+        .btn-secondary { background: var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #cbd5e1; }
+        button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; background: #94a3b8; }
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: white; padding: 40px 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .overlay.active .modal { transform: scale(1); }
+        .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .modal h3 { font-size: 18px; color: var(--text-main); margin-bottom: 8px; }
+        .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        .modal-icon { font-size: 50px; margin-bottom: 15px; }
+        .btn-close-modal { margin-top: 20px; width: 100%; background: var(--primary); color: white; display: none; }
+        
+        #sysStatus { text-align: center; font-size: 13px; color: var(--primary); margin-top: 15px; font-weight: 500;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>Pengumpulan Tugas</h2>
+        <p>Praktikum Alpro 05-01</p>
+    </div>
+
+    <div class="stepper">
+        <div class="step active"><div class="circle">1</div>Waktu</div>
+        <div class="step"><div class="circle">2</div>Biodata</div>
+        <div class="step"><div class="circle">3</div>Upload</div>
+    </div>
+
+    <form id="uploadForm">
+        <div id="section1" class="form-section active">
+            <div class="alert-box">
+                <strong>⚠️ Peringatan Keras</strong>
+                AI Detected = Sampai ketemu tahun depan, tia!
+            </div>
+            
+            <div class="form-group">
+                <label>Pilih Pertemuan *</label>
+                <select id="pertemuan" required disabled>
+                    <option value="">-- Memuat Data Server... --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Jenis Tugas *</label>
+                <select id="jenisTugas" required disabled>
+                    <option value="">-- Pilih Jenis Pengumpulan --</option>
+                    <option value="Tugas Pendahuluan">Tugas Pendahuluan (TP)</option>
+                    <option value="Jurnal">Jurnal</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" id="btnNext1" class="btn-primary" onclick="nextSection(1)" disabled>Lanjut Biodata ➔</button>
+            </div>
+            <p id="sysStatus">Menghubungkan ke Server Admin...</p>
+        </div>
+
+        <div id="section2" class="form-section">
+            <div class="form-group">
+                <label>Nama Praktikan *</label>
+                <select id="nama" required onchange="autoFillNIM()">
+                    <option value="">-- Cari Nama Kamu --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>NIM (Terisi Otomatis) *</label>
+                <input type="text" id="nim" placeholder="NIM otomatis..." required readonly>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="prevSection(2)">⬅ Kembali</button>
+                <button type="button" class="btn-primary" onclick="nextSection(2)">Lanjut Upload ➔</button>
+            </div>
+        </div>
+
+        <div id="section3" class="form-section">
+            <div class="alert-box" style="background:#eff6ff; border-color:#3b82f6; color:#1e3a8a;">
+                <strong>ℹ️ Aturan Berkas</strong>
+                Wajib PDF. Maks. ukuran 10 MB. Sistem otomatis me-rename & memilah foldernya.
+            </div>
+            <div class="form-group">
+                <label>Pilih File PDF *</label>
+                <input type="file" id="file" accept="application/pdf" required>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="prevSection(3)">⬅ Kembali</button>
+                <button type="submit" class="btn-primary" id="submitBtn">Kirim Tugas 🚀</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="overlay" id="modalOverlay">
+    <div class="modal">
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <h3>Memproses...</h3>
+            <p>Sistem sedang membuat folder khusus untuk tugasmu di Drive.</p>
+        </div>
+        <div id="resultState" style="display: none;">
+            <div class="modal-icon" id="resultIcon">✅</div>
+            <h3 id="resultTitle">Berhasil!</h3>
+            <p id="resultMessage">Tugas kamu sudah aman.</p>
+            <button type="button" class="btn-primary btn-close-modal" id="closeModalBtn" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // PASTE WEB APP URL KAMU DI SINI
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbz0ShaLRAMi5avVo6zxv-fZ3ruTy8X0X6hEvGsvnWN6a_XP2NwlTvqdZ8289P-7yoz7/exec"; 
+    
+    let dbMahasiswa = {}; // Akan diisi dari server
+
+    // KETIKA WEBSITE DIBUKA, AMBIL DATA DARI SPREADSHEET
+    window.onload = function() {
+        fetch(webAppUrl)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                // Populate Dropdown Pertemuan
+                const selectPertemuan = document.getElementById("pertemuan");
+                selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
+                if(data.weekAktif.length === 0) {
+                    selectPertemuan.innerHTML = '<option value="">-- Semua Pengumpulan Ditutup Admin --</option>';
+                } else {
+                    data.weekAktif.forEach(week => {
+                        let opt = document.createElement('option');
+                        opt.value = week; opt.innerText = "Pertemuan " + week;
+                        selectPertemuan.appendChild(opt);
+                    });
+                    document.getElementById("pertemuan").disabled = false;
+                    document.getElementById("jenisTugas").disabled = false;
+                    document.getElementById("btnNext1").disabled = false;
+                }
+
+                // Populate Dropdown Nama & Bikin Objek dbMahasiswa
+                const selectNama = document.getElementById("nama");
+                data.mahasiswa.forEach(mhs => {
+                    dbMahasiswa[mhs.nama] = mhs.nim;
+                    let opt = document.createElement('option');
+                    opt.value = mhs.nama; opt.innerText = mhs.nama;
+                    selectNama.appendChild(opt);
+                });
+
+                document.getElementById("sysStatus").innerText = "Sistem Siap.";
+                document.getElementById("sysStatus").style.color = "var(--success)";
+                setTimeout(() => document.getElementById("sysStatus").style.display = "none", 2000);
+            }
+        })
+        .catch(err => {
+            document.getElementById("sysStatus").innerText = "Gagal terhubung ke Server Admin.";
+            document.getElementById("sysStatus").style.color = "var(--danger)";
+        });
+    };
+
+    function autoFillNIM() {
+        const nm = document.getElementById("nama").value;
+        document.getElementById("nim").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
+    }
+
+    function updateStepper(step) {
+        document.querySelectorAll('.step').forEach((el, index) => {
+            if(index < step - 1) { el.classList.add('completed'); el.classList.remove('active'); } 
+            else if (index === step - 1) { el.classList.add('active'); el.classList.remove('completed'); } 
+            else { el.classList.remove('active', 'completed'); }
+        });
+    }
+
+    function nextSection(current) {
+        if (current === 1) {
+            if (!document.getElementById('pertemuan').value) return alert("Pilih pertemuan dulu!");
+            if (!document.getElementById('jenisTugas').value) return alert("Pilih Jenis Tugas dulu!");
+        }
+        if (current === 2 && !document.getElementById('nama').value) return alert("Biodata belum lengkap!");
+        
+        document.getElementById('section' + current).classList.remove('active');
+        document.getElementById('section' + (current + 1)).classList.add('active');
+        updateStepper(current + 1);
+    }
+
+    function prevSection(current) {
+        document.getElementById('section' + current).classList.remove('active');
+        document.getElementById('section' + (current - 1)).classList.add('active');
+        updateStepper(current - 1);
+    }
+
+    const overlay = document.getElementById('modalOverlay');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+
+    function showResult(isSuccess, message) {
+        loadingState.style.display = 'none'; resultState.style.display = 'block';
+        document.getElementById('resultIcon').innerText = isSuccess ? "✅" : "❌";
+        document.getElementById('resultTitle').innerText = isSuccess ? "Berhasil!" : "Gagal";
+        document.getElementById('resultTitle').style.color = isSuccess ? "var(--success)" : "var(--danger)";
+        document.getElementById('resultMessage').innerText = message;
+        document.getElementById('closeModalBtn').style.display = 'block';
+        document.getElementById('closeModalBtn').style.background = isSuccess ? "var(--success)" : "var(--danger)";
+    }
+
+    function closeModal() {
+        overlay.classList.remove('active');
+        if(document.getElementById('resultTitle').innerText === "Berhasil!") {
+            document.getElementById('uploadForm').reset();
+            prevSection(3); prevSection(2);
+        }
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('file').files[0];
+        
+        if (fileInput.type !== "application/pdf") return alert("Wajib file PDF!");
+        if (fileInput.size > 10485760) return alert("Ukuran file terlalu besar! Maksimal 10 MB.");
+
+        overlay.classList.add('active');
+        loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const payload = {
+                pertemuan: document.getElementById('pertemuan').value,
+                jenisTugas: document.getElementById('jenisTugas').value,
+                nama: document.getElementById('nama').value,
+                nim: document.getElementById('nim').value,
+                fileBase64: event.target.result.split(',')[1]
+            };
+
+            fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(result => {
+                if(result.status === "success") { showResult(true, "Tugas berhasil direkap dan folder dibuat."); } 
+                else { showResult(false, result.message); } // Pesan jika Duplikat atau Week Ditutup
+            })
+            .catch(error => showResult(false, "Gangguan jaringan."));
+        };
+        reader.readAsDataURL(fileInput);
+    });
+</script>
+</body>
+</html>
