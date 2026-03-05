@@ -149,33 +149,33 @@
 
 <script>
     // PASTE WEB APP URL KAMU DI SINI
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbz0ShaLRAMi5avVo6zxv-fZ3ruTy8X0X6hEvGsvnWN6a_XP2NwlTvqdZ8289P-7yoz7/exec"; 
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbwwoPrkU414Cr3MAnDlFA0b4eNVKn16frBIOtBvYJDTHOx6d6kApcuFtniiAFKBU1F1/exec"; 
     
-    let dbMahasiswa = {}; // Akan diisi dari server
+    let dbMahasiswa = {}; 
+    let dbConfig = {}; // Menyimpan tanggal dari spreadsheet
 
-    // KETIKA WEBSITE DIBUKA, AMBIL DATA DARI SPREADSHEET
+    // KETIKA WEBSITE DIBUKA, AMBIL DATA
     window.onload = function() {
         fetch(webAppUrl)
         .then(res => res.json())
         .then(data => {
             if(data.status === "success") {
-                // Populate Dropdown Pertemuan
+                dbConfig = data.config;
+
+                // Tampilkan Pertemuan yang disetting di Spreadsheet
                 const selectPertemuan = document.getElementById("pertemuan");
                 selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
-                if(data.weekAktif.length === 0) {
-                    selectPertemuan.innerHTML = '<option value="">-- Semua Pengumpulan Ditutup Admin --</option>';
-                } else {
-                    data.weekAktif.forEach(week => {
-                        let opt = document.createElement('option');
-                        opt.value = week; opt.innerText = "Pertemuan " + week;
-                        selectPertemuan.appendChild(opt);
-                    });
-                    document.getElementById("pertemuan").disabled = false;
-                    document.getElementById("jenisTugas").disabled = false;
-                    document.getElementById("btnNext1").disabled = false;
-                }
+                Object.keys(dbConfig).forEach(week => {
+                    let opt = document.createElement('option');
+                    opt.value = week; opt.innerText = "Pertemuan " + week;
+                    selectPertemuan.appendChild(opt);
+                });
 
-                // Populate Dropdown Nama & Bikin Objek dbMahasiswa
+                document.getElementById("pertemuan").disabled = false;
+                document.getElementById("jenisTugas").disabled = false;
+                document.getElementById("btnNext1").disabled = false;
+
+                // Populate Dropdown Nama
                 const selectNama = document.getElementById("nama");
                 data.mahasiswa.forEach(mhs => {
                     dbMahasiswa[mhs.nama] = mhs.nim;
@@ -184,13 +184,13 @@
                     selectNama.appendChild(opt);
                 });
 
-                document.getElementById("sysStatus").innerText = "Sistem Siap.";
+                document.getElementById("sysStatus").innerText = "Sistem Tersambung ke Database ✅";
                 document.getElementById("sysStatus").style.color = "var(--success)";
-                setTimeout(() => document.getElementById("sysStatus").style.display = "none", 2000);
+                setTimeout(() => document.getElementById("sysStatus").style.display = "none", 3000);
             }
         })
         .catch(err => {
-            document.getElementById("sysStatus").innerText = "Gagal terhubung ke Server Admin.";
+            document.getElementById("sysStatus").innerText = "Gagal terhubung ke Database.";
             document.getElementById("sysStatus").style.color = "var(--danger)";
         });
     };
@@ -208,10 +208,25 @@
         });
     }
 
+    // FUNGSI CEK DEADLINE SECARA REALTIME SAAT TOMBOL NEXT DITEKAN
     function nextSection(current) {
         if (current === 1) {
-            if (!document.getElementById('pertemuan').value) return alert("Pilih pertemuan dulu!");
-            if (!document.getElementById('jenisTugas').value) return alert("Pilih Jenis Tugas dulu!");
+            const pert = document.getElementById('pertemuan').value;
+            const jenis = document.getElementById('jenisTugas').value;
+            
+            if (!pert) return alert("Pilih pertemuan dulu!");
+            if (!jenis) return alert("Pilih Jenis Tugas dulu!");
+
+            // Validasi Deadline Front-End
+            const now = new Date().getTime();
+            let targetDeadline = null;
+
+            if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
+            if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
+
+            if (now > targetDeadline) {
+                return alert("⚠️ Maaf, batas waktu pengumpulan " + jenis + " untuk Pertemuan " + pert + " sudah lewat. Hubungi asisten lab.");
+            }
         }
         if (current === 2 && !document.getElementById('nama').value) return alert("Biodata belum lengkap!");
         
@@ -233,7 +248,7 @@
     function showResult(isSuccess, message) {
         loadingState.style.display = 'none'; resultState.style.display = 'block';
         document.getElementById('resultIcon').innerText = isSuccess ? "✅" : "❌";
-        document.getElementById('resultTitle').innerText = isSuccess ? "Berhasil!" : "Gagal";
+        document.getElementById('resultTitle').innerText = isSuccess ? "Berhasil!" : "Gagal Submit";
         document.getElementById('resultTitle').style.color = isSuccess ? "var(--success)" : "var(--danger)";
         document.getElementById('resultMessage').innerText = message;
         document.getElementById('closeModalBtn').style.display = 'block';
@@ -271,10 +286,10 @@
             fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(res => res.json())
             .then(result => {
-                if(result.status === "success") { showResult(true, "Tugas berhasil direkap dan folder dibuat."); } 
-                else { showResult(false, result.message); } // Pesan jika Duplikat atau Week Ditutup
+                if(result.status === "success") { showResult(true, "Tugas berhasil masuk folder dan terekap otomatis."); } 
+                else { showResult(false, result.message); } 
             })
-            .catch(error => showResult(false, "Gangguan jaringan."));
+            .catch(error => showResult(false, "Terjadi gangguan jaringan saat menghubungi Google Drive."));
         };
         reader.readAsDataURL(fileInput);
     });
