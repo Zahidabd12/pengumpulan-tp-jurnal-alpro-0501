@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Praktikum Alpro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --border: #e2e8f0; --code-bg: #1e1e1e; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; user-select: none; }
+        
+        .container { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 40px 30px; margin-bottom: 20px; }
+        .header { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px dashed var(--border); }
+        .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; font-weight: 500;}
+        .badge { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin-top: 10px;}
+        
+        .timer-bar { background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 18px; position: sticky; top: 20px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        .form-group { margin-bottom: 20px; }
+        label { font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block; }
+        select, input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; }
+        select:focus, input[type="text"]:focus { border-color: var(--primary); }
+        input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
+        
+        .question-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s; }
+        .q-number { background: var(--text-main); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 10px; display: inline-block; }
+        .q-text { font-size: 15px; font-weight: 500; margin-bottom: 15px; line-height: 1.5; }
+        
+        .options-group { display: flex; flex-direction: column; gap: 10px; }
+        .option-label { display: flex; align-items: center; gap: 10px; background: white; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; }
+        input[type="radio"]:checked + span { font-weight: 600; color: var(--primary); }
+        
+        .code-block { background: var(--code-bg); color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'Fira Code', monospace; line-height: 1.6; }
+        .code-input { background: #333; color: #a78bfa; border: 1px solid #555; padding: 2px 8px; width: 100px; text-align: center; border-radius: 4px; font-family: 'Fira Code', monospace;}
+        
+        .btn-submit { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; background: var(--primary); color: white; cursor: pointer; margin-top: 10px; transition: 0.2s;}
+        .btn-submit:hover { background: #4338ca; transform: translateY(-2px); }
+        
+        .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.8); display: flex; justify-content: center; align-items: center; z-index: 999; visibility: hidden; opacity: 0; transition: 0.3s;}
+        .overlay.active { visibility: visible; opacity: 1; }
+        .modal { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 350px; }
+        .score-display { font-size: 50px; font-weight: 700; color: var(--primary); margin: 15px 0; }
+        
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: white; padding: 14px 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 10000; opacity: 0; transition: 0.4s; border-left: 5px solid var(--danger); width: max-content; }
+        .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        #loadingMsg { text-align: center; font-weight: bold; color: var(--primary); margin: 30px 0; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastBox">
+    <span class="toast-icon">⚠️</span>
+    <span class="toast-message" id="toastMessage">Pesan error di sini</span>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div id="waitingScreen" style="display: none; text-align: center; padding: 40px 20px; background: #eef2ff; border-radius: 15px; border: 2px dashed #a5b4fc; margin-bottom: 25px;">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">Kuis Belum Dimulai 🔒</h3>
+            <p style="color: var(--text-muted); font-size: 14px;">Halaman ini akan otomatis membuka soal saat waktu dimulai.</p>
+            <div style="font-size: 32px; font-weight: bold; color: var(--primary); margin-top: 15px;" id="waitingTimer">--:--</div>
+        </div>
+        <h2 id="judulKuis">Post-Test Alpro</h2>
+        <p>Praktikum Algoritma Pemrograman 05-01</p>
+        <span class="badge" id="badgeSesi">Memuat Sesi...</span>
+    </div>
+
+    <div class="timer-bar" id="timerBar" style="display: none;">⏱️ Sisa Waktu: <span id="timeDisplay">--:--</span></div>
+
+    <form id="quizForm" style="display: none;">
+        <div id="identitasSection" style="display: flex; gap: 15px; margin-bottom: 30px;">
+            <div style="flex: 2;">
+                <label>Nama Praktikan *</label>
+                <select id="namaMhs" required onchange="autoFillNIM()">
+                    <option value="">-- Cari Nama Kamu --</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label>NIM *</label>
+                <input type="text" id="nimMhs" required readonly>
+            </div>
+        </div>
+
+        <div id="soalContainer"></div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Kumpulkan Jawaban</button>
+    </form>
+
+    <div id="loadingMsg">🔄 Menghubungkan ke Server Admin...</div>
+</div>
+
+<div class="overlay" id="modalOverlay">
+    <div class="modal">
+        <h3 id="modalTitle">Mengoreksi...</h3>
+        <div class="score-display" id="finalScore">🔄</div>
+        <p id="feedbackText" style="color: gray;">Tunggu sebentar, jawabanmu sedang diperiksa.</p>
+        <button id="closeModalBtn" onclick="window.location.reload()" class="btn-submit" style="display:none">Selesai</button>
+    </div>
+</div>
+
+<script>
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbzGVxTgWenE27qfA8m6unXFsvQpndFrZrmCi3vhPbWtgcaStm7_CjagpnyjAjVpUeho2w/exec"; 
+    
+    let dbMahasiswa = {};
+    let soalData = [];
+    let configKuis = {};
+    let timerInterval;
+    let cheatCount = 0; 
+
+    function showToast(message) {
+        const toast = document.getElementById('toastBox');
+        document.getElementById('toastMessage').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3500); 
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    window.onload = function() {
+        fetch(webAppUrl)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                configKuis = data.config;
+                soalData = data.soal;
+
+                document.getElementById('judulKuis').innerText = `${configKuis.judul} - Week ${configKuis.pekan}`;
+                
+                if (configKuis.mode === "latihan") {
+                    document.getElementById('badgeSesi').innerText = configKuis.sesi + " (Mode Latihan)";
+                    document.getElementById('badgeSesi').style.background = "#0ea5e9";
+                    document.getElementById('identitasSection').style.display = "none";
+                    document.getElementById('submitBtn').style.display = "none";
+                } else {
+                    document.getElementById('badgeSesi').innerText = configKuis.sesi + " (Ujian)";
+                    aktifkanAntiCheat();
+                }
+                
+                const selectNama = document.getElementById("namaMhs");
+                data.mahasiswa.forEach(mhs => {
+                    dbMahasiswa[mhs.nama] = mhs.nim;
+                    let opt = document.createElement('option');
+                    opt.value = mhs.nama; opt.innerText = mhs.nama;
+                    selectNama.appendChild(opt);
+                });
+
+                if (soalData.length === 0) {
+                    document.getElementById('loadingMsg').innerText = "Belum ada soal untuk sesi ini.";
+                    return;
+                }
+
+                let jmlSoal = parseInt(configKuis.jmlSoal);
+                if (!isNaN(jmlSoal) && jmlSoal > 0 && jmlSoal < soalData.length) {
+                    shuffleArray(soalData);
+                    soalData = soalData.slice(0, jmlSoal);
+                } else {
+                    shuffleArray(soalData); 
+                }
+
+                document.getElementById('loadingMsg').style.display = "none";
+                renderSoal();
+                
+                // Mulai Timer Sinkron (Mendukung fase menunggu)
+                startSynchronizedTimer(configKuis.waktuDibuka, configKuis.waktuSelesai);
+            }
+        })
+        .catch(err => {
+            document.getElementById('loadingMsg').innerText = "❌ Gagal memuat soal.";
+        });
+    };
+
+    function autoFillNIM() {
+        const nm = document.getElementById("namaMhs").value;
+        document.getElementById("nimMhs").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
+    }
+
+    function renderSoal() {
+        const container = document.getElementById('soalContainer');
+        container.innerHTML = "";
+        
+        soalData.forEach((soal, index) => {
+            let html = `<div class="question-card"><span class="q-number">Soal ${index + 1}</span>`;
+            html += `<div class="q-text">${soal.pertanyaan}</div>`;
+            
+            if (soal.gambar && soal.gambar.trim() !== "") {
+                html += `<img src="${soal.gambar}" alt="Gambar Soal" 
+                         draggable="false" 
+                         oncontextmenu="return false;" 
+                         style="max-width: 100%; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border); display: block; 
+                                pointer-events: none; -webkit-user-drag: none; -webkit-touch-callout: none;">`;
+            }
+
+            if (soal.tipe === "Pilgan") {
+                html += `<div class="options-group">`;
+                let opsiAcak = [...soal.opsi];
+                shuffleArray(opsiAcak); 
+                opsiAcak.forEach(ops => {
+                    html += `<label class="option-label">
+                                <input type="radio" name="q_${soal.id}" value="${ops}" required> 
+                                <span>${ops}</span>
+                             </label>`;
+                });
+                html += `</div>`;
+            } 
+            else if (soal.tipe === "Isian") {
+                html += `<input type="text" id="q_${soal.id}" placeholder="Ketik jawaban..." required autocomplete="off">`;
+            } 
+            else if (soal.tipe === "Rumpang") {
+                let formattedCode = soal.pertanyaan.replace("___", `<input type="text" id="q_${soal.id}" class="code-input" placeholder="_____" required autocomplete="off">`);
+                html += `<div class="code-block">${formattedCode}</div>`;
+            }
+            else if (soal.tipe === "Info") {
+                html += `<div style="padding: 12px; background: #eef2ff; color: var(--primary); border-radius: 8px; font-weight: 600; text-align: center; border: 1px dashed var(--primary);">
+                            💻 Kerjakan instruksi di atas pada komputer/IDE masing-masing!
+                         </div>`;
+            }
+            
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function startSynchronizedTimer(waktuDibukaStr, waktuSelesaiStr) {
+        const startTime = new Date(waktuDibukaStr).getTime();
+        const endTime = new Date(waktuSelesaiStr).getTime();
+        
+        timerInterval = setInterval(() => {
+            const now = new Date().getTime();
+
+            if (now < startTime) {
+                const diff = startTime - now;
+                const m = Math.floor(diff / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('waitingScreen').style.display = "block";
+                document.getElementById('quizForm').style.display = "none";
+                document.getElementById('timerBar').style.display = "none";
+                document.getElementById('waitingTimer').innerText = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+            } 
+            else if (now >= startTime && now <= endTime) {
+                const diff = endTime - now;
+                const m = Math.floor(diff / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('waitingScreen').style.display = "none";
+                document.getElementById('quizForm').style.display = "block";
+                document.getElementById('timerBar').style.display = "block";
+                document.getElementById('timerBar').style.background = (diff < 60000) ? "#ef4444" : "#fee2e2";
+                document.getElementById('timerBar').style.color = (diff < 60000) ? "white" : "#b91c1c";
+                document.getElementById('timeDisplay').innerText = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+            } 
+            else {
+                clearInterval(timerInterval);
+                document.getElementById("timeDisplay").innerText = "00:00";
+                if (configKuis.mode !== "latihan") {
+                    alert("Waktu Habis! Jawaban otomatis dikirim ke Asisten.");
+                    document.getElementById("submitBtn").click(); 
+                } else {
+                    document.getElementById("timerBar").innerHTML = "⏱️ Sesi Selesai!";
+                    document.getElementById("timerBar").style.background = "#9ca3af";
+                    document.getElementById("timerBar").style.color = "white";
+                }
+            }
+        }, 1000);
+    }
+
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if(configKuis.mode === "latihan") return;
+
+        clearInterval(timerInterval);
+        document.getElementById("modalOverlay").classList.add("active");
+        
+        let answers = {};
+        soalData.forEach(soal => {
+            if (soal.tipe === "Pilgan") {
+                const checked = document.querySelector(`input[name="q_${soal.id}"]:checked`);
+                answers[soal.id] = checked ? checked.value : "";
+            } else if (soal.tipe !== "Info") {
+                answers[soal.id] = document.getElementById(`q_${soal.id}`).value;
+            }
+        });
+
+        const payload = {
+            pekan: configKuis.pekan,
+            sesi: configKuis.sesi,
+            nama: document.getElementById("namaMhs").value,
+            nim: document.getElementById("nimMhs").value,
+            pelanggaran: cheatCount,
+            jawaban: answers
+        };
+
+        fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(result => {
+            if(result.status === "success") {
+                document.getElementById("modalTitle").innerText = "Skor Kamu";
+                document.getElementById("finalScore").innerText = result.skor;
+                document.getElementById("feedbackText").innerText = "Nilai sudah direkap otomatis di server Asisten Lab.";
+                document.getElementById("closeModalBtn").style.display = "block";
+            }
+        });
+    });
+
+    function aktifkanAntiCheat() {
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
+                showToast("⚠️ Dilarang Inspect Element!");
+                return false;
+            }
+        };
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden && document.getElementById('quizForm').style.display === "block") {
+                cheatCount++;
+                if (cheatCount === 1) {
+                    alert("⚠️ PERINGATAN 1: Kamu terdeteksi meninggalkan halaman kuis. Jangan buka tab/aplikasi lain!");
+                } else if (cheatCount >= 2) {
+                    alert("❌ PELANGGARAN! Kuis kamu di-submit paksa oleh sistem.");
+                    document.getElementById("submitBtn").click(); 
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

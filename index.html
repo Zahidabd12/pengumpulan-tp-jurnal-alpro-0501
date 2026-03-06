@@ -22,7 +22,7 @@
         .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
         
         /* COUNTDOWN WIDGET */
-        .countdown-container { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2); display: none; /* Disembunyikan sampai data diload */ animation: fadeInDown 0.5s ease; }
+        .countdown-container { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2); display: none; animation: fadeInDown 0.5s ease; }
         .countdown-title { font-size: 12px; font-weight: 500; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
         .countdown-timer { font-size: 18px; font-weight: 700; display: flex; justify-content: center; gap: 8px;}
         .countdown-timer span { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 6px; min-width: 45px;}
@@ -45,9 +45,12 @@
         
         .form-group { margin-bottom: 20px; text-align: left; }
         label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
-        select, input[type="text"], input[type="file"] { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; }
-        select:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        
+        /* Tambahan textarea di CSS */
+        select, input[type="text"], input[type="file"], textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; font-family: 'Poppins', sans-serif;}
+        select:focus, input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
+        textarea { resize: vertical; min-height: 80px; }
         
         input[type="file"] { padding: 10px; border: 1.5px dashed var(--primary); background: #eef2ff; color: var(--primary); cursor: pointer; }
         input[type="file"]::file-selector-button { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; margin-right: 15px; font-family: 'Poppins', sans-serif;}
@@ -75,7 +78,7 @@
         .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .modal h3 { font-size: 18px; color: var(--text-main); margin-bottom: 8px; }
-        .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap; /* Agar bisa pakai enter \n */}
+        .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap; }
         .modal-icon { font-size: 50px; margin-bottom: 15px; }
         .btn-close-modal { margin-top: 20px; width: 100%; background: var(--primary); color: white; display: none; }
         
@@ -165,10 +168,24 @@
                 <strong>ℹ️ Aturan Berkas</strong>
                 Wajib PDF. Maks. ukuran 10 MB. Sistem otomatis me-rename & memilah foldernya.
             </div>
+            
             <div class="form-group">
                 <label>Pilih File PDF *</label>
                 <input type="file" id="file" accept="application/pdf" required>
             </div>
+
+            <div id="feedbackSection" style="display: none; margin-top: 25px; border-top: 1.5px dashed var(--border); padding-top: 20px;">
+                <div class="form-group">
+                    <label>Feedback Praktikum Hari Ini (Anonim) *</label>
+                    <textarea id="feedbackText" placeholder="Bagaimana praktikum hari ini? Apakah materinya bisa dipahami?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Saran untuk Asprak (Anonim) *</label>
+                    <textarea id="saranText" placeholder="Saran buat Zahid/Dani agar praktikum ke depan lebih asik..."></textarea>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: -10px;"><span style="font-size:14px;">🔒</span> Kritik & saranmu akan dikirim secara rahasia tanpa Nama/NIM.</p>
+            </div>
+
             <div class="btn-group">
                 <button type="button" class="btn-secondary" onclick="prevSection(3)">⬅ Kembali</button>
                 <button type="submit" class="btn-primary" id="submitBtn">Kirim Tugas 🚀</button>
@@ -211,8 +228,8 @@
 </div>
 
 <script>
-    // URL Web App Google Apps Script
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbwwoPrkU414Cr3MAnDlFA0b4eNVKn16frBIOtBvYJDTHOx6d6kApcuFtniiAFKBU1F1/exec"; 
+    // PASTE WEB APP URL KHUSUS PENGUMPULAN TUGAS DI SINI
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbwMcXoO_5hbCgEbOOG9HVSYsEEytrjdDMKG6vCdGM3LXQFU9VtpN2fNCGV1tVc43kUq/exec"; 
     
     let dbMahasiswa = {}; 
     let dbConfig = {}; 
@@ -235,7 +252,6 @@
         let nearestDeadline = Infinity;
         let nearestName = "";
 
-        // Cari deadline yang waktunya masih di masa depan (belum lewat) dan paling dekat
         Object.keys(dbConfig).forEach(week => {
             const tp = dbConfig[week].tp;
             const jurnal = dbConfig[week].jurnal;
@@ -248,7 +264,6 @@
         const titleEl = document.getElementById("countdownTitle");
         const timerEl = document.getElementById("countdownTimer");
 
-        // Kalau tidak ada deadline yang aktif, sembunyikan kotak countdown
         if (nearestDeadline === Infinity) {
             containerEl.style.display = "none";
             return;
@@ -264,7 +279,7 @@
             if (diff <= 0) {
                 clearInterval(countdownInterval);
                 timerEl.innerHTML = `<span>00h</span> <span>00j</span> <span>00m</span> <span>00d</span>`;
-                setTimeout(startCountdown, 2000); // Cari ulang deadline berikutnya setelah habis
+                setTimeout(startCountdown, 2000); 
                 return;
             }
 
@@ -273,7 +288,6 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            // Format penambahan angka 0 (misal: "09" bukan "9")
             const dStr = days < 10 ? '0' + days : days;
             const hStr = hours < 10 ? '0' + hours : hours;
             const mStr = minutes < 10 ? '0' + minutes : minutes;
@@ -314,7 +328,6 @@
                 document.getElementById("sysStatus").style.color = "var(--success)";
                 setTimeout(() => document.getElementById("sysStatus").style.display = "none", 3000);
 
-                // Jalankan Countdown setelah data diload
                 startCountdown();
             }
         })
@@ -346,6 +359,9 @@
             
             if (!pert) return showToast("Pilih pertemuan dulu ya!");
             if (!jenis) return showToast("Pilih Jenis Tugas dulu ya!");
+
+            // Logika menampilkan Feedback Anonim JIKA JURNAL
+            document.getElementById('feedbackSection').style.display = (jenis === "Jurnal") ? "block" : "none";
 
             const now = new Date().getTime();
             let targetDeadline = null;
@@ -395,28 +411,40 @@
 
     document.getElementById('uploadForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        const jenis = document.getElementById('jenisTugas').value;
         const fileInput = document.getElementById('file').files[0];
         
+        // Validasi File
         if (fileInput.type !== "application/pdf") return showToast("File wajib berformat PDF!");
         if (fileInput.size > 10485760) return showToast("Ukuran file terlalu besar! Maksimal 10 MB.");
+
+        // Validasi Textarea Feedback jika Jurnal
+        const fbText = document.getElementById('feedbackText').value.trim();
+        const srnText = document.getElementById('saranText').value.trim();
+
+        if (jenis === "Jurnal") {
+            if (fbText === "" || srnText === "") {
+                return showToast("Dimohon mengisi Feedback dan Saran untuk Asprak ya! 🙏");
+            }
+        }
 
         overlay.classList.add('active');
         loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
 
-        // 1. Simpan waktu saat tombol submit ditekan untuk kalkulasi keterlambatan/kecepatan
         const submitTime = new Date().getTime();
 
         const reader = new FileReader();
         reader.onload = function(event) {
-            
             const pert = document.getElementById('pertemuan').value;
-            const jenis = document.getElementById('jenisTugas').value;
             
             const payload = {
                 pertemuan: pert,
                 jenisTugas: jenis,
                 nama: document.getElementById('nama').value,
                 nim: document.getElementById('nim').value,
+                feedback: fbText, // Akan kosong kalau pilih TP
+                saran: srnText,   // Akan kosong kalau pilih TP
                 fileBase64: event.target.result.split(',')[1]
             };
 
@@ -425,7 +453,6 @@
             .then(result => {
                 if(result.status === "success") { 
                     
-                    // 2. LOGIKA MENGHITUNG JARAK WAKTU SUBMIT DENGAN DEADLINE
                     let targetDeadline = (jenis === "Tugas Pendahuluan") ? dbConfig[pert].tp : dbConfig[pert].jurnal;
                     let diff = targetDeadline - submitTime;
                     let timeMessage = "";
@@ -441,7 +468,7 @@
                         }
                     }
 
-                    showResult(true, "Tugas berhasil masuk folder dan terekap otomatis." + timeMessage); 
+                    showResult(true, "Tugas berhasil terkirim. Terima kasih atas kerja kerasmu!" + timeMessage); 
                 } 
                 else { showResult(false, result.message); } 
             })
