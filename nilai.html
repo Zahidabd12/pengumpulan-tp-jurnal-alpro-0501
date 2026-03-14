@@ -276,6 +276,7 @@
     // FUNGSI UTAMA: MENGATUR TAMPILAN (LINK/FEEDBACK/BELUM DINILAI)
     function renderTugasInfo(nilai, linkUrl, labelTugas) {
         let val = parseFloat(nilai) || 0;
+        val = Number(val.toFixed(2)); // Membulatkan desimal rapi (maks 2 angka)
         let link = (linkUrl || "").toString().trim();
 
         // Kasus 1: Asprak menulis "Tidak Ditemukan" (Absen Tugas)
@@ -360,7 +361,11 @@
                     let htmlJurnal = renderTugasInfo(item.nilaiJurnal, item.linkJurnal, "Jurnal");
                     
                     // Total week tetap ditampilkan angkanya atau '-' jika masih diproses
-                    let totalWeekDisplay = (item.nilaiTotalWeek == 0 && (!item.linkTP || !item.linkJurnal)) ? "-" : item.nilaiTotalWeek;
+                    // Merapikan nilai Total Week maks 2 desimal
+                    let rawTotal = parseFloat(item.nilaiTotalWeek) || 0;
+                    let cleanTotal = Number(rawTotal.toFixed(2));
+                    
+                    let totalWeekDisplay = (rawTotal === 0 && (!item.linkTP || !item.linkJurnal)) ? "-" : cleanTotal;
 
                     let tr = document.createElement("tr");
                     tr.innerHTML = `
