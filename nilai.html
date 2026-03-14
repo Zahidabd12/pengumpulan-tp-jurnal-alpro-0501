@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Nilai & Komplain - Alpro 05-01</title>
+    <title>Cek Nilai & Feedback - Alpro 05-01</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --border: #e2e8f0; }
+        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --warning: #d97706; --border: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
         body { 
@@ -54,20 +54,29 @@
         .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
         button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; background: #94a3b8; }
         
-        /* TABEL NILAI */
+        /* TABEL NILAI & FEEDBACK */
         .table-wrapper { overflow-x: auto; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
         thead { background: #eef2ff; color: var(--primary); }
-        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { font-weight: 600; }
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover { background: #f8fafc; }
-        .nilai-badge { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+        
+        .nilai-badge { padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block; }
         .badge-good { background: #d1fae5; color: #065f46; }
         .badge-avg { background: #fef3c7; color: #92400e; }
         .badge-bad { background: #fee2e2; color: #991b1b; }
+        .badge-neutral { background: #e2e8f0; color: #475569; }
 
-        /* Modal & Toast (Sama dengan index) */
+        .btn-feedback { text-decoration: none; font-size: 11px; font-weight: 600; background: #eef2ff; color: var(--primary); padding: 5px 10px; border-radius: 6px; border: 1px solid #c7d2fe; display: inline-block; margin-top: 8px; transition: 0.2s; }
+        .btn-feedback:hover { background: var(--primary); color: white; }
+        
+        .status-text { font-size: 11px; font-weight: 600; display: inline-block; margin-top: 8px; }
+        .text-warning { color: var(--warning); background: #fef3c7; padding: 3px 8px; border-radius: 4px; }
+        .text-danger { color: #dc2626; background: #fee2e2; padding: 3px 8px; border-radius: 4px; }
+
+        /* Modal & Toast */
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal { background: white; padding: 40px 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -99,7 +108,7 @@
 
 <div class="container">
     <div class="header">
-        <h2>Transparansi Nilai</h2>
+        <h2>Transparansi Nilai & Feedback</h2>
         <p>Praktikum Alpro 05-01</p>
     </div>
 
@@ -112,7 +121,7 @@
     <div id="section1" class="form-section active">
         <div class="alert-box info">
             <strong>ℹ️ Informasi</strong>
-            Pilih namamu untuk mengecek nilai TP dan Jurnal setiap minggunya.
+            Pilih namamu untuk mengecek nilai TP, Jurnal, dan melihat feedback/koreksi dari Asprak.
         </div>
         
         <div class="form-group">
@@ -127,7 +136,7 @@
         </div>
 
         <div class="btn-group">
-            <button type="button" id="btnCekNilai" class="btn-primary" onclick="cekNilai()" disabled>Cek Nilai Saya 📊</button>
+            <button type="button" id="btnCekNilai" class="btn-primary" onclick="cekNilai()" disabled>Cek Nilai & Feedback 📊</button>
         </div>
         <p id="sysStatus">Menghubungkan ke Server Admin...</p>
     </div>
@@ -142,10 +151,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Pertemuan</th>
-                        <th>Nilai TP</th>
-                        <th>Nilai Jurnal</th>
-                        <th>Nilai Akhir Week</th>
+                        <th style="text-align: left;">Pertemuan</th>
+                        <th>Tugas Pendahuluan</th>
+                        <th>Jurnal</th>
+                        <th>Total Week</th>
                     </tr>
                 </thead>
                 <tbody id="tabelNilaiBody">
@@ -162,7 +171,7 @@
     <div id="section3" class="form-section">
         <div class="alert-box">
             <strong>⚠️ Perhatian</strong>
-            Pastikan komplain dengan sopan dan jelaskan bagian mana yang menurutmu kurang sesuai.
+            Pastikan komplain dengan sopan. Jika nilai masih bertanda "⏳ Sedang Penilaian", harap bersabar ya!
         </div>
         
         <form id="komplainForm">
@@ -170,12 +179,12 @@
                 <label>Pilih Pertemuan yang Dikomplain *</label>
                 <select id="komplainPertemuan" required>
                     <option value="">-- Pilih Pertemuan --</option>
-                    </select>
+                </select>
             </div>
             
             <div class="form-group">
                 <label>Jelaskan Keluhanmu *</label>
-                <textarea id="pesanKomplain" placeholder="Contoh: Permisi Mas/Mbak, nilai Jurnal saya di week ini kok kosong ya? Padahal saya sudah mengumpulkan..." required></textarea>
+                <textarea id="pesanKomplain" placeholder="Contoh: Permisi Mas Zahid/Mas Dani, saya sudah mengumpulkan Jurnal tapi kok statusnya tidak mengumpulkan ya?" required></textarea>
             </div>
 
             <div class="btn-group">
@@ -210,7 +219,7 @@
     
     let dbMahasiswa = {}; 
     let toastTimeout;
-    let availableWeeks = []; // Menyimpan data week yang nilainya sudah ada untuk dropdown komplain
+    let availableWeeks = [];
 
     function showToast(message) {
         const toast = document.getElementById('toastBox');
@@ -220,7 +229,6 @@
         toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500); 
     }
 
-    // LOAD DATA NAMA MAHASISWA SAAT HALAMAN DIBUKA
     window.onload = function() {
         fetch(webAppUrl)
         .then(res => res.json())
@@ -255,12 +263,42 @@
         document.getElementById("nim").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
     }
 
+    // FUNGSI UNTUK LOGIKA WARNA NILAI
     function getBadgeClass(nilai) {
+        if (nilai === "-") return 'badge-neutral';
         let num = parseFloat(nilai);
-        if (isNaN(num) || num === 0) return 'badge-bad';
+        if (isNaN(num)) return 'badge-bad';
         if (num >= 80) return 'badge-good';
         if (num >= 60) return 'badge-avg';
         return 'badge-bad';
+    }
+
+    // FUNGSI UTAMA: MENGATUR TAMPILAN (LINK/FEEDBACK/BELUM DINILAI)
+    function renderTugasInfo(nilai, linkUrl, labelTugas) {
+        let val = parseFloat(nilai) || 0;
+        let link = (linkUrl || "").toString().trim().toLowerCase();
+
+        // Kasus 1: Asprak sudah mengoreksi (Ada link yang mengandung 'http')
+        if (link.startsWith("http")) {
+            return `
+                <span class="nilai-badge ${getBadgeClass(val)}">${val}</span><br>
+                <a href="${linkUrl}" target="_blank" class="btn-feedback">📄 Feedback ${labelTugas}</a>
+            `;
+        } 
+        
+        // Kasus 2: Mahasiswa tidak mengumpulkan (Asprak mengisi '-', 'tidak', 'null')
+        if (link.includes("tidak") || link === "-" || link === "null" || link === "kosong") {
+            return `
+                <span class="nilai-badge badge-bad">0</span><br>
+                <span class="status-text text-danger">❌ Tidak Mengumpulkan</span>
+            `;
+        }
+
+        // Kasus 3: Kosong / Belum dinilai sama sekali (Asprak belum isi link)
+        return `
+            <span class="nilai-badge badge-neutral">-</span><br>
+            <span class="status-text text-warning">⏳ Sedang Penilaian</span>
+        `;
     }
 
     const overlay = document.getElementById('modalOverlay');
@@ -290,7 +328,6 @@
         overlay.classList.remove('active');
     }
 
-    // FUNGSI CEK NILAI
     function cekNilai() {
         const nm = document.getElementById("nama").value;
         const nim = document.getElementById("nim").value;
@@ -303,19 +340,26 @@
         .then(res => res.json())
         .then(result => {
             if(result.status === "success") {
-                // Populate Data ke Tabel
                 const tbody = document.getElementById("tabelNilaiBody");
                 tbody.innerHTML = "";
                 availableWeeks = [];
 
                 result.data.forEach(item => {
                     availableWeeks.push(item.pertemuan);
+                    
+                    // Render UI berdasarkan ketersediaan Link & Nilai
+                    let htmlTP = renderTugasInfo(item.nilaiTP, item.linkTP, "TP");
+                    let htmlJurnal = renderTugasInfo(item.nilaiJurnal, item.linkJurnal, "Jurnal");
+                    
+                    // Total week tetap ditampilkan angkanya atau '-' jika masih diproses
+                    let totalWeekDisplay = (item.nilaiTotalWeek == 0 && (!item.linkTP || !item.linkJurnal)) ? "-" : item.nilaiTotalWeek;
+
                     let tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td><strong>${item.pertemuan}</strong></td>
-                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiTP)}">${item.nilaiTP}</span></td>
-                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiJurnal)}">${item.nilaiJurnal}</span></td>
-                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiTotalWeek)}">${item.nilaiTotalWeek}</span></td>
+                        <td style="text-align: left;"><strong>${item.pertemuan}</strong></td>
+                        <td>${htmlTP}</td>
+                        <td>${htmlJurnal}</td>
+                        <td><span class="nilai-badge ${getBadgeClass(totalWeekDisplay)}" style="font-size: 15px;">${totalWeekDisplay}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -323,7 +367,6 @@
                 document.getElementById("dispNama").innerText = nm;
                 document.getElementById("dispNIM").innerText = nim;
 
-                // Ganti Section
                 document.getElementById('section1').classList.remove('active');
                 document.getElementById('section2').classList.add('active');
                 updateStepper(2);
@@ -352,7 +395,6 @@
     }
 
     function goToKomplain() {
-        // Isi dropdown pertemuan komplain berdasarkan nilai yg tersedia
         const selectKomp = document.getElementById("komplainPertemuan");
         selectKomp.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
         availableWeeks.forEach(w => {
@@ -372,7 +414,6 @@
         updateStepper(2);
     }
 
-    // FUNGSI SUBMIT KOMPLAIN
     document.getElementById('komplainForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -400,16 +441,14 @@
             if(result.status === "success") { 
                 showResult(true, "Terkirim!", "Komplain kamu berhasil dikirim dan akan segera direview oleh Asisten Praktikum."); 
                 document.getElementById('komplainForm').reset();
-                setTimeout(() => { kembaliKeNilai(); }, 2000); // Otomatis kembali setelah 2 detik
+                setTimeout(() => { kembaliKeNilai(); }, 2000);
             } 
             else { showResult(false, "Gagal Mengirim", result.message); } 
         })
         .catch(error => showResult(false, "Error Sistem", "Terjadi gangguan jaringan. Coba lagi."));
     });
 
-    // ==========================================
     // SCRIPT ANTI INSPECT & KLIK KANAN
-    // ==========================================
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya."); });
     document.onkeydown = function(e) {
         if(e.keyCode == 123) { showToast("⚠️ F12 dikunci, jangan coba-coba inspect!"); return false; }
