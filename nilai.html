@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Nilai & Komplain - Alpro 05-01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --border: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; 
+            background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; 
+        }
+        
+        .container { background: var(--card-bg); width: 100%; max-width: 600px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; }
+        
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        
+        .alert-box { background: #fef2f2; border-left: 4px solid var(--danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 13px; color: #991b1b; }
+        .alert-box.info { background: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+        .alert-box strong { display: block; margin-bottom: 4px; }
+
+        .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .stepper::before { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: var(--border); z-index: 1; }
+        .step { position: relative; z-index: 2; background: var(--card-bg); padding: 0 10px; text-align: center; color: var(--text-muted); font-weight: 500; font-size: 14px; transition: 0.3s;}
+        .step .circle { width: 32px; height: 32px; border-radius: 50%; background: var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; font-weight: 600; transition: 0.3s; }
+        .step.active .circle { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); }
+        .step.active { color: var(--primary); }
+        .step.completed .circle { background: var(--success); color: white; }
+        
+        .form-section { display: none; animation: slideIn 0.4s ease forwards; }
+        .form-section.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
+        
+        select, input[type="text"], textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; }
+        select:focus, input[type="text"]:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
+        textarea { resize: vertical; min-height: 100px; }
+        
+        .btn-group { display: flex; gap: 12px; margin-top: 30px; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
+        .btn-secondary { background: var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; background: #94a3b8; }
+        
+        /* TABEL NILAI */
+        .table-wrapper { overflow-x: auto; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        thead { background: #eef2ff; color: var(--primary); }
+        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { font-weight: 600; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #f8fafc; }
+        .nilai-badge { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+        .badge-good { background: #d1fae5; color: #065f46; }
+        .badge-avg { background: #fef3c7; color: #92400e; }
+        .badge-bad { background: #fee2e2; color: #991b1b; }
+
+        /* Modal & Toast (Sama dengan index) */
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: white; padding: 40px 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .overlay.active .modal { transform: scale(1); }
+        .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .modal h3 { font-size: 18px; color: var(--text-main); margin-bottom: 8px; }
+        .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap; }
+        .modal-icon { font-size: 50px; margin-bottom: 15px; }
+        .btn-close-modal { margin-top: 20px; width: 100%; background: var(--primary); color: white; display: none; }
+        
+        #sysStatus { text-align: center; font-size: 13px; color: var(--primary); margin-top: 15px; font-weight: 500;}
+
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: white; padding: 14px 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 10000; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid var(--danger); width: max-content; max-width: 90%; }
+        .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { font-size: 20px; }
+        .toast-message { font-size: 14px; font-weight: 500; color: var(--text-main); }
+        
+        .nav-link { margin-top: 20px; font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600; transition: 0.2s;}
+        .nav-link:hover { color: var(--primary-hover); text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastBox">
+    <span class="toast-icon">⚠️</span>
+    <span class="toast-message" id="toastMessage">Pesan error di sini</span>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>Transparansi Nilai</h2>
+        <p>Praktikum Alpro 05-01</p>
+    </div>
+
+    <div class="stepper">
+        <div class="step active" id="step1"><div class="circle">1</div>Identitas</div>
+        <div class="step" id="step2"><div class="circle">2</div>Data Nilai</div>
+        <div class="step" id="step3"><div class="circle">3</div>Komplain</div>
+    </div>
+
+    <div id="section1" class="form-section active">
+        <div class="alert-box info">
+            <strong>ℹ️ Informasi</strong>
+            Pilih namamu untuk mengecek nilai TP dan Jurnal setiap minggunya.
+        </div>
+        
+        <div class="form-group">
+            <label>Nama Praktikan *</label>
+            <select id="nama" required onchange="autoFillNIM()" disabled>
+                <option value="">-- Memuat Data Server... --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>NIM (Terisi Otomatis) *</label>
+            <input type="text" id="nim" placeholder="NIM otomatis..." required readonly>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" id="btnCekNilai" class="btn-primary" onclick="cekNilai()" disabled>Cek Nilai Saya 📊</button>
+        </div>
+        <p id="sysStatus">Menghubungkan ke Server Admin...</p>
+    </div>
+
+    <div id="section2" class="form-section">
+        <div class="form-group" style="text-align: center; margin-bottom: 25px;">
+            <h3 style="color: var(--primary); font-size: 18px;" id="dispNama">Nama Mahasiswa</h3>
+            <p style="color: var(--text-muted); font-size: 13px;" id="dispNIM">12345678</p>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pertemuan</th>
+                        <th>Nilai TP</th>
+                        <th>Nilai Jurnal</th>
+                        <th>Nilai Akhir Week</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelNilaiBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-secondary" onclick="resetPage()">⬅ Ganti Nama</button>
+            <button type="button" class="btn-danger" onclick="goToKomplain()">Ada yg salah? Komplain 📢</button>
+        </div>
+    </div>
+
+    <div id="section3" class="form-section">
+        <div class="alert-box">
+            <strong>⚠️ Perhatian</strong>
+            Pastikan komplain dengan sopan dan jelaskan bagian mana yang menurutmu kurang sesuai.
+        </div>
+        
+        <form id="komplainForm">
+            <div class="form-group">
+                <label>Pilih Pertemuan yang Dikomplain *</label>
+                <select id="komplainPertemuan" required>
+                    <option value="">-- Pilih Pertemuan --</option>
+                    </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Jelaskan Keluhanmu *</label>
+                <textarea id="pesanKomplain" placeholder="Contoh: Permisi Mas/Mbak, nilai Jurnal saya di week ini kok kosong ya? Padahal saya sudah mengumpulkan..." required></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="kembaliKeNilai()">⬅ Batal</button>
+                <button type="submit" class="btn-primary">Kirim Komplain 🚀</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<a href="index.html" class="nav-link">⬅ Kembali ke Form Pengumpulan Tugas</a>
+
+<div class="overlay" id="modalOverlay">
+    <div class="modal">
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <h3 id="loadingTitle">Memproses...</h3>
+            <p id="loadingDesc">Sistem sedang mengambil data.</p>
+        </div>
+        <div id="resultState" style="display: none;">
+            <div class="modal-icon" id="resultIcon">✅</div>
+            <h3 id="resultTitle">Berhasil!</h3>
+            <p id="resultMessage">Tugas kamu sudah aman.</p>
+            <button type="button" class="btn-primary btn-close-modal" id="closeModalBtn" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // PASTE WEB APP URL SAMA DENGAN INDEX.HTML
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbykjxp22MGYm1gqKrLDv8Wa0YCpX1NXkDbFDFCHPJUNcEMJJIfO49QT4BLRw8tV1ws/exec"; 
+    
+    let dbMahasiswa = {}; 
+    let toastTimeout;
+    let availableWeeks = []; // Menyimpan data week yang nilainya sudah ada untuk dropdown komplain
+
+    function showToast(message) {
+        const toast = document.getElementById('toastBox');
+        document.getElementById('toastMessage').innerText = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500); 
+    }
+
+    // LOAD DATA NAMA MAHASISWA SAAT HALAMAN DIBUKA
+    window.onload = function() {
+        fetch(webAppUrl)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                const selectNama = document.getElementById("nama");
+                selectNama.innerHTML = '<option value="">-- Cari Nama Kamu --</option>';
+                data.mahasiswa.forEach(mhs => {
+                    dbMahasiswa[mhs.nama] = mhs.nim;
+                    let opt = document.createElement('option');
+                    opt.value = mhs.nama; opt.innerText = mhs.nama;
+                    selectNama.appendChild(opt);
+                });
+
+                document.getElementById("nama").disabled = false;
+                document.getElementById("btnCekNilai").disabled = false;
+
+                document.getElementById("sysStatus").innerText = "Sistem Tersambung ke Database ✅";
+                document.getElementById("sysStatus").style.color = "var(--success)";
+                setTimeout(() => document.getElementById("sysStatus").style.display = "none", 3000);
+            }
+        })
+        .catch(err => {
+            document.getElementById("sysStatus").innerText = "Gagal terhubung ke Database.";
+            document.getElementById("sysStatus").style.color = "var(--danger)";
+            showToast("Gagal memuat daftar mahasiswa. Refresh halaman.");
+        });
+    };
+
+    function autoFillNIM() {
+        const nm = document.getElementById("nama").value;
+        document.getElementById("nim").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
+    }
+
+    function getBadgeClass(nilai) {
+        let num = parseFloat(nilai);
+        if (isNaN(num) || num === 0) return 'badge-bad';
+        if (num >= 80) return 'badge-good';
+        if (num >= 60) return 'badge-avg';
+        return 'badge-bad';
+    }
+
+    const overlay = document.getElementById('modalOverlay');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+
+    function showLoading(title, desc) {
+        overlay.classList.add('active');
+        loadingState.style.display = 'block'; 
+        resultState.style.display = 'none'; 
+        document.getElementById('loadingTitle').innerText = title;
+        document.getElementById('loadingDesc').innerText = desc;
+    }
+
+    function showResult(isSuccess, title, message) {
+        loadingState.style.display = 'none'; 
+        resultState.style.display = 'block';
+        document.getElementById('resultIcon').innerText = isSuccess ? "✅" : "❌";
+        document.getElementById('resultTitle').innerText = title;
+        document.getElementById('resultTitle').style.color = isSuccess ? "var(--success)" : "var(--danger)";
+        document.getElementById('resultMessage').innerText = message;
+        document.getElementById('closeModalBtn').style.display = 'block';
+        document.getElementById('closeModalBtn').style.background = isSuccess ? "var(--success)" : "var(--danger)";
+    }
+
+    function closeModal() {
+        overlay.classList.remove('active');
+    }
+
+    // FUNGSI CEK NILAI
+    function cekNilai() {
+        const nm = document.getElementById("nama").value;
+        const nim = document.getElementById("nim").value;
+        
+        if (!nm || !nim) return showToast("Silakan pilih namamu terlebih dahulu!");
+
+        showLoading("Mencari Nilai...", "Menyinkronkan data dengan spreadsheet Asprak.");
+
+        fetch(webAppUrl + "?action=getNilai&nim=" + nim)
+        .then(res => res.json())
+        .then(result => {
+            if(result.status === "success") {
+                // Populate Data ke Tabel
+                const tbody = document.getElementById("tabelNilaiBody");
+                tbody.innerHTML = "";
+                availableWeeks = [];
+
+                result.data.forEach(item => {
+                    availableWeeks.push(item.pertemuan);
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><strong>${item.pertemuan}</strong></td>
+                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiTP)}">${item.nilaiTP}</span></td>
+                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiJurnal)}">${item.nilaiJurnal}</span></td>
+                        <td><span class="nilai-badge ${getBadgeClass(item.nilaiTotalWeek)}">${item.nilaiTotalWeek}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("dispNama").innerText = nm;
+                document.getElementById("dispNIM").innerText = nim;
+
+                // Ganti Section
+                document.getElementById('section1').classList.remove('active');
+                document.getElementById('section2').classList.add('active');
+                updateStepper(2);
+                closeModal();
+            } else {
+                showResult(false, "Data Tidak Ditemukan", "Nilai untuk NIM kamu belum diinput oleh Asisten Praktikum.");
+            }
+        })
+        .catch(err => {
+            showResult(false, "Error Sistem", "Gagal mengambil data nilai dari server.");
+        });
+    }
+
+    function updateStepper(step) {
+        document.querySelectorAll('.step').forEach((el, index) => {
+            if(index < step - 1) { el.classList.add('completed'); el.classList.remove('active'); } 
+            else if (index === step - 1) { el.classList.add('active'); el.classList.remove('completed'); } 
+            else { el.classList.remove('active', 'completed'); }
+        });
+    }
+
+    function resetPage() {
+        document.getElementById('section2').classList.remove('active');
+        document.getElementById('section1').classList.add('active');
+        updateStepper(1);
+    }
+
+    function goToKomplain() {
+        // Isi dropdown pertemuan komplain berdasarkan nilai yg tersedia
+        const selectKomp = document.getElementById("komplainPertemuan");
+        selectKomp.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
+        availableWeeks.forEach(w => {
+            let opt = document.createElement("option");
+            opt.value = w; opt.innerText = w;
+            selectKomp.appendChild(opt);
+        });
+
+        document.getElementById('section2').classList.remove('active');
+        document.getElementById('section3').classList.add('active');
+        updateStepper(3);
+    }
+
+    function kembaliKeNilai() {
+        document.getElementById('section3').classList.remove('active');
+        document.getElementById('section2').classList.add('active');
+        updateStepper(2);
+    }
+
+    // FUNGSI SUBMIT KOMPLAIN
+    document.getElementById('komplainForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const pert = document.getElementById('komplainPertemuan').value;
+        const pesan = document.getElementById('pesanKomplain').value.trim();
+        const nm = document.getElementById("nama").value;
+        const nim = document.getElementById("nim").value;
+
+        if(!pert) return showToast("Pilih pertemuan yang ingin dikomplain!");
+        if(pesan === "") return showToast("Pesan keluhan tidak boleh kosong!");
+
+        showLoading("Mengirim Komplain...", "Mohon tunggu sebentar.");
+
+        const payload = {
+            action: "komplain",
+            nim: nim,
+            nama: nm,
+            pertemuan: pert,
+            pesan: pesan
+        };
+
+        fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(result => {
+            if(result.status === "success") { 
+                showResult(true, "Terkirim!", "Komplain kamu berhasil dikirim dan akan segera direview oleh Asisten Praktikum."); 
+                document.getElementById('komplainForm').reset();
+                setTimeout(() => { kembaliKeNilai(); }, 2000); // Otomatis kembali setelah 2 detik
+            } 
+            else { showResult(false, "Gagal Mengirim", result.message); } 
+        })
+        .catch(error => showResult(false, "Error Sistem", "Terjadi gangguan jaringan. Coba lagi."));
+    });
+
+    // ==========================================
+    // SCRIPT ANTI INSPECT & KLIK KANAN
+    // ==========================================
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya."); });
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) { showToast("⚠️ F12 dikunci, jangan coba-coba inspect!"); return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { showToast("⚠️ Inspect element dilarang!"); return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { showToast("⚠️ Console dilarang!"); return false; }
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { showToast("⚠️ View Source dilarang!"); return false; }
+    };
+</script>
+</body>
+</html>
