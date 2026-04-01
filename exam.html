@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CBT Praktikum Core Programming</title>
+  <title>Viewer Soal Praktikum</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   
   <style>
@@ -11,68 +11,42 @@
       --color-primary: #4f46e5; --color-primary-hover: #4338ca;
       --color-bg: #f8fafc; --color-surface: #ffffff;
       --color-text: #0f172a; --color-text-muted: #64748b;
-      --color-border: #e2e8f0; --color-danger: #ef4444; --color-success: #10b981;
+      --color-border: #e2e8f0; --color-danger: #ef4444; 
       --font-sans: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); color: var(--color-text); background-color: var(--color-bg); line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
-    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03); }
+    body { font-family: var(--font-sans); color: var(--color-text); background-color: var(--color-bg); line-height: 1.6; }
+    .wrap { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03); }
 
-    /* Sticky Header & Timer */
-    .sticky-hdr { position: sticky; top: 0; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); z-index: 100; padding: 1rem 0; border-bottom: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display: none;}
-    .hdr-container { max-width: 720px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .timer-box { display: flex; align-items: center; gap: 12px; background: var(--color-surface); border: 2px solid var(--color-primary); border-radius: 8px; padding: 6px 16px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1); }
-    .timer-val { font-size: 1.25rem; font-weight: 600; font-family: var(--font-mono); color: var(--color-primary); }
-    .timer-warn { border-color: var(--color-danger); }
-    .timer-warn .timer-val { color: var(--color-danger); animation: pulse 1s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-    /* Input & Buttons */
-    input.std-input, select.std-input { width: 100%; padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; font-family: var(--font-sans); outline: none; transition: 0.2s; margin-bottom: 1rem;}
-    input.std-input:focus, select.std-input:focus { border-color: var(--color-primary); }
+    .sticky-hdr { position: sticky; top: 0; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); z-index: 100; padding: 1rem 0; border-bottom: 1px solid var(--color-border); display: none;}
+    .hdr-container { max-width: 800px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; }
+    
+    input.std-input { width: 100%; padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; margin-bottom: 1rem; font-family: var(--font-sans);}
+    input.std-input:focus { border-color: var(--color-primary); }
     .btn-submit { padding: 14px 28px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; font-family: var(--font-sans);}
-    .btn-submit:hover:not(:disabled) { background: var(--color-primary-hover); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
+    .btn-submit:hover:not(:disabled) { background: var(--color-primary-hover); transform: translateY(-2px); }
     .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* UI Ujian */
-    .progress-bar { background: var(--color-border); border-radius: 99px; height: 6px; margin-bottom: 1.5rem; overflow: hidden; }
-    .progress-fill { background: var(--color-primary); height: 100%; border-radius: 99px; transition: width 0.4s; }
-    .badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 99px; margin-bottom: 10px;}
-    .mc-opt { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; font-weight: 500;}
-    .mc-opt.selected { background: #eef2ff; border-color: var(--color-primary); color: var(--color-primary); }
-    .mc-opt.correct { background: #ecfdf5; border-color: var(--color-success); color: #065f46; }
-    .mc-opt.wrong { background: #fef2f2; border-color: var(--color-danger); color: #991b1b; }
-    .code-block { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 16px; font-family: var(--font-mono); font-size: 0.9rem; margin-bottom: 16px; overflow-x: auto; border: 1px solid #333;}
-    .code-input { width: 100%; padding: 10px 12px; border: 2px solid var(--color-border); border-radius: 8px; font-family: var(--font-mono); font-size: 0.9rem; outline: none; transition: 0.2s;}
-    .code-input.correct-input { border-color: var(--color-success); background: #ecfdf5; }
-    .code-input.wrong-input { border-color: var(--color-danger); background: #fef2f2; }
-    textarea.essay-input { width: 100%; min-height: 120px; padding: 14px; border: 2px solid var(--color-border); border-radius: 8px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; resize: vertical;}
-    
-    .tab-alert { position: fixed; top: 0; left: 0; right: 0; background: var(--color-danger); color: white; text-align: center; padding: 12px; font-size: 0.95rem; font-weight: 600; z-index: 9999; transform: translateY(-100%); transition: transform 0.3s;}
-    .tab-alert.show { transform: translateY(0); }
-    
-    /* Lobby Screen Specifics */
-    #countdown-lobby { font-size: 3rem; font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); margin: 10px 0; }
+    #countdown-lobby { font-size: 3.5rem; font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); margin: 10px 0; }
     .lobby-box { background: #eef2ff; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px dashed #c7d2fe;}
+
+    .q-number { font-size: 1.25rem; font-weight: 700; color: var(--color-primary); margin-bottom: 10px; border-bottom: 2px solid #eef2ff; padding-bottom: 5px;}
+    .q-text { font-size: 1rem; color: var(--color-text); white-space: pre-wrap; font-family: var(--font-mono); background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid var(--color-border);}
   </style>
 </head>
 <body>
 
-<div class="tab-alert" id="tabAlert">Peringatan: Kamu berpindah tab! Kembali ke halaman ujian.</div>
-
 <div class="sticky-hdr" id="sticky-header">
   <div class="hdr-container">
     <div>
-      <div style="font-size: 1.125rem; font-weight: 600;">Ujian CBT Praktikum</div>
+      <div style="font-size: 1.125rem; font-weight: 600;">Soal Praktikum</div>
       <div style="font-size: 0.875rem; color: var(--color-text-muted);" id="exam-sub">Nama — NIM</div>
     </div>
-    <div class="timer-box" id="timerBox">
-      <div>
-        <div style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Sisa Waktu</div>
-        <div class="timer-val" id="timerVal">60:00</div>
-      </div>
+    <div style="text-align: right;">
+      <div style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Kerjakan di</div>
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--color-primary);">VS Code</div>
     </div>
   </div>
 </div>
@@ -80,16 +54,12 @@
 <div class="wrap" id="app">
   
   <div class="card" id="screen-login" style="max-width: 460px; margin: 4rem auto; text-align: center;">
-    <h2 style="margin-bottom: 5px;">CBT Core Programming</h2>
-    <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 20px;">Masukkan NIM dan Kelas untuk mengecek jadwal sesimu.</p>
+    <h2 style="margin-bottom: 5px;">Portal Soal Praktikum</h2>
+    <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 20px;">Masukkan NIM untuk mengecek jadwal dan mengunduh soal.</p>
     
     <input type="text" class="std-input" id="inp-nim" placeholder="NIM (Contoh: 12022...)" autocomplete="off">
-    <select class="std-input" id="inp-kelas">
-      <option value="">— Pilih Kelas —</option>
-      <option>Kelas A</option><option>Kelas B</option>
-    </select>
     
-    <button class="btn-submit" onclick="checkJadwal()" id="btn-login">Cek Jadwal Server 🔍</button>
+    <button class="btn-submit" onclick="checkJadwal()" id="btn-login">Masuk ke Ruang Tunggu</button>
     <p id="login-msg" style="color: var(--color-danger); font-size: 14px; margin-top: 15px; font-weight: 500;"></p>
   </div>
 
@@ -103,52 +73,16 @@
       <p id="lobby-status" style="font-size: 0.9rem; color: var(--color-text-muted); margin-top: 5px;">Sistem sedang menghitung jadwal...</p>
     </div>
     
-    <button class="btn-submit" id="btn-start-exam" onclick="fetchSoalDanMulai()" disabled>Mulai Ujian 🚀</button>
+    <button class="btn-submit" id="btn-start-exam" onclick="fetchSoal()" disabled>Buka Soal Ujian 🚀</button>
   </div>
 
   <div id="screen-exam" style="display:none;">
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2rem; text-align:center;">
-      <div style="background: white; border: 1px solid var(--color-border); padding: 15px; border-radius: 10px;">
-        <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-primary);" id="m-total">100</div>
-        <div style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">POIN SAAT INI</div>
-      </div>
-      <div style="background: white; border: 1px solid var(--color-border); padding: 15px; border-radius: 10px;">
-        <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-primary);" id="m-done">0/0</div>
-        <div style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">TERJAWAB</div>
-      </div>
-      <div style="background: white; border: 1px solid var(--color-border); padding: 15px; border-radius: 10px;">
-        <div style="font-size: 1.5rem; font-weight: 600; color: var(--color-danger);" id="m-penalty">0</div>
-        <div style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">PENALTI</div>
-      </div>
+    <div class="card" style="background: #eef2ff; border-color: #c7d2fe; text-align: center;">
+      <h3 style="color: var(--color-primary); margin-bottom: 5px;">Aturan Pengerjaan</h3>
+      <p style="font-size: 0.9rem; color: var(--color-text-muted);">Kerjakan soal di bawah ini menggunakan <b>Visual Studio Code</b>. Setelah selesai, kumpulkan file jawaban sesuai instruksi asisten lab.</p>
     </div>
 
     <div id="questions-container"></div>
-    <div style="margin-top:3rem; padding-top:2rem; border-top: 2px dashed var(--color-border);">
-      <button class="btn-submit" onclick="confirmSubmit()" id="btn-submit-exam">Kumpulkan Jawaban 📤</button>
-    </div>
-  </div>
-
-  <div id="screen-result" style="display:none; max-width: 500px; margin: 4rem auto; text-align: center;">
-    <div class="card">
-      <h3 style="color: var(--color-success); margin-bottom: 10px;">✅ Ujian Selesai!</h3>
-      <div style="font-size: 4rem; font-weight: 700; color: var(--color-primary); line-height: 1;" id="res-score">--</div>
-      <p style="color: var(--color-text-muted); margin: 10px 0 20px;">Skor Akhir Sementara</p>
-      
-      <div style="text-align: left; background: var(--color-bg); padding: 1.5rem; border-radius: 8px; font-size: 0.95rem;">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border);">
-          <span style="color: var(--color-text-muted);">Sesi</span><strong id="r-sesi">—</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border);">
-          <span style="color: var(--color-text-muted);">Penalti Terkena</span><strong id="r-penalty" style="color: var(--color-danger);">—</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span style="color: var(--color-text-muted);">Pelanggaran Tab</span><strong id="r-tabs" style="color: var(--color-danger);">—</strong>
-        </div>
-      </div>
-      <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 20px;">Jawaban kamu sudah direkap ke dalam Spreadsheet Admin.</p>
-    </div>
   </div>
 
 </div>
@@ -156,67 +90,40 @@
 <script>
   // ==========================================
   // 🔴 GANTI URL INI DENGAN URL WEB APP KAMU!
-  const API_URL = "https://script.google.com/macros/s/AKfycbxuYZ4UIiIeuyYZJuzTyuSCeIxS1rB62feiNOapgb5F4Pd9irjBr5IdbWWu_EpkuzJxQw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbykbnrG8XALV4ptvbS_RBBeJjQYpeVpeKuVnLBJLoBu89LsFK4i6DK2I3GBmXYsBDZFhA/exec";
   // ==========================================
 
-  const CONFIG = { duration: 60 * 60, penaltyPerWrong: 5, maxPenaltyPerQ: 3 };
-  
-  let userData = { nim: "", nama: "", kelas: "", sesi: "" };
-  let QUESTIONS = [];
-  let state = {
-    timerLeft: CONFIG.duration, timerInterval: null,
-    tabSwitches: 0, penaltyTotal: 0,
-    answers: {}, codeAttempts: {}, codeScores: {}, mcAnswered: {},
-    done: 0, submitted: false
-  };
+  let userData = { nim: "", nama: "", sesi: "" };
   let lobbyInterval;
 
-  // Cek Autosave saat halaman diload
-  window.onload = function() {
-    const savedState = localStorage.getItem('examState');
-    const savedQuestions = localStorage.getItem('examQuestions');
-    if(savedState && savedQuestions) {
-      if(confirm("Ditemukan sesi ujian yang belum selesai. Lanjutkan?")) {
-        state = JSON.parse(savedState);
-        QUESTIONS = JSON.parse(savedQuestions);
-        userData = state.userData; // Ambil data user dari state
-        document.getElementById('screen-login').style.display = 'none';
-        mulaiUjianUI(true); // Lanjut ujian
-      } else {
-        localStorage.removeItem('examState');
-        localStorage.removeItem('examQuestions');
-      }
-    }
-  };
-
-  // --- TAHAP 1: LOGIN & CEK JADWAL ---
+  // --- 1. LOGIN & CEK JADWAL ---
   function checkJadwal() {
     const nim = document.getElementById('inp-nim').value.trim();
-    const kelas = document.getElementById('inp-kelas').value;
-    if (!nim || !kelas) return alert("Isi NIM dan Kelas!");
+    if (!nim) return alert("NIM tidak boleh kosong!");
     
-    document.getElementById('btn-login').innerText = "Mengecek ke Server... ⏳";
-    document.getElementById('btn-login').disabled = true;
+    const btn = document.getElementById('btn-login');
+    btn.innerText = "Mengecek ke Server... ⏳";
+    btn.disabled = true;
 
     fetch(`${API_URL}?action=checkLobby&nim=${nim}`)
       .then(res => res.json())
       .then(data => {
         if (data.status === "error") {
           document.getElementById('login-msg').innerText = data.message;
-          document.getElementById('btn-login').innerText = "Cek Jadwal Server 🔍";
-          document.getElementById('btn-login').disabled = false;
+          btn.innerText = "Masuk ke Ruang Tunggu";
+          btn.disabled = false;
         } else {
-          userData = { nim: data.data.nim, nama: data.data.nama, kelas: kelas, sesi: data.data.sesi };
+          userData = { nim: data.data.nim, nama: data.data.nama, sesi: data.data.sesi };
           setupLobby(data.startTime, data.serverTime);
         }
       }).catch(err => {
-        alert("Gagal koneksi ke server.");
-        document.getElementById('btn-login').innerText = "Cek Jadwal Server 🔍";
-        document.getElementById('btn-login').disabled = false;
+        document.getElementById('login-msg').innerText = "Gagal terhubung. Pastikan URL Web App benar dan internet stabil.";
+        btn.innerText = "Coba Lagi";
+        btn.disabled = false;
       });
   }
 
-  // --- TAHAP 2: LOBBY & RAHASIA SESI ---
+  // --- 2. LOBBY COUNTDOWN ---
   function setupLobby(startTime, serverTime) {
     document.getElementById('screen-login').style.display = 'none';
     document.getElementById('screen-lobby').style.display = 'block';
@@ -231,248 +138,70 @@
       const diff = startTime - now;
 
       if (diff <= 0) {
-        // WAKTUNYA UJIAN!
         clearInterval(lobbyInterval);
-        document.getElementById('lobby-greeting').innerHTML = `Halo, ${userData.nama}! Kamu masuk di <strong>${userData.sesi}</strong>.`;
+        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>! Sesi kamu (${userData.sesi}) sudah dimulai.`;
         document.getElementById('countdown-lobby').innerText = "00:00:00";
-        document.getElementById('lobby-status').innerText = "Waktu ujian telah tiba!";
+        document.getElementById('lobby-status').innerText = "Akses soal telah dibuka!";
         document.getElementById('btn-start-exam').disabled = false;
-        document.getElementById('btn-start-exam').style.animation = "pulse 1s infinite"; 
       } else if (diff > 900000) { 
-        // LEBIH DARI H-15 MENIT (Mode Rahasia Sesi)
-        document.getElementById('lobby-greeting').innerHTML = `Halo, ${userData.nama}!`;
+        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>!`;
         document.getElementById('countdown-lobby').innerText = `${jamMulai} WIB`; 
         document.getElementById('countdown-lobby').style.fontSize = "2.5rem";
-        document.getElementById('lobby-status').innerText = "Ini jam ujianmu. Kembali ke sini minimal 15 menit sebelum waktu tersebut.";
+        document.getElementById('lobby-status').innerText = "Jadwalmu masih lama. Kembali ke sini 15 menit sebelum ujian.";
       } else {
-        // MASUK H-15 MENIT (Sesi Direveal)
-        document.getElementById('lobby-greeting').innerHTML = `Halo, ${userData.nama}! Kamu masuk di <strong>${userData.sesi}</strong>.`;
-        document.getElementById('countdown-lobby').style.fontSize = "3rem";
+        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>! Sesi kamu (${userData.sesi}) akan segera dimulai.`;
+        document.getElementById('countdown-lobby').style.fontSize = "3.5rem";
         
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
         document.getElementById('countdown-lobby').innerText = (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-        document.getElementById('lobby-status').innerText = "Persiapkan dirimu. Dilarang membuka tab lain saat ujian.";
+        document.getElementById('lobby-status').innerText = "Bersiaplah untuk membuka VS Code.";
       }
     }, 1000);
   }
 
-  // --- TAHAP 3: FETCH SOAL DARI SPREADSHEET ---
-  function fetchSoalDanMulai() {
-    document.getElementById('btn-start-exam').innerText = "Mengunduh Soal... ⏳";
-    document.getElementById('btn-start-exam').disabled = true;
-    document.getElementById('btn-start-exam').style.animation = "none";
+  // --- 3. FETCH SOAL & TAMPILKAN ---
+  function fetchSoal() {
+    const btn = document.getElementById('btn-start-exam');
+    btn.innerText = "Mengunduh Soal... ⏳";
+    btn.disabled = true;
 
     fetch(`${API_URL}?action=getSoal&sesi=${userData.sesi}`)
       .then(res => res.json())
       .then(data => {
-        QUESTIONS = data.soal;
-        localStorage.setItem('examQuestions', JSON.stringify(QUESTIONS)); // Save soal to local
-        
-        // Reset state baru
-        QUESTIONS.forEach(q => { state.codeAttempts[q.id] = 0; state.codeScores[q.id] = q.points; });
-        state.userData = userData; 
-        
-        document.getElementById('screen-lobby').style.display = 'none';
-        mulaiUjianUI(false);
-      });
-  }
-
-  // --- TAHAP 4: RENDER UJIAN UTAMA ---
-  function mulaiUjianUI(isResume) {
-    document.getElementById('screen-exam').style.display = 'block';
-    document.getElementById('sticky-header').style.display = 'block';
-    document.getElementById('exam-sub').textContent = userData.nama + ' — ' + userData.nim;
-    
-    renderQuestions();
-    
-    // Jika Resume, kembalikan tampilan
-    if(isResume) {
-      QUESTIONS.forEach(q => {
-        if(q.type === 'mc' && state.mcAnswered[q.id]) selectMC(q.id, state.answers[q.id], q.answer, q.points, true);
-        else if (q.type === 'essay' && state.answers[q.id]) document.getElementById(`essay-${q.id}`).value = state.answers[q.id];
-        else if (q.type === 'code' && state.answers[q.id + '_done']) {
-           document.getElementById(`checkbtn-${q.id}`).disabled = true;
-           document.getElementById(`blank-${q.id}-0`).value = state.answers[q.id+'_ans'] || ""; // Asumsi titik pertama saja buat simplifikasi
+        if (data.status === "error") {
+            alert(data.message);
+            btn.innerText = "Buka Soal Ujian 🚀";
+            btn.disabled = false;
+            return;
         }
+
+        document.getElementById('screen-lobby').style.display = 'none';
+        document.getElementById('sticky-header').style.display = 'block';
+        document.getElementById('screen-exam').style.display = 'block';
+        document.getElementById('exam-sub').textContent = userData.nama + ' — ' + userData.nim;
+        
+        let htmlSoal = "";
+        data.soal.forEach(q => {
+          // Ganti \n dari spreadsheet menjadi tag <br> di HTML
+          let formattedText = q.text.replace(/\n/g, '<br>');
+          htmlSoal += `
+            <div class="card">
+              <div class="q-number">Soal Nomor ${q.no}</div>
+              <div class="q-text">${formattedText}</div>
+            </div>`;
+        });
+        
+        document.getElementById('questions-container').innerHTML = htmlSoal;
+      }).catch(err => {
+        alert("Gagal mengunduh soal. Coba klik lagi.");
+        btn.innerText = "Buka Soal Ujian 🚀";
+        btn.disabled = false;
       });
-      updateMetrics();
-    }
-    
-    saveStateToLocal();
-    startTimer();
   }
 
-  function renderQuestions() {
-    let html = ""; let mcIdx = 0, codeIdx = 0, essayIdx = 0;
-    QUESTIONS.forEach((q, i) => {
-      if (q.type === 'mc') { mcIdx++; html += renderMC(q, mcIdx); } 
-      else if (q.type === 'code') { codeIdx++; html += renderCode(q, codeIdx); } 
-      else { essayIdx++; html += renderEssay(q, essayIdx); }
-    });
-    document.getElementById('questions-container').innerHTML = html;
-  }
-
-  function renderMC(q, idx) {
-    const opts = q.options.map((o, oi) => `<div class="mc-opt" id="opt-${q.id}-${oi}" onclick="selectMC('${q.id}',${oi},${q.answer},${q.points})"><span>${o}</span></div>`).join('');
-    return `<div class="card" id="qcard-${q.id}">
-      <span class="badge" style="background:#e0e7ff; color:#3730a3;">Pilihan Ganda</span>
-      <div style="font-weight:600; margin: 10px 0;">Soal ${idx}: ${q.text}</div>${opts}
-    </div>`;
-  }
-
-  function renderCode(q, idx) {
-    const blanks = q.blanks.map((b, bi) => `<input class="code-input anti-paste" id="blank-${q.id}-${bi}" placeholder="${b.placeholder}" onpaste="return false;" autocomplete="off" style="margin-bottom:10px;"/>`).join('');
-    return `<div class="card" id="qcard-${q.id}">
-      <span class="badge" style="background:#fce7f3; color:#9d174d;">Coding Rumpang</span>
-      <div style="font-weight:600; margin: 10px 0;">Soal ${idx}: ${q.text}</div>
-      <div class="code-block">${q.code.replace(/\n/g,'<br>').replace(/ /g, '&nbsp;')}</div>
-      ${blanks}
-      <button class="btn-submit" id="checkbtn-${q.id}" onclick="checkCode('${q.id}')" style="padding: 10px; font-size: 0.9rem; margin-top: 10px;">Cek Syntax Sistem</button>
-      <div id="code-feedback-${q.id}" style="margin-top:10px; font-size: 0.85rem;"></div>
-    </div>`;
-  }
-
-  function renderEssay(q, idx) {
-    return `<div class="card" id="qcard-${q.id}">
-      <span class="badge" style="background:#dcfce7; color:#166534;">Essay</span>
-      <div style="font-weight:600; margin: 10px 0;">Soal ${idx}: ${q.text}</div>
-      <textarea class="essay-input anti-paste" id="essay-${q.id}" placeholder="Ketik jawabanmu di sini..." oninput="saveEssay('${q.id}')" onpaste="return false;"></textarea>
-    </div>`;
-  }
-
-  // --- LOGIK INPUT JAWABAN ---
-  function selectMC(qid, optIdx, correct, points, isResume = false) {
-    if (state.mcAnswered[qid] && !isResume) return;
-    state.answers[qid] = optIdx;
-    
-    QUESTIONS.find(q => q.id === qid).options.forEach((_, oi) => {
-      const el = document.getElementById(`opt-${qid}-${oi}`);
-      el.classList.remove('selected','correct','wrong');
-      if (oi === optIdx) {
-        el.classList.add('selected');
-        if (optIdx === correct) el.classList.add('correct');
-        else el.classList.add('wrong');
-      } else if (oi === correct && state.mcAnswered[qid]) el.classList.add('correct');
-    });
-
-    if(!isResume) {
-      state.answers[qid + '_score'] = (optIdx === correct) ? points : 0;
-      state.mcAnswered[qid] = true;
-      state.done++; updateMetrics(); saveStateToLocal();
-    }
-  }
-
-  function checkCode(qid) {
-    const q = QUESTIONS.find(q => q.id === qid);
-    let allCorrect = true;
-    
-    q.blanks.forEach((b, bi) => {
-      const inp = document.getElementById(`blank-${q.id}-${bi}`);
-      state.answers[qid+'_ans'] = inp.value; // Save input for resume
-      if (inp.value.trim().toLowerCase() !== b.answer.toLowerCase()) allCorrect = false;
-    });
-
-    const fb = document.getElementById(`code-feedback-${qid}`);
-    if (allCorrect) {
-      fb.innerHTML = `<span style="color:var(--color-success);">✅ Benar! Sempurna.</span>`;
-      document.getElementById(`checkbtn-${qid}`).disabled = true;
-      if (!state.answers[qid + '_done']) { state.answers[qid + '_done'] = true; state.done++; updateMetrics(); }
-      state.answers[qid + '_score'] = state.codeScores[qid];
-    } else {
-      state.codeAttempts[qid]++;
-      const pen = CONFIG.penaltyPerWrong;
-      state.codeScores[qid] = Math.max(0, state.codeScores[qid] - pen);
-      state.penaltyTotal += pen;
-      
-      fb.innerHTML = `<span style="color:var(--color-danger);">❌ Syntax Error. Terkena penalti -${pen} poin. Sisa ${CONFIG.maxPenaltyPerQ - state.codeAttempts[qid]} percobaan.</span>`;
-      
-      if (state.codeAttempts[qid] >= CONFIG.maxPenaltyPerQ) {
-        document.getElementById(`checkbtn-${qid}`).disabled = true;
-        if (!state.answers[qid + '_done']) { state.answers[qid + '_done'] = true; state.done++; updateMetrics(); }
-      }
-      updateMetrics();
-    }
-    saveStateToLocal();
-  }
-
-  function saveEssay(qid) {
-    const val = document.getElementById(`essay-${qid}`).value.trim();
-    state.answers[qid] = val;
-    if (!state.answers[qid + '_done'] && val.length > 10) { state.answers[qid + '_done'] = true; state.done++; updateMetrics(); }
-    saveStateToLocal();
-  }
-
-  function updateMetrics() {
-    document.getElementById('m-done').textContent = state.done + '/' + QUESTIONS.length;
-    document.getElementById('progressFill').style.width = (state.done / QUESTIONS.length * 100) + '%';
-    document.getElementById('m-penalty').textContent = state.penaltyTotal;
-    
-    let baseScore = 100 - state.penaltyTotal; // Simplified logic for UI total display
-    document.getElementById('m-total').textContent = Math.max(0, baseScore);
-  }
-
-  function saveStateToLocal() { if(!state.submitted) localStorage.setItem('examState', JSON.stringify(state)); }
-
-  // --- TIMER & SUBMIT (TAHAP 5) ---
-  function startTimer() {
-    state.timerInterval = setInterval(() => {
-      state.timerLeft--;
-      if (state.timerLeft <= 0) { clearInterval(state.timerInterval); submitExam(); return; }
-      const m = Math.floor(state.timerLeft / 60), s = state.timerLeft % 60;
-      document.getElementById('timerVal').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      if (state.timerLeft <= 300) document.getElementById('timerBox').classList.add('timer-warn');
-      if(state.timerLeft % 10 === 0) saveStateToLocal(); 
-    }, 1000);
-  }
-
-  function confirmSubmit() { if (confirm('Kumpulkan ke server sekarang?')) submitExam(); }
-
-  function submitExam() {
-    if (state.submitted) return;
-    state.submitted = true; clearInterval(state.timerInterval);
-    document.getElementById('btn-submit-exam').innerText = "Mengirim ke Server... ⏳";
-    document.getElementById('btn-submit-exam').disabled = true;
-    
-    // Kalkulasi Skor Asli
-    let finalScore = 0;
-    QUESTIONS.forEach(q => {
-      if (q.type === 'mc') finalScore += (state.answers[q.id + '_score'] || 0);
-      else if (q.type === 'code') finalScore += (state.codeScores[q.id] || 0);
-      else finalScore += q.points; // Asumsi essay dinilai full by system dulu
-    });
-
-    const payload = {
-        nim: userData.nim, nama: userData.nama, sesi: userData.sesi,
-        skor: finalScore, penalti: state.penaltyTotal, tabSwitches: state.tabSwitches
-    };
-
-    fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
-      .then(res => res.json())
-      .then(result => {
-          document.getElementById('sticky-header').style.display = 'none';
-          document.getElementById('screen-exam').style.display = 'none';
-          document.getElementById('screen-result').style.display = 'block';
-          
-          document.getElementById('res-score').textContent = finalScore;
-          document.getElementById('r-sesi').textContent = userData.sesi;
-          document.getElementById('r-penalty').textContent = state.penaltyTotal + ' Poin';
-          document.getElementById('r-tabs').textContent = state.tabSwitches + ' Kali';
-          
-          localStorage.removeItem('examState'); localStorage.removeItem('examQuestions');
-      }).catch(err => alert("Gagal mengirim data. Hubungi Asisten Lab!"));
-  }
-
-  // --- ANTI CHEAT ---
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden && !state.submitted && document.getElementById('screen-exam').style.display === 'block') {
-      state.tabSwitches++; saveStateToLocal();
-      const alert = document.getElementById('tabAlert');
-      alert.classList.add('show'); setTimeout(() => alert.classList.remove('show'), 3000);
-    }
-  });
-
+  // Anti Inspect (Hanya mencegah iseng, gampang dibypass orang pro, tapi cukup buat maba)
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.key === 'F12') e.preventDefault();
