@@ -3,205 +3,340 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Viewer Soal Praktikum</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <title>Portal Soal Praktikum - Telkom University</title>
   
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
   <style>
     :root {
-      --color-primary: #4f46e5; --color-primary-hover: #4338ca;
-      --color-bg: #f8fafc; --color-surface: #ffffff;
-      --color-text: #0f172a; --color-text-muted: #64748b;
-      --color-border: #e2e8f0; --color-danger: #ef4444; 
-      --font-sans: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --danger-bg: #fef2f2;
+      --success: #10b981;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); color: var(--color-text); background-color: var(--color-bg); line-height: 1.6; }
-    .wrap { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
-    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03); }
-
-    .sticky-hdr { position: sticky; top: 0; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); z-index: 100; padding: 1rem 0; border-bottom: 1px solid var(--color-border); display: none;}
-    .hdr-container { max-width: 800px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
     
-    input.std-input { width: 100%; padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; margin-bottom: 1rem; font-family: var(--font-sans);}
-    input.std-input:focus { border-color: var(--color-primary); }
-    .btn-submit { padding: 14px 28px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; font-family: var(--font-sans);}
-    .btn-submit:hover:not(:disabled) { background: var(--color-primary-hover); transform: translateY(-2px); }
-    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+    .wrap { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+    
+    /* Card Styles */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .card-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
+    
+    /* Inputs & Buttons */
+    .input-group { margin-bottom: 1.5rem; text-align: left; }
+    .std-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; transition: 0.2s; color: var(--text-main); }
+    .std-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    
+    .btn-submit { display: flex; justify-content: center; align-items: center; width: 100%; padding: 14px 28px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-submit:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    #countdown-lobby { font-size: 3.5rem; font-family: var(--font-mono); font-weight: 700; color: var(--color-primary); margin: 10px 0; }
-    .lobby-box { background: #eef2ff; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px dashed #c7d2fe;}
+    /* Sticky Header untuk Ujian */
+    .sticky-hdr { position: sticky; top: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid var(--border); display: none; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .hdr-container { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+    .hdr-title { font-weight: 700; font-size: 1.125rem; }
+    .hdr-sub { font-size: 0.85rem; color: var(--text-muted); }
+    
+    .exam-timer { background: #eef2ff; color: var(--primary); padding: 8px 16px; border-radius: 8px; font-family: 'Fira Code', monospace; font-weight: 700; font-size: 1.25rem; border: 1px solid #c7d2fe; letter-spacing: 1px; }
+    .exam-timer.danger { background: var(--danger-bg); color: #b91c1c; border-color: #fecaca; animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-    .q-number { font-size: 1.25rem; font-weight: 700; color: var(--color-primary); margin-bottom: 10px; border-bottom: 2px solid #eef2ff; padding-bottom: 5px;}
-    .q-text { font-size: 1rem; color: var(--color-text); white-space: pre-wrap; font-family: var(--font-mono); background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid var(--color-border);}
+    /* Lobby Room */
+    .lobby-box { background: #eef2ff; padding: 2rem 1rem; border-radius: 12px; margin: 1.5rem 0; border: 1px dashed #a5b4fc; text-align: center; }
+    #countdown-lobby { font-size: 4rem; font-family: 'Fira Code', monospace; font-weight: 700; color: var(--primary); margin: 10px 0; line-height: 1; letter-spacing: -2px;}
+    .lobby-subtitle { font-size: 0.85rem; font-weight: 600; color: var(--primary); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* Pertanyaan Viewer */
+    .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .q-header { display: flex; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #f1f5f9; }
+    .q-number { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+    .q-text { font-size: 1rem; color: var(--text-main); white-space: pre-wrap; background: #f8fafc; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border); font-family: 'Inter', sans-serif; line-height: 1.7; }
+    .q-text code { font-family: 'Fira Code', monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+    .q-img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--border); }
+    
+    /* Pesan Error */
+    #login-msg { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; font-weight: 500; min-height: 20px; }
   </style>
 </head>
 <body>
 
-<div class="sticky-hdr" id="sticky-header">
+<div class="sticky-hdr" id="exam-header">
   <div class="hdr-container">
     <div>
-      <div style="font-size: 1.125rem; font-weight: 600;">Soal Praktikum</div>
-      <div style="font-size: 0.875rem; color: var(--color-text-muted);" id="exam-sub">Nama — NIM</div>
+        <div class="hdr-title" id="user-display">Nama Praktikan</div>
+        <div class="hdr-sub">Selesaikan jawaban di VS Code</div>
     </div>
-    <div style="text-align: right;">
-      <div style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Kerjakan di</div>
-      <div style="font-size: 1.1rem; font-weight: 700; color: var(--color-primary);">VS Code</div>
-    </div>
+    <div class="exam-timer" id="main-timer">00:00:00</div>
   </div>
 </div>
 
 <div class="wrap" id="app">
   
-  <div class="card" id="screen-login" style="max-width: 460px; margin: 4rem auto; text-align: center;">
-    <h2 style="margin-bottom: 5px;">Portal Soal Praktikum</h2>
-    <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 20px;">Masukkan NIM untuk mengecek jadwal dan mengunduh soal.</p>
+  <div class="card" id="screen-login" style="max-width: 480px; margin: 4rem auto; text-align: center;">
+    <h2 class="card-title">Portal Soal Praktikum</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Masukkan NIM kamu untuk mengakses ruang tunggu ujian.</p>
     
-    <input type="text" class="std-input" id="inp-nim" placeholder="NIM (Contoh: 12022...)" autocomplete="off">
+    <div class="input-group">
+      <input type="text" class="std-input" id="inp-nim" placeholder="Masukkan NIM kamu..." autocomplete="off">
+    </div>
     
-    <button class="btn-submit" onclick="checkJadwal()" id="btn-login">Masuk ke Ruang Tunggu</button>
-    <p id="login-msg" style="color: var(--color-danger); font-size: 14px; margin-top: 15px; font-weight: 500;"></p>
+    <button class="btn-submit" id="btn-login" onclick="checkJadwal()">Masuk Lobby</button>
+    <p id="login-msg"></p>
   </div>
 
   <div class="card" id="screen-lobby" style="display: none; max-width: 500px; margin: 4rem auto; text-align: center;">
-    <h2 style="margin-bottom: 5px;">Ruang Tunggu</h2>
-    <p id="lobby-greeting" style="font-size: 1.1rem;">Halo, [Nama]!</p>
+    <h2 class="card-title">Ruang Tunggu</h2>
+    <p id="lobby-greeting" style="font-size: 1.1rem; color: var(--text-main);">Halo!</p>
     
     <div class="lobby-box">
-      <p style="margin: 0; font-size: 0.85rem; color: var(--color-primary); font-weight: 600; letter-spacing: 0.05em;">UJIAN DIMULAI PADA:</p>
-      <div id="countdown-lobby">--:--</div>
-      <p id="lobby-status" style="font-size: 0.9rem; color: var(--color-text-muted); margin-top: 5px;">Sistem sedang menghitung jadwal...</p>
+      <p class="lobby-subtitle" id="lobby-label-time">UJIAN DIMULAI PADA:</p>
+      <div id="countdown-lobby">--:--:--</div>
+      <p id="lobby-status" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;"></p>
     </div>
     
     <button class="btn-submit" id="btn-start-exam" onclick="fetchSoal()" disabled>Buka Soal Ujian 🚀</button>
   </div>
 
-  <div id="screen-exam" style="display:none;">
+  <div id="screen-soal" style="display: none;">
     <div class="card" style="background: #eef2ff; border-color: #c7d2fe; text-align: center;">
-      <h3 style="color: var(--color-primary); margin-bottom: 5px;">Aturan Pengerjaan</h3>
-      <p style="font-size: 0.9rem; color: var(--color-text-muted);">Kerjakan soal di bawah ini menggunakan <b>Visual Studio Code</b>. Setelah selesai, kumpulkan file jawaban sesuai instruksi asisten lab.</p>
+      <h3 style="color: var(--primary); margin-bottom: 5px;">Aturan Pengerjaan</h3>
+      <p style="font-size: 0.95rem; color: var(--text-muted);">Kerjakan soal di bawah ini menggunakan <b>Visual Studio Code</b> atau IDE pilihanmu. Perhatikan sisa waktu di atas.</p>
     </div>
 
     <div id="questions-container"></div>
+    
+    <div class="card" style="text-align: center; border: 2px dashed #cbd5e1; background: transparent; box-shadow: none;">
+        <p style="font-weight: 600; color: var(--text-muted);">Akhir dari daftar soal.</p>
+    </div>
+  </div>
+
+  <div class="card" id="screen-timeout" style="display: none; text-align: center; border: 2px solid var(--danger); max-width: 500px; margin: 4rem auto;">
+    <h1 style="color: var(--danger); font-size: 3rem; margin-bottom: 10px; line-height: 1;">WAKTU HABIS!</h1>
+    <p style="color: var(--text-main); margin-bottom: 1.5rem; font-size: 1.05rem;">Akses ujian untuk sesi kamu telah ditutup.</p>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">Segera kumpulkan file jawaban di portal pengumpulan sesuai instruksi asisten praktikum.</p>
+    <button class="btn-submit" style="background: var(--surface); color: var(--text-main); border: 1px solid var(--border);" onclick="location.reload()">Kembali ke Halaman Awal</button>
   </div>
 
 </div>
 
 <script>
-  // ==========================================
-  // 🔴 GANTI URL INI DENGAN URL WEB APP KAMU!
-  const API_URL = "https://script.google.com/macros/s/AKfycbykbnrG8XALV4ptvbS_RBBeJjQYpeVpeKuVnLBJLoBu89LsFK4i6DK2I3GBmXYsBDZFhA/exec";
-  // ==========================================
+  // URL WEB APP APPS SCRIPT (SUDAH DI-INJECT)
+  const API_URL = "https://script.google.com/macros/s/AKfycbwe-gN1F09WntHonNH0GBXB0FkPxgIa6JW0WM5OijztUppEIPlrXzXl4CXQFHdzFVYV2g/exec";
+  
+  let userData = {};
+  let timeOffset = 0;
+  let lobbyIntervalTimer = null; // Di-define di luar agar mudah di-clear
+  let examIntervalTimer = null;
 
-  let userData = { nim: "", nama: "", sesi: "" };
-  let lobbyInterval;
-
-  // --- 1. LOGIN & CEK JADWAL ---
+  // --- FUNGSI 1: CEK JADWAL & LOGIN ---
   function checkJadwal() {
     const nim = document.getElementById('inp-nim').value.trim();
-    if (!nim) return alert("NIM tidak boleh kosong!");
+    const btnLogin = document.getElementById('btn-login');
+    const msgBox = document.getElementById('login-msg');
     
-    const btn = document.getElementById('btn-login');
-    btn.innerText = "Mengecek ke Server... ⏳";
-    btn.disabled = true;
+    if(!nim) {
+      msgBox.innerText = "NIM tidak boleh kosong!";
+      return;
+    }
+    
+    msgBox.innerText = "";
+    btnLogin.innerText = "Mengecek ke Server... ⏳";
+    btnLogin.disabled = true;
 
     fetch(`${API_URL}?action=checkLobby&nim=${nim}`)
       .then(res => res.json())
       .then(data => {
-        if (data.status === "error") {
-          document.getElementById('login-msg').innerText = data.message;
-          btn.innerText = "Masuk ke Ruang Tunggu";
-          btn.disabled = false;
-        } else {
-          userData = { nim: data.data.nim, nama: data.data.nama, sesi: data.data.sesi };
-          setupLobby(data.startTime, data.serverTime);
+        btnLogin.innerText = "Masuk Lobby";
+        btnLogin.disabled = false;
+
+        if(data.status === "error") {
+            msgBox.innerText = data.message;
+            return;
         }
-      }).catch(err => {
-        document.getElementById('login-msg').innerText = "Gagal terhubung. Pastikan URL Web App benar dan internet stabil.";
-        btn.innerText = "Coba Lagi";
-        btn.disabled = false;
+        
+        // Simpan Data
+        userData = data.data;
+        userData.startTime = data.startTime;
+        userData.endTime = data.endTime;
+        timeOffset = data.serverTime - Date.now();
+        
+        const now = Date.now() + timeOffset;
+
+        // Validasi: Apakah waktu sesi sudah lewat sama sekali?
+        if (now >= userData.endTime) {
+            document.getElementById('screen-login').style.display = 'none';
+            document.getElementById('screen-timeout').style.display = 'block';
+            document.querySelector('#screen-timeout h1').innerText = "SESI BERAKHIR";
+            document.querySelector('#screen-timeout p').innerText = "Waktu pengerjaan untuk sesimu sudah lewat.";
+        } else {
+            showLobby();
+        }
+      })
+      .catch(err => {
+        msgBox.innerText = "Gagal koneksi ke server. Pastikan internet stabil.";
+        btnLogin.innerText = "Masuk Lobby";
+        btnLogin.disabled = false;
       });
   }
 
-  // --- 2. LOBBY COUNTDOWN ---
-  function setupLobby(startTime, serverTime) {
+  // --- FUNGSI 2: RUANG TUNGGU (LOBBY) ---
+  function showLobby() {
     document.getElementById('screen-login').style.display = 'none';
     document.getElementById('screen-lobby').style.display = 'block';
+    document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>!`;
 
-    const dateMulai = new Date(startTime);
-    const jamMulai = (dateMulai.getHours() < 10 ? '0' : '') + dateMulai.getHours() + ':' + 
-                     (dateMulai.getMinutes() < 10 ? '0' : '') + dateMulai.getMinutes();
-    const timeOffset = serverTime - new Date().getTime(); 
+    // Fungsi internal untuk mengecek waktu di lobby
+    function cekWaktuLobby() {
+      const now = Date.now() + timeOffset;
+      const diffStart = userData.startTime - now;
+      const diffEnd = userData.endTime - now; 
 
-    lobbyInterval = setInterval(() => {
-      const now = new Date().getTime() + timeOffset;
-      const diff = startTime - now;
+      const countdownEl = document.getElementById('countdown-lobby');
+      const statusEl = document.getElementById('lobby-status');
+      const btnStart = document.getElementById('btn-start-exam');
 
-      if (diff <= 0) {
-        clearInterval(lobbyInterval);
-        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>! Sesi kamu (${userData.sesi}) sudah dimulai.`;
-        document.getElementById('countdown-lobby').innerText = "00:00:00";
-        document.getElementById('lobby-status').innerText = "Akses soal telah dibuka!";
-        document.getElementById('btn-start-exam').disabled = false;
-      } else if (diff > 900000) { 
-        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>!`;
-        document.getElementById('countdown-lobby').innerText = `${jamMulai} WIB`; 
-        document.getElementById('countdown-lobby').style.fontSize = "2.5rem";
-        document.getElementById('lobby-status').innerText = "Jadwalmu masih lama. Kembali ke sini 15 menit sebelum ujian.";
-      } else {
-        document.getElementById('lobby-greeting').innerHTML = `Halo, <strong>${userData.nama}</strong>! Sesi kamu (${userData.sesi}) akan segera dimulai.`;
-        document.getElementById('countdown-lobby').style.fontSize = "3.5rem";
+      // Jika mahasiswa ketiduran di lobby sampai sesi habis
+      if (diffEnd <= 0) {
+        if (lobbyIntervalTimer) clearInterval(lobbyIntervalTimer);
+        document.getElementById('screen-lobby').style.display = 'none';
+        document.getElementById('screen-timeout').style.display = 'block';
+      } 
+      // Waktu ujian tiba (Tombol dibuka)
+      else if (diffStart <= 0) {
+        if (lobbyIntervalTimer) clearInterval(lobbyIntervalTimer);
+        countdownEl.innerText = "00:00:00";
+        statusEl.innerText = "Akses soal telah dibuka!";
+        statusEl.style.color = "var(--success)";
+        statusEl.style.fontWeight = "600";
+        btnStart.disabled = false;
+      } 
+      // Jauh sebelum ujian (> 15 Menit) - Mode Rahasia
+      else if (diffStart > 900000) {
+        const d = new Date(userData.startTime);
+        const formatJam = (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById('countdown-lobby').innerText = (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-        document.getElementById('lobby-status').innerText = "Bersiaplah untuk membuka VS Code.";
+        countdownEl.innerText = `${formatJam} WIB`;
+        countdownEl.style.fontSize = "3rem";
+        statusEl.innerText = "Kembali ke sini 15 menit sebelum ujian untuk masuk antrean.";
+      } 
+      // H-15 Menit - Tampilkan hitungan mundur
+      else {
+        document.getElementById('lobby-label-time').innerText = `SESI KAMU (${userData.sesi}) DIMULAI DALAM:`;
+        countdownEl.style.fontSize = "4rem";
+        
+        const h = Math.floor(diffStart / 3600000);
+        const m = Math.floor((diffStart % 3600000) / 60000);
+        const s = Math.floor((diffStart % 60000) / 1000);
+        
+        let displayHours = (h > 0) ? h.toString().padStart(2,'0') + ':' : '';
+        countdownEl.innerText = `${displayHours}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        statusEl.innerText = "Persiapkan dirimu dan buka Visual Studio Code.";
       }
-    }, 1000);
+    }
+
+    // Panggil sekali agar layar tidak nge-lag 1 detik
+    cekWaktuLobby(); 
+    lobbyIntervalTimer = setInterval(cekWaktuLobby, 1000);
   }
 
-  // --- 3. FETCH SOAL & TAMPILKAN ---
+  // --- FUNGSI 3: FETCH DATA SOAL ---
   function fetchSoal() {
-    const btn = document.getElementById('btn-start-exam');
-    btn.innerText = "Mengunduh Soal... ⏳";
-    btn.disabled = true;
+    const btnStart = document.getElementById('btn-start-exam');
+    btnStart.innerText = "Mengunduh Soal... ⏳";
+    btnStart.disabled = true;
 
     fetch(`${API_URL}?action=getSoal&sesi=${userData.sesi}`)
       .then(res => res.json())
       .then(data => {
-        if (data.status === "error") {
+        if(data.status === "error") {
             alert(data.message);
-            btn.innerText = "Buka Soal Ujian 🚀";
-            btn.disabled = false;
+            btnStart.innerText = "Buka Soal Ujian 🚀";
+            btnStart.disabled = false;
             return;
         }
 
         document.getElementById('screen-lobby').style.display = 'none';
-        document.getElementById('sticky-header').style.display = 'block';
-        document.getElementById('screen-exam').style.display = 'block';
-        document.getElementById('exam-sub').textContent = userData.nama + ' — ' + userData.nim;
+        document.getElementById('exam-header').style.display = 'block';
+        document.getElementById('screen-soal').style.display = 'block';
+        document.getElementById('user-display').innerText = userData.nama;
         
         let htmlSoal = "";
         data.soal.forEach(q => {
-          // Ganti \n dari spreadsheet menjadi tag <br> di HTML
+          // Format text (ubah \n jadi <br> buat spasi antar baris)
           let formattedText = q.text.replace(/\n/g, '<br>');
+          
           htmlSoal += `
-            <div class="card">
-              <div class="q-number">Soal Nomor ${q.no}</div>
+            <div class="q-card">
+              <div class="q-header">
+                <span class="q-number">SOAL ${q.no}</span>
+              </div>
               <div class="q-text">${formattedText}</div>
+              ${q.img ? `<img src="${q.img}" class="q-img" alt="Gambar Soal ${q.no}">` : ""}
             </div>`;
         });
-        
         document.getElementById('questions-container').innerHTML = htmlSoal;
-      }).catch(err => {
+        
+        // Render Matematika pakai KaTeX jika ada tag $ $
+        if(window.renderMathInElement) {
+            renderMathInElement(document.getElementById('questions-container'), {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        }
+
+        startExamTimer();
+      })
+      .catch(err => {
         alert("Gagal mengunduh soal. Coba klik lagi.");
-        btn.innerText = "Buka Soal Ujian 🚀";
-        btn.disabled = false;
+        btnStart.innerText = "Buka Soal Ujian 🚀";
+        btnStart.disabled = false;
       });
   }
 
-  // Anti Inspect (Hanya mencegah iseng, gampang dibypass orang pro, tapi cukup buat maba)
+  // --- FUNGSI 4: TIMER UJIAN ---
+  function startExamTimer() {
+    const timerEl = document.getElementById('main-timer');
+    
+    examIntervalTimer = setInterval(() => {
+        const now = Date.now() + timeOffset;
+        const diffEnd = userData.endTime - now;
+
+        if (diffEnd <= 0) {
+            clearInterval(examIntervalTimer);
+            document.getElementById('screen-soal').style.display = 'none';
+            document.getElementById('exam-header').style.display = 'none';
+            document.getElementById('screen-timeout').style.display = 'block';
+        } else {
+            // Berubah merah jika sisa waktu kurang dari 5 Menit (300.000 ms)
+            if (diffEnd < 300000) {
+                timerEl.classList.add('danger'); 
+            }
+            
+            const h = Math.floor(diffEnd / 3600000);
+            const m = Math.floor((diffEnd % 3600000) / 60000);
+            const s = Math.floor((diffEnd % 60000) / 1000);
+            
+            let displayHours = (h > 0) ? h.toString().padStart(2,'0') + ':' : '';
+            timerEl.innerText = `${displayHours}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+    }, 1000);
+  }
+
+  // --- KEAMANAN DASAR ---
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.key === 'F12') e.preventDefault();
