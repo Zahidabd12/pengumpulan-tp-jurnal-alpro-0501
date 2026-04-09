@@ -238,8 +238,8 @@
 </div>
 
 <script>
-    // PASTE WEB APP URL DI SINI
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbzdxBMjB5zVndkuEd8U_rGQsUjEW1LjFth3al3udCzSjIQo2EtIQMgSrOXTwNUo99iN/exec"; 
+    // MASUKKAN LINK WEB APP DI SINI !!!
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbw5vuDo80PqaV1dLl4hQUGlAAPeQ-d4wQP99P_wpXrtqFpitVAkjHmnOZptKIyxh7fO/exec"; 
     
     let dbMahasiswa = {}; 
     let toastTimeout;
@@ -296,8 +296,8 @@
         return 'badge-bad';
     }
 
-    // UPDATE: Render Tabel Informasi dengan Indikasi AI
-    function renderTugasInfo(nilaiRaw, linkUrl, labelTugas) {
+    // UPDATE: Render Tabel Informasi (Deteksi AI berdasar kolom Kebenaran Program)
+    function renderTugasInfo(nilaiRaw, linkUrl, labelTugas, kompAwal) {
         let link = (linkUrl || "").toString().trim();
 
         // Kasus 1: Asprak menulis "Tidak Ditemukan" (Absen Tugas)
@@ -308,18 +308,18 @@
             `;
         }
 
-        // Kasus 2: Mahasiswa sudah upload, TAPI nilai MASIH KOSONG di Spreadsheet
-        if (link !== "" && nilaiRaw === "") {
+        // Kasus 2: Mahasiswa sudah upload, TAPI kolom komponen (Kebenaran Program) MASIH KOSONG
+        if (link !== "" && (kompAwal === "" || kompAwal === undefined)) {
             return `
                 <span class="nilai-badge badge-neutral">-</span><br>
                 <span class="status-text text-warning">⏳ Sedang Penilaian</span>
             `;
         }
 
-        let val = parseFloat(nilaiRaw);
+        let val = parseFloat(nilaiRaw) || 0;
 
-        // Kasus 3: NILAI 0 MUTLAK (Ketahuan AI / Plagiasi)
-        if (link !== "" && val === 0) {
+        // Kasus 3: NILAI 0 MUTLAK (AI / Plagiasi - komponen diisi 0 dan total = 0)
+        if (link !== "" && kompAwal !== "" && val === 0) {
             return `
                 <span class="nilai-badge badge-bad">0</span><br>
                 <span class="status-text text-danger" style="margin-top: 5px;">🚨 Indikasi AI / Plagiasi</span><br>
@@ -336,7 +336,7 @@
             `;
         }
 
-        // Default: Jika link benar-benar kosong (Belum ada aktivitas)
+        // Default: Jika link benar-benar kosong (Belum ada aktivitas sama sekali)
         return `
             <span class="nilai-badge badge-neutral">-</span><br>
             <span class="status-text text-warning">⏳ Menunggu Data</span>
@@ -389,10 +389,10 @@
                 result.data.forEach(item => {
                     availableWeeks.push(item.pertemuan);
                     
-                    let htmlTP = renderTugasInfo(item.nilaiTP, item.linkTP, "TP");
-                    let htmlJurnal = renderTugasInfo(item.nilaiJurnal, item.linkJurnal, "Jurnal");
+                    // Kita oper data kompTP_Awal dan kompJurnal_Awal ke fungsi
+                    let htmlTP = renderTugasInfo(item.nilaiTP, item.linkTP, "TP", item.kompTP_Awal);
+                    let htmlJurnal = renderTugasInfo(item.nilaiJurnal, item.linkJurnal, "Jurnal", item.kompJurnal_Awal);
                     
-                    // UPDATE: Perhitungan Nilai Total Week agar bisa membaca string kosong
                     let rawTotal = item.nilaiTotalWeek;
                     let totalWeekDisplay = (rawTotal === "") ? "-" : Number(parseFloat(rawTotal).toFixed(2));
 
