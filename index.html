@@ -132,7 +132,8 @@
                     <option value="">-- Pilih Jenis Pengumpulan --</option>
                     <option value="Tugas Pendahuluan">Tugas Pendahuluan (TP)</option>
                     <option value="Jurnal">Jurnal</option>
-                    <option value="Tugas">Tugas Praktikum</option> </select>
+                    <option value="Tugas">Tugas Praktikum</option>
+                </select>
             </div>
 
             <div class="btn-group">
@@ -159,7 +160,7 @@
         </div>
 
         <div id="section3" class="form-section">
-            <div class="alert-box" style="background:#eff6ff; border-color:#3b82f6; color:#1e3a8a;">
+            <div class="alert-box" id="infoAturanBerkas" style="background:#eff6ff; border-color:#3b82f6; color:#1e3a8a;">
                 <strong>ℹ️ Aturan Berkas</strong>
                 Wajib PDF. Maks. ukuran 10 MB. Sistem otomatis me-rename & memilah foldernya.
             </div>
@@ -167,6 +168,12 @@
             <div class="form-group">
                 <label>Pilih File PDF *</label>
                 <input type="file" id="file" accept="application/pdf" required>
+            </div>
+
+            <div class="form-group" id="groupFilePy" style="display: none; padding: 15px; background: #fffbeb; border: 1.5px dashed #fbbf24; border-radius: 10px;">
+                <label style="color: #b45309;">📁 Upload Source Code (.py) *</label>
+                <input type="file" id="filePy" accept=".py" style="border-color: #fcd34d; background: #fef3c7; color: #b45309;">
+                <p style="font-size: 11px; color: #d97706; margin-top: 8px;">Khusus Tugas Week 5, wajib lampirkan source code Python asli.</p>
             </div>
 
             <div id="feedbackSection" style="display: none; margin-top: 25px; border-top: 1.5px dashed var(--border); padding-top: 20px;">
@@ -199,11 +206,6 @@
             👨‍💻 <span>Nur Fattah Ham<b>Dani</b></span>
         </a>
     </div>
-    
-    <div style="margin-top: 18px; font-size: 11px; color: var(--text-muted); background: var(--bg-color); padding: 8px 12px; border-radius: 8px; border: 1px dashed var(--border); line-height: 1.4;">
-        🕒 <b>Jam Kerja: 08.00 - 17.00 WIB</b><br>
-        <i>(Mohon maaf, mungkin akan sedikit slow respon di luar jam kerja)</i>
-    </div>
 </div> 
 
 <a href="nilai.html" style="margin-top: 25px; font-size: 14px; color: var(--primary); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
@@ -227,8 +229,8 @@
 </div>
 
 <script>
-    // PASTE WEB APP URL DI SINI
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbw5vuDo80PqaV1dLl4hQUGlAAPeQ-d4wQP99P_wpXrtqFpitVAkjHmnOZptKIyxh7fO/exec"; 
+    // MASUKKAN LINK WEB APP DI SINI
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbwsHWGQEf5HDjOzuLdAFvdqUkvGuH-TQbEIgvrVgojsx7e_xzvsjcT1La5mmBH7iA/exec"; 
     
     let dbMahasiswa = {}; 
     let dbConfig = {}; 
@@ -245,12 +247,10 @@
 
     function startCountdown() {
         clearInterval(countdownInterval);
-        
         const now = new Date().getTime();
         let nearestDeadline = Infinity;
         let nearestName = "";
 
-        // UPDATE: Deteksi 3 jenis tugas
         Object.keys(dbConfig).forEach(week => {
             const tp = dbConfig[week].tp;
             const jurnal = dbConfig[week].jurnal;
@@ -265,10 +265,7 @@
         const titleEl = document.getElementById("countdownTitle");
         const timerEl = document.getElementById("countdownTimer");
 
-        if (nearestDeadline === Infinity) {
-            containerEl.style.display = "none";
-            return;
-        }
+        if (nearestDeadline === Infinity) { containerEl.style.display = "none"; return; }
 
         containerEl.style.display = "block";
         titleEl.innerText = `⏳ Deadline Terdekat: ${nearestName}`;
@@ -289,22 +286,14 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            const dStr = days < 10 ? '0' + days : days;
-            const hStr = hours < 10 ? '0' + hours : hours;
-            const mStr = minutes < 10 ? '0' + minutes : minutes;
-            const sStr = seconds < 10 ? '0' + seconds : seconds;
-
-            timerEl.innerHTML = `<span>${dStr}h</span> <span>${hStr}j</span> <span>${mStr}m</span> <span>${sStr}d</span>`;
+            timerEl.innerHTML = `<span>${days<10?'0'+days:days}h</span> <span>${hours<10?'0'+hours:hours}j</span> <span>${minutes<10?'0'+minutes:minutes}m</span> <span>${seconds<10?'0'+seconds:seconds}d</span>`;
         }, 1000);
     }
 
     window.onload = function() {
-        fetch(webAppUrl)
-        .then(res => res.json())
-        .then(data => {
+        fetch(webAppUrl).then(res => res.json()).then(data => {
             if(data.status === "success") {
                 dbConfig = data.config;
-
                 const selectPertemuan = document.getElementById("pertemuan");
                 selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
                 Object.keys(dbConfig).forEach(week => {
@@ -328,11 +317,9 @@
                 document.getElementById("sysStatus").innerText = "Sistem Tersambung ke Database ✅";
                 document.getElementById("sysStatus").style.color = "var(--success)";
                 setTimeout(() => document.getElementById("sysStatus").style.display = "none", 3000);
-
                 startCountdown();
             }
-        })
-        .catch(err => {
+        }).catch(err => {
             document.getElementById("sysStatus").innerText = "Gagal terhubung ke Database.";
             document.getElementById("sysStatus").style.color = "var(--danger)";
             document.getElementById("countdownTitle").innerText = "❌ Gagal memuat deadline";
@@ -361,22 +348,39 @@
             if (!pert) return showToast("Pilih pertemuan dulu ya!");
             if (!jenis) return showToast("Pilih Jenis Tugas dulu ya!");
 
-            document.getElementById('feedbackSection').style.display = (jenis === "Jurnal") ? "block" : "none";
-
             const now = new Date().getTime();
             let targetDeadline = null;
 
-            // UPDATE: Validasi Deadline form section 1
             if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
             else if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
             else if (jenis === "Tugas") targetDeadline = dbConfig[pert].tugas;
 
-            if (now > targetDeadline) {
-                return showToast("Maaf, batas waktu " + jenis + " untuk Pertemuan " + pert + " sudah lewat.");
-            }
+            if (now > targetDeadline) return showToast("Maaf, batas waktu " + jenis + " untuk Pertemuan " + pert + " sudah lewat.");
         }
         
-        if (current === 2 && !document.getElementById('nama').value) return showToast("Biodata belum lengkap!");
+        if (current === 2) {
+            if (!document.getElementById('nama').value) return showToast("Biodata belum lengkap!");
+            
+            // LOGIKA DYNAMIC UI: Munculkan input file .py jika Week 5 & Tugas
+            const pert = document.getElementById('pertemuan').value;
+            const jenis = document.getElementById('jenisTugas').value;
+            const groupFilePy = document.getElementById('groupFilePy');
+            const filePy = document.getElementById('filePy');
+            const infoAturan = document.getElementById('infoAturanBerkas');
+
+            document.getElementById('feedbackSection').style.display = (jenis === "Jurnal") ? "block" : "none";
+
+            if (pert === "5" && jenis === "Tugas") {
+                groupFilePy.style.display = "block";
+                filePy.setAttribute("required", "required");
+                infoAturan.innerHTML = "<strong>ℹ️ Aturan Berkas (Khusus Week 5)</strong> Wajib upload 1 File PDF Laporan & 1 File Script Python (.py). Maks. 10 MB per file.";
+            } else {
+                groupFilePy.style.display = "none";
+                filePy.removeAttribute("required");
+                filePy.value = ""; // Reset value
+                infoAturan.innerHTML = "<strong>ℹ️ Aturan Berkas</strong> Wajib PDF. Maks. ukuran 10 MB. Sistem otomatis me-rename & memilah foldernya.";
+            }
+        }
         
         document.getElementById('section' + current).classList.remove('active');
         document.getElementById('section' + (current + 1)).classList.add('active');
@@ -411,32 +415,52 @@
         }
     }
 
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    // Fungsi utilitas untuk membaca file menjadi Base64 (Asynchronous)
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        const pert = document.getElementById('pertemuan').value;
         const jenis = document.getElementById('jenisTugas').value;
         const fileInput = document.getElementById('file').files[0];
+        const isWeek5Tugas = (pert === "5" && jenis === "Tugas");
         
-        if (fileInput.type !== "application/pdf") return showToast("File wajib berformat PDF!");
-        if (fileInput.size > 10485760) return showToast("Ukuran file terlalu besar! Maksimal 10 MB.");
+        if (fileInput.type !== "application/pdf") return showToast("File utama wajib berformat PDF!");
+        if (fileInput.size > 10485760) return showToast("Ukuran file PDF terlalu besar! Maks. 10 MB.");
+
+        let filePyInput = null;
+        if (isWeek5Tugas) {
+            filePyInput = document.getElementById('filePy').files[0];
+            if (!filePyInput) return showToast("Wajib melampirkan file .py untuk Tugas Week 5!");
+            if (!filePyInput.name.toLowerCase().endsWith(".py")) return showToast("File source code wajib berekstensi .py!");
+            if (filePyInput.size > 10485760) return showToast("Ukuran file Python terlalu besar! Maks. 10 MB.");
+        }
 
         const fbText = document.getElementById('feedbackText').value.trim();
         const srnText = document.getElementById('saranText').value.trim();
-
-        if (jenis === "Jurnal") {
-            if (fbText === "" || srnText === "") {
-                return showToast("Dimohon mengisi Feedback dan Saran untuk Asprak ya! 🙏");
-            }
+        if (jenis === "Jurnal" && (fbText === "" || srnText === "")) {
+            return showToast("Dimohon mengisi Feedback dan Saran untuk Asprak ya! 🙏");
         }
 
         overlay.classList.add('active');
         loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
 
-        const submitTime = new Date().getTime();
-        const reader = new FileReader();
-        
-        reader.onload = function(event) {
-            const pert = document.getElementById('pertemuan').value;
+        try {
+            const submitTime = new Date().getTime();
+            const pdfBase64 = await readFileAsBase64(fileInput);
+            let pyBase64 = "";
+
+            if (isWeek5Tugas) {
+                pyBase64 = await readFileAsBase64(filePyInput);
+            }
             
             const payload = {
                 pertemuan: pert,
@@ -445,44 +469,38 @@
                 nim: document.getElementById('nim').value,
                 feedback: fbText, 
                 saran: srnText,   
-                fileBase64: event.target.result.split(',')[1]
+                fileBase64: pdfBase64,
+                filePyBase64: pyBase64 // Dikirim kosong kalau bukan week 5
             };
 
-            fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(result => {
-                if(result.status === "success") { 
-                    
-                    // UPDATE: Pesan selisih waktu sukses 3 jenis tugas
-                    let targetDeadline = 0;
-                    if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
-                    else if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
-                    else if (jenis === "Tugas") targetDeadline = dbConfig[pert].tugas;
-                    
-                    let diff = targetDeadline - submitTime;
-                    let timeMessage = "";
+            const response = await fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) });
+            const result = await response.json();
 
-                    if (diff > 0) {
-                        const h = Math.floor(diff / (1000 * 60 * 60));
-                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                        
-                        if (h > 0) {
-                            timeMessage = `\n\nKamu mengumpulkan ${h} jam ${m} menit sebelum deadline. Semangat terus! 🔥`;
-                        } else {
-                            timeMessage = `\n\nKamu mengumpulkan ${m} menit sebelum deadline. Nyaris! 😅`;
-                        }
-                    }
+            if(result.status === "success") { 
+                let targetDeadline = 0;
+                if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
+                else if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
+                else if (jenis === "Tugas") targetDeadline = dbConfig[pert].tugas;
+                
+                let diff = targetDeadline - submitTime;
+                let timeMessage = "";
 
-                    showResult(true, "Tugas berhasil terkirim. Terima kasih atas kerja kerasmu!" + timeMessage); 
-                } 
-                else { showResult(false, result.message); } 
-            })
-            .catch(error => showResult(false, "Terjadi gangguan jaringan saat menghubungi Google Drive."));
-        };
-        reader.readAsDataURL(fileInput);
+                if (diff > 0) {
+                    const h = Math.floor(diff / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    if (h > 0) timeMessage = `\n\nKamu mengumpulkan ${h} jam ${m} menit sebelum deadline. Semangat terus! 🔥`;
+                    else timeMessage = `\n\nKamu mengumpulkan ${m} menit sebelum deadline. Nyaris! 😅`;
+                }
+
+                showResult(true, "Tugas berhasil terkirim. Terima kasih atas kerja kerasmu!" + timeMessage); 
+            } else { 
+                showResult(false, result.message); 
+            } 
+        } catch (error) {
+            showResult(false, "Terjadi gangguan jaringan saat memproses atau mengunggah file.");
+        }
     });
 
-    // SCRIPT ANTI INSPECT & KLIK KANAN
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya."); });
     document.onkeydown = function(e) {
         if(e.keyCode == 123) { showToast("⚠️ F12 dikunci, jangan coba-coba inspect!"); return false; }
