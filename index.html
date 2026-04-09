@@ -10,7 +10,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
         body { 
-            /* Anti-Select Text */
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; 
             background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; 
         }
@@ -21,7 +20,6 @@
         .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
         .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
         
-        /* COUNTDOWN WIDGET */
         .countdown-container { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2); display: none; animation: fadeInDown 0.5s ease; }
         .countdown-title { font-size: 12px; font-weight: 500; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
         .countdown-timer { font-size: 18px; font-weight: 700; display: flex; justify-content: center; gap: 8px;}
@@ -69,7 +67,6 @@
         .cp-item { background: #eef2ff; color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; border: 1px solid #c7d2fe; transition: 0.2s; }
         .cp-item:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); cursor: default; }
         
-        /* Modal Style */
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal { background: white; padding: 40px 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -83,7 +80,6 @@
         
         #sysStatus { text-align: center; font-size: 13px; color: var(--primary); margin-top: 15px; font-weight: 500;}
 
-        /* CSS TOAST NOTIFICATION */
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: white; padding: 14px 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 10000; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid var(--danger); width: max-content; max-width: 90%; }
         .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast-icon { font-size: 20px; }
@@ -136,7 +132,7 @@
                     <option value="">-- Pilih Jenis Pengumpulan --</option>
                     <option value="Tugas Pendahuluan">Tugas Pendahuluan (TP)</option>
                     <option value="Jurnal">Jurnal</option>
-                </select>
+                    <option value="Tugas">Tugas Praktikum</option> </select>
             </div>
 
             <div class="btn-group">
@@ -231,8 +227,8 @@
 </div>
 
 <script>
-    // PASTE WEB APP URL KHUSUS PENGUMPULAN TUGAS DI SINI
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbwRu0um_9d2S0rRTuqvYUvwWpXNHURb1mQPUaQnZSdTcEFqvsShtzW1L9DxuG-H9g/exec"; 
+    // PASTE WEB APP URL DI SINI
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbzdxBMjB5zVndkuEd8U_rGQsUjEW1LjFth3al3udCzSjIQo2EtIQMgSrOXTwNUo99iN/exec"; 
     
     let dbMahasiswa = {}; 
     let dbConfig = {}; 
@@ -247,7 +243,6 @@
         toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500); 
     }
 
-    // FUNGSI UNTUK MEMULAI COUNTDOWN DEADLINE TERDEKAT
     function startCountdown() {
         clearInterval(countdownInterval);
         
@@ -255,12 +250,15 @@
         let nearestDeadline = Infinity;
         let nearestName = "";
 
+        // UPDATE: Deteksi 3 jenis tugas
         Object.keys(dbConfig).forEach(week => {
             const tp = dbConfig[week].tp;
             const jurnal = dbConfig[week].jurnal;
+            const tugas = dbConfig[week].tugas; 
             
             if (tp > now && tp < nearestDeadline) { nearestDeadline = tp; nearestName = `Tugas Pendahuluan (Week ${week})`; }
             if (jurnal > now && jurnal < nearestDeadline) { nearestDeadline = jurnal; nearestName = `Jurnal (Week ${week})`; }
+            if (tugas > now && tugas < nearestDeadline) { nearestDeadline = tugas; nearestName = `Tugas Praktikum (Week ${week})`; }
         });
 
         const containerEl = document.getElementById("countdownContainer");
@@ -363,14 +361,15 @@
             if (!pert) return showToast("Pilih pertemuan dulu ya!");
             if (!jenis) return showToast("Pilih Jenis Tugas dulu ya!");
 
-            // Logika menampilkan Feedback Anonim JIKA JURNAL
             document.getElementById('feedbackSection').style.display = (jenis === "Jurnal") ? "block" : "none";
 
             const now = new Date().getTime();
             let targetDeadline = null;
 
+            // UPDATE: Validasi Deadline form section 1
             if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
-            if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
+            else if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
+            else if (jenis === "Tugas") targetDeadline = dbConfig[pert].tugas;
 
             if (now > targetDeadline) {
                 return showToast("Maaf, batas waktu " + jenis + " untuk Pertemuan " + pert + " sudah lewat.");
@@ -418,11 +417,9 @@
         const jenis = document.getElementById('jenisTugas').value;
         const fileInput = document.getElementById('file').files[0];
         
-        // Validasi File
         if (fileInput.type !== "application/pdf") return showToast("File wajib berformat PDF!");
         if (fileInput.size > 10485760) return showToast("Ukuran file terlalu besar! Maksimal 10 MB.");
 
-        // Validasi Textarea Feedback jika Jurnal
         const fbText = document.getElementById('feedbackText').value.trim();
         const srnText = document.getElementById('saranText').value.trim();
 
@@ -436,8 +433,8 @@
         loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
 
         const submitTime = new Date().getTime();
-
         const reader = new FileReader();
+        
         reader.onload = function(event) {
             const pert = document.getElementById('pertemuan').value;
             
@@ -446,8 +443,8 @@
                 jenisTugas: jenis,
                 nama: document.getElementById('nama').value,
                 nim: document.getElementById('nim').value,
-                feedback: fbText, // Akan kosong kalau pilih TP
-                saran: srnText,   // Akan kosong kalau pilih TP
+                feedback: fbText, 
+                saran: srnText,   
                 fileBase64: event.target.result.split(',')[1]
             };
 
@@ -456,7 +453,12 @@
             .then(result => {
                 if(result.status === "success") { 
                     
-                    let targetDeadline = (jenis === "Tugas Pendahuluan") ? dbConfig[pert].tp : dbConfig[pert].jurnal;
+                    // UPDATE: Pesan selisih waktu sukses 3 jenis tugas
+                    let targetDeadline = 0;
+                    if (jenis === "Tugas Pendahuluan") targetDeadline = dbConfig[pert].tp;
+                    else if (jenis === "Jurnal") targetDeadline = dbConfig[pert].jurnal;
+                    else if (jenis === "Tugas") targetDeadline = dbConfig[pert].tugas;
+                    
                     let diff = targetDeadline - submitTime;
                     let timeMessage = "";
 
@@ -480,9 +482,7 @@
         reader.readAsDataURL(fileInput);
     });
 
-    // ==========================================
     // SCRIPT ANTI INSPECT & KLIK KANAN
-    // ==========================================
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya."); });
     document.onkeydown = function(e) {
         if(e.keyCode == 123) { showToast("⚠️ F12 dikunci, jangan coba-coba inspect!"); return false; }

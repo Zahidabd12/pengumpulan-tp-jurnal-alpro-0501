@@ -238,8 +238,8 @@
 </div>
 
 <script>
-    // PASTE WEB APP URL SAMA DENGAN INDEX.HTML
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbwRu0um_9d2S0rRTuqvYUvwWpXNHURb1mQPUaQnZSdTcEFqvsShtzW1L9DxuG-H9g/exec"; 
+    // PASTE WEB APP URL DI SINI
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbzdxBMjB5zVndkuEd8U_rGQsUjEW1LjFth3al3udCzSjIQo2EtIQMgSrOXTwNUo99iN/exec"; 
     
     let dbMahasiswa = {}; 
     let toastTimeout;
@@ -287,7 +287,6 @@
         document.getElementById("nim").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
     }
 
-    // FUNGSI UNTUK LOGIKA WARNA NILAI
     function getBadgeClass(nilai) {
         if (nilai === "-") return 'badge-neutral';
         let num = parseFloat(nilai);
@@ -297,10 +296,8 @@
         return 'badge-bad';
     }
 
-    // FUNGSI UTAMA: MENGATUR TAMPILAN (LINK/FEEDBACK/BELUM DINILAI) DENGAN PEMBULATAN
-    function renderTugasInfo(nilai, linkUrl, labelTugas) {
-        let val = parseFloat(nilai) || 0;
-        val = Number(val.toFixed(2)); // Membulatkan maksimal 2 angka di belakang koma
+    // UPDATE: Render Tabel Informasi dengan Indikasi AI
+    function renderTugasInfo(nilaiRaw, linkUrl, labelTugas) {
         let link = (linkUrl || "").toString().trim();
 
         // Kasus 1: Asprak menulis "Tidak Ditemukan" (Absen Tugas)
@@ -311,16 +308,28 @@
             `;
         }
 
-        // Kasus 2: Mahasiswa sudah upload (ada link), TAPI nilai masih 0 atau kosong
-        if (link !== "" && val === 0) {
+        // Kasus 2: Mahasiswa sudah upload, TAPI nilai MASIH KOSONG di Spreadsheet
+        if (link !== "" && nilaiRaw === "") {
             return `
                 <span class="nilai-badge badge-neutral">-</span><br>
                 <span class="status-text text-warning">⏳ Sedang Penilaian</span>
             `;
         }
 
-        // Kasus 3: Sudah dinilai (Ada link drive dan nilai lebih dari 0)
+        let val = parseFloat(nilaiRaw);
+
+        // Kasus 3: NILAI 0 MUTLAK (Ketahuan AI / Plagiasi)
+        if (link !== "" && val === 0) {
+            return `
+                <span class="nilai-badge badge-bad">0</span><br>
+                <span class="status-text text-danger" style="margin-top: 5px;">🚨 Indikasi AI / Plagiasi</span><br>
+                <a href="${link}" target="_blank" class="btn-feedback" style="background:#fef2f2; border-color:#fca5a5; color:#b91c1c;">📄 Cek Bukti/Feedback</a>
+            `;
+        }
+
+        // Kasus 4: Sudah dinilai Normal (Nilai > 0)
         if (link.startsWith("http") && val > 0) {
+            val = Number(val.toFixed(2));
             return `
                 <span class="nilai-badge ${getBadgeClass(val)}">${val}</span><br>
                 <a href="${link}" target="_blank" class="btn-feedback">📄 Feedback ${labelTugas}</a>
@@ -380,14 +389,12 @@
                 result.data.forEach(item => {
                     availableWeeks.push(item.pertemuan);
                     
-                    // Render UI berdasarkan ketersediaan Link & Nilai
                     let htmlTP = renderTugasInfo(item.nilaiTP, item.linkTP, "TP");
                     let htmlJurnal = renderTugasInfo(item.nilaiJurnal, item.linkJurnal, "Jurnal");
                     
-                    // Total week ditampilkan dengan pembulatan 2 desimal
-                    let rawTotal = parseFloat(item.nilaiTotalWeek) || 0;
-                    let cleanTotal = Number(rawTotal.toFixed(2));
-                    let totalWeekDisplay = (rawTotal === 0 && (!item.linkTP || !item.linkJurnal)) ? "-" : cleanTotal;
+                    // UPDATE: Perhitungan Nilai Total Week agar bisa membaca string kosong
+                    let rawTotal = item.nilaiTotalWeek;
+                    let totalWeekDisplay = (rawTotal === "") ? "-" : Number(parseFloat(rawTotal).toFixed(2));
 
                     let tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -399,19 +406,17 @@
                     tbody.appendChild(tr);
                 });
 
-                // Render Tabel Riwayat Komplain
                 const tbodyKomp = document.getElementById("tabelKomplainBody");
                 const containerKomp = document.getElementById("containerKomplain");
                 tbodyKomp.innerHTML = "";
 
                 if (result.komplain && result.komplain.length > 0) {
-                    containerKomp.style.display = "block"; // Munculkan tabel jika ada komplain
+                    containerKomp.style.display = "block"; 
                     
                     result.komplain.forEach(k => {
-                        let stClass = "st-menunggu"; // Default Kuning
+                        let stClass = "st-menunggu"; 
                         let stText = (k.status || "").toLowerCase();
                         
-                        // Deteksi kata kunci dari spreadsheet untuk menentukan warna
                         if (stText.includes("proses") || stText.includes("cek")) stClass = "st-proses";
                         else if (stText.includes("selesai")) stClass = "st-selesai";
                         else if (stText.includes("tolak")) stClass = "st-tolak";
@@ -425,7 +430,7 @@
                         tbodyKomp.appendChild(tr);
                     });
                 } else {
-                    containerKomp.style.display = "none"; // Sembunyikan jika tidak pernah komplain
+                    containerKomp.style.display = "none"; 
                 }
 
                 document.getElementById("dispNama").innerText = nm;
@@ -507,7 +512,7 @@
                 document.getElementById('komplainForm').reset();
                 setTimeout(() => { 
                     kembaliKeNilai(); 
-                    cekNilai(); // Refresh data supaya tabel komplain langsung update
+                    cekNilai(); 
                 }, 2000);
             } 
             else { showResult(false, "Gagal Mengirim", result.message); } 
@@ -515,7 +520,6 @@
         .catch(error => showResult(false, "Error Sistem", "Terjadi gangguan jaringan. Coba lagi."));
     });
 
-    // SCRIPT ANTI INSPECT & KLIK KANAN
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Hayo, mau ngapain? Fitur klik kanan dimatikan ya."); });
     document.onkeydown = function(e) {
         if(e.keyCode == 123) { showToast("⚠️ F12 dikunci, jangan coba-coba inspect!"); return false; }
