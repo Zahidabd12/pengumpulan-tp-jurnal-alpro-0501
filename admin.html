@@ -1,279 +1,471 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal - Supabase</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Lab Praktikum</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-surface: #ffffff;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-text: #94a3b8;
+            --sidebar-active: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 6px;
+        }
 
-  <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --bg-color: #f8fafc;
-      --surface: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --success: #10b981;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); font-size: 14px; }
+        
+        /* Helper Classes */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); }
-    
-    .navbar { background: var(--surface); padding: 1rem 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .navbar h2 { color: var(--primary); }
-    
-    .wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; display: flex; gap: 2rem; }
-    
-    /* Sidebar Menu */
-    .sidebar { width: 250px; display: flex; flex-direction: column; gap: 0.5rem; }
-    .menu-btn { padding: 12px 16px; background: transparent; border: 1px solid transparent; border-radius: 8px; text-align: left; font-size: 1rem; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-    .menu-btn:hover { background: #e0e7ff; color: var(--primary); }
-    .menu-btn.active { background: #e0e7ff; color: var(--primary); border-color: #c7d2fe; }
+        /* Typography */
+        h1, h2, h3 { font-weight: 600; color: var(--text-main); }
+        .section-title { font-size: 18px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
-    /* Content Area */
-    .content { flex: 1; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: none; }
-    .card.active { display: block; }
-    
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
-    .std-input { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; font-family: inherit; }
-    .std-input:focus { border-color: var(--primary); }
-    textarea.std-input { resize: vertical; min-height: 120px; }
-    
-    .btn { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-    .btn:hover { background: var(--primary-hover); }
-    .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn.success { background: var(--success); }
-    .btn.success:hover { background: #059669; }
-  </style>
+        /* Form Controls */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 6px; color: var(--text-main); }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; transition: all 0.2s; background-color: #f8fafc; }
+        .form-control:focus { outline: none; border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        textarea.form-control { min-height: 100px; resize: vertical; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; color: #fff; background-color: var(--primary); }
+        .btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover:not(:disabled) { background-color: #059669; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background-color: #dc2626; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
+
+        /* --- LOGIN SCREEN --- */
+        .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: var(--sidebar-bg); }
+        .login-card { background: var(--bg-surface); padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-card h2 { margin-bottom: 8px; text-align: center; }
+        .login-card p { color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+
+        /* --- DASHBOARD LAYOUT --- */
+        .dashboard { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header h2 { color: #fff; font-size: 16px; letter-spacing: 0.5px; }
+        .sidebar-menu { padding: 20px 0; flex: 1; }
+        .menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .menu-item:hover { background-color: var(--sidebar-hover); color: var(--sidebar-active); }
+        .menu-item.active { background-color: var(--primary); color: #fff; border-left: 4px solid #93c5fd; }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .topbar { background-color: var(--bg-surface); padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .content-area { padding: 32px; flex: 1; overflow-y: auto; }
+        
+        /* Cards */
+        .card { background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        /* Toast Notification System */
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { min-width: 250px; padding: 16px; border-radius: var(--radius); color: #fff; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background-color: var(--success); }
+        .toast.error { background-color: var(--danger); }
+        .toast.info { background-color: var(--primary); }
+
+        /* Table/Log styling */
+        .log-box { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: var(--text-muted); margin-top: 16px; }
+    </style>
 </head>
 <body>
 
-<div class="navbar">
-  <h2>⚙️ Admin Portal Praktikum</h2>
-  <div style="font-weight: 600; color: var(--text-muted);">Database: Supabase</div>
-</div>
+    <div id="toast-container"></div>
 
-<div class="wrap">
-  <div class="sidebar">
-    <button class="menu-btn active" onclick="switchTab('tab-sesi', this)">🕒 Manajemen Sesi</button>
-    <button class="menu-btn" onclick="switchTab('tab-soal', this)">📝 Tambah Soal</button>
-    <button class="menu-btn" onclick="switchTab('tab-nilai', this)">💯 Penilaian Langsung</button>
-  </div>
-
-  <div class="content">
-    
-    <div class="card active" id="tab-sesi">
-      <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">Konfigurasi Waktu Sesi</h3>
-      <form onsubmit="submitData(event, 'saveSesi')">
-        <div class="form-group">
-          <label>Nama Sesi (Contoh: Sesi 1)</label>
-          <input type="text" class="std-input" id="inp-sesi-name" required>
+    <div id="view-login" class="login-wrapper">
+        <div class="login-card">
+            <h2>Portal Admin</h2>
+            <p>Sistem Manajemen Praktikum</p>
+            <form id="form-login" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Administrator</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="admin@kampus.id" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-pass" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 8px;">Masuk Sistem</button>
+            </form>
         </div>
-        <div class="form-group">
-          <label>Waktu Mulai (Start Time)</label>
-          <input type="datetime-local" class="std-input" id="inp-sesi-start" required>
-        </div>
-        <div class="form-group">
-          <label>Waktu Selesai (End Time)</label>
-          <input type="datetime-local" class="std-input" id="inp-sesi-end" required>
-        </div>
-        <button type="submit" class="btn">Simpan Jadwal Sesi</button>
-      </form>
     </div>
 
-    <div class="card" id="tab-soal">
-      <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">Bank Soal Ujian</h3>
-      <form onsubmit="submitData(event, 'saveSoal')">
-        <div class="form-group">
-          <label>Pilih Sesi (Contoh: Sesi 1)</label>
-          <input type="text" class="std-input" id="inp-soal-sesi" required>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
-            <label>Nomor Soal</label>
-            <input type="number" class="std-input" id="inp-soal-no" required>
-          </div>
-          <div class="form-group" style="flex: 2;">
-            <label>URL Gambar (Opsional)</label>
-            <input type="url" class="std-input" id="inp-soal-img" placeholder="https://...">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Teks Soal (Bisa menggunakan Markdown/LaTeX $$)</label>
-          <textarea class="std-input" id="inp-soal-text" required></textarea>
-        </div>
-        <button type="submit" class="btn">Tambah ke Bank Soal</button>
-      </form>
-    </div>
+    <div id="view-dashboard" class="dashboard hidden">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>LAB PRAKTIKUM</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item active" onclick="switchTab('tab-sesi', this)">🕒 Manajemen Sesi</div>
+                <div class="menu-item" onclick="switchTab('tab-soal', this)">📝 Bank Soal</div>
+                <div class="menu-item" onclick="switchTab('tab-nilai', this)">💯 Input Nilai</div>
+                <div class="menu-item" onclick="switchTab('tab-import', this)">👥 Import Mahasiswa</div>
+            </nav>
+        </aside>
 
-    <div class="card" id="tab-nilai">
-      <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">Input Nilai Praktikan</h3>
-      <form onsubmit="submitData(event, 'saveNilai')">
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
-            <label>NIM Praktikan</label>
-            <input type="text" class="std-input" id="inp-nilai-nim" required>
-          </div>
-          <div class="form-group" style="flex: 1;">
-            <label>Sesi</label>
-            <input type="text" class="std-input" id="inp-nilai-sesi" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Nilai Akhir (0-100)</label>
-          <input type="number" class="std-input" id="inp-nilai-skor" min="0" max="100" required>
-        </div>
-        <div class="form-group">
-          <label>Catatan Asisten (Opsional)</label>
-          <textarea class="std-input" id="inp-nilai-catatan" style="min-height: 80px;"></textarea>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button type="submit" class="btn success" style="flex: 1;">Simpan Nilai</button>
-          <button type="button" class="btn" style="flex: 1; background: #0f172a;" onclick="exportNilaiCSV()">📊 Download Rekap Nilai (CSV)</button>
-        </div>
-      </form>
-    </div>
+        <main class="main">
+            <header class="topbar">
+                <div style="font-weight: 600; color: var(--text-muted);">Mode: Administrator</div>
+                <div class="flex" style="align-items: center; gap: 16px;">
+                    <span id="user-display" style="font-weight: 500;">Admin</span>
+                    <button class="btn btn-outline" style="padding: 6px 12px;" onclick="handleLogout()">Logout</button>
+                </div>
+            </header>
 
-  </div>
-</div>
+            <div class="content-area">
+                
+                <div id="tab-sesi" class="card tab-content">
+                    <h2 class="section-title">Konfigurasi Jadwal Sesi</h2>
+                    <form onsubmit="submitData(event, 'Sesi')">
+                        <div class="form-group">
+                            <label class="form-label">Nama Sesi (Unique)</label>
+                            <input type="text" id="inp-sesi-name" class="form-control" placeholder="Contoh: Sesi 1 - Senin Pagi" required>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Waktu Mulai</label>
+                                <input type="datetime-local" id="inp-sesi-start" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Waktu Selesai</label>
+                                <input type="datetime-local" id="inp-sesi-end" class="form-control" required>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <button type="submit" class="btn">Simpan Jadwal Sesi</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="tab-soal" class="card tab-content hidden">
+                    <h2 class="section-title">Input Soal Ujian</h2>
+                    <form onsubmit="submitData(event, 'Soal')">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Target Sesi</label>
+                                <input type="text" id="inp-soal-sesi" class="form-control" placeholder="Pastikan sama dengan Nama Sesi" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nomor Soal</label>
+                                <input type="number" id="inp-soal-no" class="form-control" placeholder="1, 2, 3..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">URL Gambar Lampiran (Opsional)</label>
+                            <input type="url" id="inp-soal-img" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Teks Pertanyaan</label>
+                            <textarea id="inp-soal-text" class="form-control" placeholder="Tuliskan soal di sini. Mendukung plain text..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Simpan ke Bank Soal</button>
+                    </form>
+                </div>
+
+                <div id="tab-nilai" class="card tab-content hidden">
+                    <h2 class="section-title">Input & Rekapitulasi Nilai</h2>
+                    <form onsubmit="submitData(event, 'Nilai')">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">NIM Praktikan</label>
+                                <input type="text" id="inp-nilai-nim" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sesi Praktikum</label>
+                                <input type="text" id="inp-nilai-sesi" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nilai Akhir (0-100)</label>
+                            <input type="number" id="inp-nilai-skor" class="form-control" min="0" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catatan Asisten (Opsional)</label>
+                            <textarea id="inp-nilai-catatan" class="form-control" style="min-height: 80px;"></textarea>
+                        </div>
+                        <div class="flex" style="gap: 12px; margin-top: 16px;">
+                            <button type="submit" class="btn btn-success">Simpan Nilai</button>
+                            <button type="button" class="btn btn-outline" onclick="exportNilaiCSV()">Unduh Rekap Nilai (CSV)</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="tab-import" class="card tab-content hidden">
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                        <h2 style="font-size: 18px;">Registrasi Mahasiswa Massal (Excel)</h2>
+                        <button class="btn btn-outline" onclick="downloadTemplate()">Unduh Template</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Unggah File Data (.xlsx)</label>
+                        <input type="file" id="excel-file" class="form-control" accept=".xlsx, .xls" style="padding: 6px;">
+                    </div>
+                    <button class="btn" onclick="processExcel()">Mulai Proses Import</button>
+                    
+                    <div id="import-log" class="log-box">
+                        Sistem siap. Silakan unggah file untuk memulai proses batch import...
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
 
 <script>
-  // ==========================================
-  // 1. KONFIGURASI SUPABASE (WAJIB DIISI)
-  // ==========================================
-  // --- KONFIGURASI SUPABASE ---
-const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ==========================================
+    // 1. INIT SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_DISINI'; 
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY_DISINI'; 
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // ==========================================
-  // 2. FUNGSI PINDAH TAB MENU
-  // ==========================================
-  function switchTab(tabId, btnElement) {
-    document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
-    document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btnElement.classList.add('active');
-  }
+    let sessionActive = false;
 
-  // ==========================================
-  // 3. FUNGSI SIMPAN DATA KE SUPABASE
-  // ==========================================
-  async function submitData(event, actionType) {
-    event.preventDefault();
-    const btn = event.target.querySelector('button[type="submit"]');
-    const originalText = btn.innerText;
-    btn.innerText = "Menyimpan... ⏳";
-    btn.disabled = true;
-
-    try {
-      let result;
-
-      if (actionType === 'saveSesi') {
-        const payload = {
-          nama_sesi: document.getElementById('inp-sesi-name').value,
-          waktu_mulai: document.getElementById('inp-sesi-start').value,
-          waktu_selesai: document.getElementById('inp-sesi-end').value
-        };
-        // Asumsi kamu sudah buat tabel 'Sesi' di Supabase
-        result = await supabase.from('Sesi').insert([payload]); 
-      } 
-      
-      else if (actionType === 'saveSoal') {
-        const payload = {
-          sesi: document.getElementById('inp-soal-sesi').value,
-          no_soal: document.getElementById('inp-soal-no').value,
-          url_gambar: document.getElementById('inp-soal-img').value,
-          teks_soal: document.getElementById('inp-soal-text').value
-        };
-        // Asumsi kamu sudah buat tabel 'Soal' di Supabase
-        result = await supabase.from('Soal').insert([payload]);
-      } 
-      
-      else if (actionType === 'saveNilai') {
-        const payload = {
-          nim: document.getElementById('inp-nilai-nim').value,
-          sesi: document.getElementById('inp-nilai-sesi').value,
-          skor: document.getElementById('inp-nilai-skor').value,
-          catatan: document.getElementById('inp-nilai-catatan').value
-        };
-        // Asumsi kamu sudah buat tabel 'Nilai' di Supabase
-        result = await supabase.from('Nilai').insert([payload]);
-      }
-
-      if (result.error) throw result.error;
-
-      alert("✅ Data berhasil disimpan ke database!");
-      event.target.reset(); // Kosongkan form setelah sukses
-
-    } catch (error) {
-      alert("❌ Gagal menyimpan: " + error.message);
-    } finally {
-      btn.innerText = originalText;
-      btn.disabled = false;
+    // ==========================================
+    // 2. UI UTILITIES (TOAST & TABS)
+    // ==========================================
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
-  }
 
-  // ==========================================
-  // 4. FUNGSI EXPORT DATA KE CSV/EXCEL
-  // ==========================================
-  async function exportNilaiCSV() {
-    const btn = document.querySelector('button[onclick="exportNilaiCSV()"]');
-    const originalText = btn.innerText;
-    btn.innerText = "Mendownload... ⏳";
-    btn.disabled = true;
-
-    try {
-      // Ambil semua data dari tabel 'Nilai'
-      const { data, error } = await supabase.from('Nilai').select('*');
-      
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        alert("⚠️ Belum ada data nilai di database.");
-        return;
-      }
-
-      // Buat Header CSV
-      const headers = ['ID_Data', 'NIM_Praktikan', 'Sesi_Praktikum', 'Skor_Akhir', 'Catatan_Asisten', 'Waktu_Input'];
-      
-      // Mapping data ke bentuk array untuk setiap baris
-      const rows = data.map(row => [
-        row.id || '', 
-        row.nim || '', 
-        row.sesi || '', 
-        row.skor || '', 
-        `"${(row.catatan || '').replace(/"/g, '""')}"`, // Handle tanda kutip/koma di dalam teks catatan
-        row.created_at ? new Date(row.created_at).toLocaleString('id-ID') : ''
-      ]);
-
-      // Gabungkan header dan isi data dengan koma dan enter (\n)
-      const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-
-      // Proses Download File CSV
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Rekap_Nilai_Praktikum_${new Date().getTime()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-    } catch (err) {
-      alert("❌ Gagal mendownload CSV: " + err.message);
-    } finally {
-      btn.innerText = originalText;
-      btn.disabled = false;
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.remove('hidden');
+        element.classList.add('active');
     }
-  }
+
+    // ==========================================
+    // 3. AUTHENTICATION (STRICT ADMIN CHECK)
+    // ==========================================
+    async function checkAuth() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+            // Verifikasi apakah user yang login memiliki role 'admin' di tabel profiles
+            const { data: profile, error } = await supabase.from('profiles').select('role, full_name').eq('id', session.user.id).single();
+            
+            if (profile && profile.role === 'admin') {
+                sessionActive = true;
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
+            } else {
+                // Jika login tapi bukan admin (misal mahasiswa nyasar)
+                await supabase.auth.signOut();
+                showToast('Akses Ditolak. Anda bukan Administrator.', 'error');
+            }
+        }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.innerText = "Memverifikasi..."; btn.disabled = true;
+
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-pass').value;
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            showToast(error.message, 'error');
+            btn.innerText = "Masuk Sistem"; btn.disabled = false;
+        } else {
+            await checkAuth(); // Verifikasi role admin
+            if(!sessionActive) {
+                btn.innerText = "Masuk Sistem"; btn.disabled = false;
+            }
+        }
+    }
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        location.reload();
+    }
+
+    // ==========================================
+    // 4. CRUD OPERATIONS (SESI, SOAL, NILAI)
+    // ==========================================
+    async function submitData(e, tableName) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = "Menyimpan..."; btn.disabled = true;
+
+        let payload = {};
+
+        if (tableName === 'Sesi') {
+            payload = {
+                nama_sesi: document.getElementById('inp-sesi-name').value,
+                waktu_mulai: document.getElementById('inp-sesi-start').value,
+                waktu_selesai: document.getElementById('inp-sesi-end').value
+            };
+        } else if (tableName === 'Soal') {
+            payload = {
+                sesi: document.getElementById('inp-soal-sesi').value,
+                no_soal: document.getElementById('inp-soal-no').value,
+                url_gambar: document.getElementById('inp-soal-img').value,
+                teks_soal: document.getElementById('inp-soal-text').value
+            };
+        } else if (tableName === 'Nilai') {
+            payload = {
+                nim: document.getElementById('inp-nilai-nim').value,
+                sesi: document.getElementById('inp-nilai-sesi').value,
+                skor: document.getElementById('inp-nilai-skor').value,
+                catatan: document.getElementById('inp-nilai-catatan').value
+            };
+        }
+
+        try {
+            const { error } = await supabase.from(tableName).insert([payload]);
+            if (error) throw error;
+            showToast(`Data ${tableName} berhasil disimpan!`, 'success');
+            e.target.reset();
+        } catch (err) {
+            showToast(`Gagal: ${err.message}`, 'error');
+        } finally {
+            btn.innerText = originalText; btn.disabled = false;
+        }
+    }
+
+    // ==========================================
+    // 5. EXPORT & IMPORT EXCEL
+    // ==========================================
+    async function exportNilaiCSV() {
+        try {
+            showToast('Menyiapkan file CSV...', 'info');
+            const { data, error } = await supabase.from('Nilai').select('*');
+            if (error) throw error;
+            if (!data || data.length === 0) return showToast('Belum ada data nilai', 'error');
+
+            const headers = ['ID', 'NIM', 'Sesi', 'Skor', 'Catatan', 'Waktu_Input'];
+            const rows = data.map(r => [r.id, r.nim, r.sesi, r.skor, `"${(r.catatan||'').replace(/"/g, '""')}"`, r.created_at]);
+            
+            const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Rekap_Nilai_${new Date().getTime()}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Download berhasil!', 'success');
+        } catch (err) {
+            showToast(`Error: ${err.message}`, 'error');
+        }
+    }
+
+    function downloadTemplate() {
+        const wb = XLSX.utils.book_new();
+        const wsData = [
+            ["Nama", "Email", "Password", "NIM", "Sesi"],
+            ["Bagas Bintang", "bagas@kampus.id", "Pass123!", "130120001", "Sesi 1"],
+            ["Ilman Baruna", "ilman@kampus.id", "Pass456!", "130120002", "Sesi 1"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        XLSX.utils.book_append_sheet(wb, ws, "Template_User");
+        XLSX.writeFile(wb, "Template_Import_Mahasiswa.xlsx");
+    }
+
+    async function processExcel() {
+        const file = document.getElementById('excel-file').files[0];
+        if (!file) return showToast('Pilih file excel terlebih dahulu', 'error');
+
+        const reader = new FileReader();
+        const logBox = document.getElementById('import-log');
+        logBox.innerHTML = "<div>⏳ Membaca file excel...</div>";
+
+        reader.onload = async (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            let successCount = 0;
+            logBox.innerHTML += `<div>🚀 Ditemukan ${json.length} baris data. Memulai sinkronisasi Supabase...</div><br>`;
+
+            for (const row of json) {
+                // Create User in Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: row.Email,
+                    password: row.Password,
+                    options: { data: { full_name: row.Nama } }
+                });
+
+                if (authError) {
+                    logBox.innerHTML += `<div style="color: var(--danger)">❌ [${row.NIM}] ${row.Nama}: ${authError.message}</div>`;
+                    continue;
+                }
+
+                // Insert into Profiles table
+                const { error: profError } = await supabase.from('profiles').insert([{
+                    id: authData.user.id,
+                    full_name: row.Nama,
+                    nim: row.NIM,
+                    session_name: row.Sesi,
+                    role: 'mahasiswa'
+                }]);
+
+                if (profError) {
+                    logBox.innerHTML += `<div style="color: #ca8a04">⚠️ [${row.NIM}] ${row.Nama}: Auth dibuat, tapi data profil gagal (${profError.message})</div>`;
+                } else {
+                    successCount++;
+                    logBox.innerHTML += `<div style="color: var(--success)">✅ [${row.NIM}] ${row.Nama}: Berhasil diimpor.</div>`;
+                }
+            }
+            
+            logBox.innerHTML += `<br><div><strong>🎉 Selesai! ${successCount} dari ${json.length} data berhasil diimpor.</strong></div>`;
+            showToast(`Selesai! ${successCount} data masuk.`, 'success');
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    // Cek auth saat halaman dimuat
+    window.onload = checkAuth;
+
 </script>
 </body>
 </html>
