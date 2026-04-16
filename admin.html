@@ -106,11 +106,11 @@
             <p>Sistem Manajemen Praktikum</p>
             <form id="form-login" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label class="form-label">Email Administrator</label>
+                    <label class="form-label" for="login-email">Email Administrator</label>
                     <input type="email" id="login-email" class="form-control" placeholder="admin@kampus.id" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Password</label>
+                    <label class="form-label" for="login-pass">Password</label>
                     <input type="password" id="login-pass" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn" style="width: 100%; margin-top: 8px;">Masuk Sistem</button>
@@ -146,16 +146,16 @@
                     <h2 class="section-title">Konfigurasi Jadwal Sesi</h2>
                     <form onsubmit="submitData(event, 'Sesi')">
                         <div class="form-group">
-                            <label class="form-label">Nama Sesi (Unique)</label>
-                            <input type="text" id="inp-sesi-name" class="form-control" placeholder="Contoh: Sesi 1 - Senin Pagi" required>
+                            <label class="form-label" for="inp-sesi-name">Nama Sesi (Unique)</label>
+                            <input type="text" id="inp-sesi-name" class="form-control" placeholder="Contoh: Sesi 1" required>
                         </div>
                         <div class="grid-2">
                             <div class="form-group">
-                                <label class="form-label">Waktu Mulai</label>
+                                <label class="form-label" for="inp-sesi-start">Waktu Mulai</label>
                                 <input type="datetime-local" id="inp-sesi-start" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Waktu Selesai</label>
+                                <label class="form-label" for="inp-sesi-end">Waktu Selesai</label>
                                 <input type="datetime-local" id="inp-sesi-end" class="form-control" required>
                             </div>
                         </div>
@@ -170,20 +170,20 @@
                     <form onsubmit="submitData(event, 'Soal')">
                         <div class="grid-2">
                             <div class="form-group">
-                                <label class="form-label">Target Sesi</label>
+                                <label class="form-label" for="inp-soal-sesi">Target Sesi</label>
                                 <input type="text" id="inp-soal-sesi" class="form-control" placeholder="Pastikan sama dengan Nama Sesi" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Nomor Soal</label>
+                                <label class="form-label" for="inp-soal-no">Nomor Soal</label>
                                 <input type="number" id="inp-soal-no" class="form-control" placeholder="1, 2, 3..." required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">URL Gambar Lampiran (Opsional)</label>
+                            <label class="form-label" for="inp-soal-img">URL Gambar Lampiran (Opsional)</label>
                             <input type="url" id="inp-soal-img" class="form-control" placeholder="https://...">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Teks Pertanyaan</label>
+                            <label class="form-label" for="inp-soal-text">Teks Pertanyaan</label>
                             <textarea id="inp-soal-text" class="form-control" placeholder="Tuliskan soal di sini. Mendukung plain text..." required></textarea>
                         </div>
                         <button type="submit" class="btn">Simpan ke Bank Soal</button>
@@ -195,20 +195,20 @@
                     <form onsubmit="submitData(event, 'Nilai')">
                         <div class="grid-2">
                             <div class="form-group">
-                                <label class="form-label">NIM Praktikan</label>
+                                <label class="form-label" for="inp-nilai-nim">NIM Praktikan</label>
                                 <input type="text" id="inp-nilai-nim" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Sesi Praktikum</label>
+                                <label class="form-label" for="inp-nilai-sesi">Sesi Praktikum</label>
                                 <input type="text" id="inp-nilai-sesi" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Nilai Akhir (0-100)</label>
+                            <label class="form-label" for="inp-nilai-skor">Nilai Akhir (0-100)</label>
                             <input type="number" id="inp-nilai-skor" class="form-control" min="0" max="100" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Catatan Asisten (Opsional)</label>
+                            <label class="form-label" for="inp-nilai-catatan">Catatan Asisten (Opsional)</label>
                             <textarea id="inp-nilai-catatan" class="form-control" style="min-height: 80px;"></textarea>
                         </div>
                         <div class="flex" style="gap: 12px; margin-top: 16px;">
@@ -225,7 +225,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Unggah File Data (.xlsx)</label>
+                        <label class="form-label" for="excel-file">Unggah File Data (.xlsx)</label>
                         <input type="file" id="excel-file" class="form-control" accept=".xlsx, .xls" style="padding: 6px;">
                     </div>
                     <button class="btn" onclick="processExcel()">Mulai Proses Import</button>
@@ -241,7 +241,7 @@
 
 <script>
     // ==========================================
-    // 1. INIT SUPABASE
+    // 1. INIT SUPABASE (Ganti dengan Data Kamu)
     // ==========================================
     const SUPABASE_URL = 'YOUR_SUPABASE_URL_DISINI'; 
     const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY_DISINI'; 
@@ -275,14 +275,13 @@
     }
 
     // ==========================================
-    // 3. AUTHENTICATION (STRICT ADMIN CHECK)
+    // 3. AUTHENTICATION LOGIC
     // ==========================================
     async function checkAuth() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-            // Verifikasi apakah user yang login memiliki role 'admin' di tabel profiles
-            const { data: profile, error } = await supabase.from('profiles').select('role, full_name').eq('id', session.user.id).single();
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
             
             if (profile && profile.role === 'admin') {
                 sessionActive = true;
@@ -290,31 +289,59 @@
                 document.getElementById('view-dashboard').classList.remove('hidden');
                 document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
             } else {
-                // Jika login tapi bukan admin (misal mahasiswa nyasar)
                 await supabase.auth.signOut();
-                showToast('Akses Ditolak. Anda bukan Administrator.', 'error');
             }
         }
     }
 
     async function handleLogin(e) {
         e.preventDefault();
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
         btn.innerText = "Memverifikasi..."; btn.disabled = true;
 
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-pass').value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        try {
+            // 1. Coba Login
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-        if (error) {
-            showToast(error.message, 'error');
-            btn.innerText = "Masuk Sistem"; btn.disabled = false;
-        } else {
-            await checkAuth(); // Verifikasi role admin
-            if(!sessionActive) {
+            if (error) {
+                alert("❌ LOGIN GAGAL: Email atau Password salah.\nDetail: " + error.message);
                 btn.innerText = "Masuk Sistem"; btn.disabled = false;
+                return;
             }
+
+            // 2. Cek Profil & Role
+            const { data: profile, error: profileError } = await supabase.from('profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+
+            if (profileError) {
+                alert("⚠️ LOGIN SUKSES, TAPI PROFIL DIBLOKIR!\nPastikan Anda sudah mematikan RLS pada tabel 'profiles'.\nDetail Error: " + profileError.message);
+                await supabase.auth.signOut();
+                btn.innerText = "Masuk Sistem"; btn.disabled = false;
+                return;
+            }
+
+            if (!profile || profile.role !== 'admin') {
+                alert("⛔ AKSES DITOLAK!\nRole akun ini bukan 'admin'.");
+                await supabase.auth.signOut();
+                btn.innerText = "Masuk Sistem"; btn.disabled = false;
+                return;
+            }
+
+            // 3. Masuk ke Dashboard
+            sessionActive = true;
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
+            showToast('Berhasil Login!', 'success');
+
+        } catch (err) {
+            alert("Terjadi kesalahan sistem: " + err.message);
+            btn.innerText = "Masuk Sistem"; btn.disabled = false;
         }
     }
 
@@ -463,7 +490,6 @@
     // ==========================================
     // INIT
     // ==========================================
-    // Cek auth saat halaman dimuat
     window.onload = checkAuth;
 
 </script>
