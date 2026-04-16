@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Praktikum - Supabase Auth</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --bg: #f8fafc; --text: #0f172a; --border: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 1rem; }
+        .card { background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-alt { background: #10b981; margin-top: 10px; }
+        .nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid var(--border); }
+        .hidden { display: none; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-link { padding: 10px 20px; cursor: pointer; border-radius: 8px; border: 1px solid var(--border); }
+        .tab-link.active { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div id="nav-bar" class="nav hidden">
+    <div id="user-info" style="font-weight: 600;">Memuat...</div>
+    <button class="btn" style="width: auto; background: #ef4444;" onclick="handleLogout()">Keluar</button>
+</div>
+
+<div class="container">
+    <div id="screen-login" class="card">
+        <h2 style="text-align: center;">Masuk ke Portal</h2>
+        <input type="email" id="login-email" placeholder="Email (Contoh: mhs@kampus.id)">
+        <input type="password" id="login-pass" placeholder="Password">
+        <button class="btn" onclick="handleLogin()">Masuk</button>
+        <p id="login-msg" style="color: red; font-size: 0.9rem;"></p>
+    </div>
+
+    <div id="screen-admin" class="hidden">
+        <div class="tabs">
+            <div class="tab-link active" onclick="showTab('admin-import')">👥 Import User</div>
+            <div class="tab-link" onclick="showTab('admin-soal')">📝 Soal & Sesi</div>
+            <div class="tab-link" onclick="showTab('admin-nilai')">📊 Nilai</div>
+        </div>
+
+        <div id="admin-import" class="tab-content active card">
+            <h3>Import Mahasiswa via Excel</h3>
+            <p style="font-size: 0.9rem; color: #64748b;">Gunakan format: Nama, Email, Password, NIM, Sesi</p>
+            <button class="btn btn-alt" style="background: #64748b;" onclick="downloadTemplate()">📥 Download Template Excel</button>
+            <hr>
+            <input type="file" id="excel-file" accept=".xlsx, .xls">
+            <button class="btn" onclick="processExcel()">🚀 Mulai Import Data</button>
+            <div id="import-log" style="margin-top: 10px; font-size: 0.8rem; max-height: 150px; overflow-y: auto;"></div>
+        </div>
+
+        <div id="admin-soal" class="tab-content card">
+            <p>Menu Manajemen Soal & Sesi (Silakan integrasikan fungsi simpan Soal/Sesi kamu di sini).</p>
+        </div>
+    </div>
+
+    <div id="screen-mhs" class="hidden card">
+        <h2>Selamat Datang, <span id="mhs-name"></span></h2>
+        <p>Sesi kamu: <b id="mhs-session"></b></p>
+        <button class="btn" id="btn-start-ujian">Buka Soal Ujian</button>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURASI ---
+    // --- KONFIGURASI SUPABASE ---
+const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+
+    // --- AUTH LOGIC ---
+    async function handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+        if (error) return alert("Login Gagal: " + error.message);
+        checkSession();
+    }
+
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+            currentUser = { ...session.user, ...profile };
+            showDashboard();
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('nav-bar').classList.remove('hidden');
+        document.getElementById('user-info').innerText = `${currentUser.full_name} (${currentUser.role})`;
+
+        if (currentUser.role === 'admin') {
+            document.getElementById('screen-admin').classList.remove('hidden');
+        } else {
+            document.getElementById('screen-mhs').classList.remove('hidden');
+            document.getElementById('mhs-name').innerText = currentUser.full_name;
+            document.getElementById('mhs-session').innerText = currentUser.session_name;
+        }
+    }
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        location.reload();
+    }
+
+    // --- TAB LOGIC ---
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // --- EXCEL LOGIC ---
+    function downloadTemplate() {
+        const wb = XLSX.utils.book_new();
+        const wsData = [
+            ["Nama", "Email", "Password", "NIM", "Sesi"],
+            ["Budi Santoso", "budi@mhs.id", "Pass123!", "2024001", "Sesi 1"],
+            ["Siti Aminah", "siti@mhs.id", "Pass456!", "2024002", "Sesi 1"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        XLSX.utils.book_append_sheet(wb, ws, "Template_User");
+        XLSX.writeFile(wb, "Template_Import_User.xlsx");
+    }
+
+    async function processExcel() {
+        const file = document.getElementById('excel-file').files[0];
+        if (!file) return alert("Pilih file dulu!");
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            const log = document.getElementById('import-log');
+            log.innerHTML = "<b>Memproses...</b><br>";
+
+            for (const row of json) {
+                // 1. Create Auth User
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: row.Email,
+                    password: row.Password,
+                    options: { data: { full_name: row.Nama } }
+                });
+
+                if (authError) {
+                    log.innerHTML += `❌ ${row.Email}: ${authError.message}<br>`;
+                    continue;
+                }
+
+                // 2. Insert into Profiles
+                const { error: profError } = await supabase.from('profiles').insert([{
+                    id: authData.user.id,
+                    full_name: row.Nama,
+                    nim: row.NIM,
+                    session_name: row.Sesi,
+                    role: 'mahasiswa'
+                }]);
+
+                if (profError) {
+                    log.innerHTML += `⚠️ ${row.Email}: Auth sukses, tapi profil gagal (${profError.message})<br>`;
+                } else {
+                    log.innerHTML += `✅ ${row.Email}: Berhasil diimpor.<br>`;
+                }
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Jalankan pengecekan saat halaman dimuat
+    checkSession();
+</script>
+</body>
+</html>
