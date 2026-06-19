@@ -60,6 +60,20 @@
             100% { transform: translate(100px, 50px) rotate(45deg) scale(1.2); }
         }
 
+        /* Cursor Glow Follower */
+        .cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
         .container {
             background: var(--surface);
             backdrop-filter: blur(24px);
@@ -73,6 +87,8 @@
             position: relative;
             z-index: 10;
             animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
         }
 
         @keyframes slideUpFade {
@@ -294,6 +310,8 @@
     </style>
 </head>
 <body>
+
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="bg-shapes">
     <div class="shape shape-1"></div>
@@ -646,6 +664,29 @@
     });
 
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("Fitur klik kanan dinonaktifkan untuk keamanan."); });
+
+    // Cursor Follower & 3D Tilt Effect
+    const cursorGlow = document.getElementById('cursorGlow');
+    const tiltContainer = document.querySelector('.container');
+
+    document.addEventListener('mousemove', (e) => {
+        // Move the glow
+        cursorGlow.style.opacity = '1';
+        cursorGlow.style.left = e.clientX + 'px';
+        cursorGlow.style.top = e.clientY + 'px';
+
+        // 3D Tilt effect (Only on larger screens for performance/ux)
+        if(window.innerWidth > 768) {
+            const xAxis = (window.innerWidth / 2 - e.clientX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.clientY) / 25;
+            tiltContainer.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+        }
+    });
+
+    document.addEventListener('mouseleave', () => {
+        cursorGlow.style.opacity = '0';
+        tiltContainer.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+    });
 </script>
 </body>
 </html>
