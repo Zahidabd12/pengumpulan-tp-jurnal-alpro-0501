@@ -87,8 +87,6 @@
             position: relative;
             z-index: 10;
             animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
         }
 
         @keyframes slideUpFade {
@@ -665,27 +663,17 @@
 
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("Fitur klik kanan dinonaktifkan untuk keamanan."); });
 
-    // Cursor Follower & 3D Tilt Effect
+    // Cursor Follower Effect
     const cursorGlow = document.getElementById('cursorGlow');
-    const tiltContainer = document.querySelector('.container');
 
     document.addEventListener('mousemove', (e) => {
-        // Move the glow
         cursorGlow.style.opacity = '1';
         cursorGlow.style.left = e.clientX + 'px';
         cursorGlow.style.top = e.clientY + 'px';
-
-        // 3D Tilt effect (Only on larger screens for performance/ux)
-        if(window.innerWidth > 768) {
-            const xAxis = (window.innerWidth / 2 - e.clientX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.clientY) / 25;
-            tiltContainer.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
-        }
     });
 
     document.addEventListener('mouseleave', () => {
         cursorGlow.style.opacity = '0';
-        tiltContainer.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
     });
 </script>
 </body>
