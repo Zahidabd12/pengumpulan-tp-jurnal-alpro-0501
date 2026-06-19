@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumpulan UAS - Praktikum Alpro 05-01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #ec4899;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            width: 100%;
+            max-width: 550px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .header h2 { font-weight: 800; font-size: 28px; line-height: 1.2; background: -webkit-linear-gradient(#fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+
+        .countdown-container {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .countdown-title { font-size: 13px; font-weight: 500; color: var(--secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .countdown-timer { font-size: 24px; font-weight: 700; display: flex; justify-content: center; gap: 10px; }
+        .countdown-timer span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            min-width: 55px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-section { display: none; animation: slideIn 0.4s ease forwards; }
+        .form-section.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .form-group { margin-bottom: 24px; text-align: left; }
+        label { font-size: 14px; font-weight: 500; color: var(--text-main); margin-bottom: 10px; display: block; }
+
+        select, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        select option { background: #1e293b; color: white; }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        input[readonly] { color: var(--text-muted); opacity: 0.7; cursor: not-allowed; }
+
+        input[type="file"] {
+            padding: 12px;
+            border: 1.5px dashed var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-right: 15px;
+            font-family: 'Outfit', sans-serif;
+        }
+        input[type="file"]::file-selector-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
+
+        .btn-group { display: flex; gap: 15px; margin-top: 35px; }
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid var(--border); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: var(--card-bg); border: 1px solid var(--border); padding: 40px 30px; border-radius: 24px; text-align: center; max-width: 380px; width: 90%; transform: scale(0.9); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .overlay.active .modal { transform: scale(1); }
+        
+        .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 25px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .modal h3 { font-size: 22px; font-weight: 700; color: white; margin-bottom: 10px; }
+        .modal p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+        .modal-icon { font-size: 60px; margin-bottom: 20px; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .btn-close-modal { margin-top: 25px; width: 100%; display: none; }
+
+        #sysStatus { text-align: center; font-size: 14px; color: var(--primary); margin-top: 20px; font-weight: 500; }
+
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%); background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(10px); padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 14px; z-index: 10000; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 4px solid var(--danger); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); width: max-content; max-width: 90%; color: white;}
+        .toast-container.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { font-size: 22px; }
+        
+        .nav-link { margin-top: 30px; font-size: 15px; color: var(--text-muted); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .nav-link:hover { color: white; }
+
+        .file-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastBox">
+    <span class="toast-icon">⚠️</span>
+    <span class="toast-message" id="toastMessage">Pesan error di sini</span>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="badge">Ujian Akhir Semester</div>
+        <h2>Pengumpulan UAS</h2>
+        <p>Praktikum Algoritma Pemrograman 05-01</p>
+    </div>
+
+    <div class="countdown-container" id="countdownContainer">
+        <div class="countdown-title">Waktu Tersisa</div>
+        <div class="countdown-timer" id="countdownTimer">
+            <span>--h</span> <span>--j</span> <span>--m</span> <span>--d</span>
+        </div>
+    </div>
+
+    <form id="uploadForm">
+        <div id="section1" class="form-section active">
+            <div class="form-group">
+                <label>Pilih Pertemuan</label>
+                <select id="pertemuan" disabled>
+                    <option value="UAS" selected>Pertemuan UAS</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nama Praktikan</label>
+                <select id="nama" required onchange="autoFillNIM()">
+                    <option value="">-- Cari Nama Kamu --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nomor Induk Mahasiswa (NIM)</label>
+                <input type="text" id="nim" placeholder="NIM otomatis terisi..." required readonly>
+            </div>
+            <div class="btn-group">
+                <button type="button" id="btnNext1" class="btn-primary" onclick="nextSection(1)" disabled>Lanjut Upload File ➔</button>
+            </div>
+            <p id="sysStatus">Menghubungkan ke Server...</p>
+        </div>
+
+        <div id="section2" class="form-section">
+            <div class="form-group">
+                <label>File Jawaban UAS (PDF) *</label>
+                <input type="file" id="file" accept="application/pdf" required>
+                <p class="file-hint">Wajib berformat PDF. Maksimal ukuran file 10 MB.</p>
+            </div>
+
+            <div class="form-group">
+                <label>File Source Code (.py) Opsional</label>
+                <input type="file" id="filePy" accept=".py">
+                <p class="file-hint">Lampirkan file Python (.py) jika diminta pada soal UAS.</p>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="prevSection(2)">⬅ Kembali</button>
+                <button type="submit" class="btn-primary" id="submitBtn">Kirim Jawaban 🚀</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<a href="index.html" class="nav-link">⬅ Kembali ke Pengumpulan Reguler</a>
+
+<div class="overlay" id="modalOverlay">
+    <div class="modal">
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <h3>Sedang Mengunggah...</h3>
+            <p>Mohon tunggu sebentar, sistem sedang menyimpan file ke server aman.</p>
+        </div>
+        <div id="resultState" style="display: none;">
+            <div class="modal-icon" id="resultIcon">✅</div>
+            <h3 id="resultTitle">Berhasil!</h3>
+            <p id="resultMessage">Tugas UAS kamu telah tersimpan.</p>
+            <button type="button" class="btn-primary btn-close-modal" id="closeModalBtn" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Link Web App yang sama dengan index.html
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbwsHWGQEf5HDjOzuLdAFvdqUkvGuH-TQbEIgvrVgojsx7e_xzvsjcT1La5mmBH7iA/exec"; 
+    
+    let dbMahasiswa = {}; 
+    let uasDeadline = null;
+    let toastTimeout;
+    let countdownInterval;
+
+    function showToast(message) {
+        const toast = document.getElementById('toastBox');
+        document.getElementById('toastMessage').innerText = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500); 
+    }
+
+    function startCountdown() {
+        if (!uasDeadline) return;
+        
+        const containerEl = document.getElementById("countdownContainer");
+        const timerEl = document.getElementById("countdownTimer");
+        containerEl.style.display = "block";
+
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const diff = uasDeadline - now;
+
+            if (diff <= 0) {
+                clearInterval(countdownInterval);
+                timerEl.innerHTML = `<span>00h</span> <span>00j</span> <span>00m</span> <span>00d</span>`;
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            timerEl.innerHTML = `<span>${days<10?'0'+days:days}h</span> <span>${hours<10?'0'+hours:hours}j</span> <span>${minutes<10?'0'+minutes:minutes}m</span> <span>${seconds<10?'0'+seconds:seconds}d</span>`;
+        }, 1000);
+    }
+
+    window.onload = function() {
+        fetch(webAppUrl).then(res => res.json()).then(data => {
+            if(data.status === "success") {
+                // Cari config untuk "UAS"
+                if (data.config["UAS"]) {
+                    // Gunakan batas waktu 'tugas' untuk UAS
+                    uasDeadline = data.config["UAS"].tugas; 
+                    startCountdown();
+                } else {
+                    document.querySelector('.countdown-title').innerText = "Catatan Penting";
+                    document.getElementById('countdownTimer').innerHTML = "<span style='font-size: 14px; padding: 10px; width: 100%; border: none;'>Pastikan baris 'UAS' ada di Sheet Setting agar batas waktu aktif.</span>";
+                    document.getElementById('countdownContainer').style.display = 'block';
+                }
+
+                const selectNama = document.getElementById("nama");
+                data.mahasiswa.forEach(mhs => {
+                    dbMahasiswa[mhs.nama] = mhs.nim;
+                    let opt = document.createElement('option');
+                    opt.value = mhs.nama; opt.innerText = mhs.nama;
+                    selectNama.appendChild(opt);
+                });
+
+                document.getElementById("btnNext1").disabled = false;
+                document.getElementById("sysStatus").innerText = "Sistem Tersambung ✅";
+                document.getElementById("sysStatus").style.color = "var(--success)";
+                setTimeout(() => document.getElementById("sysStatus").style.display = "none", 3000);
+            }
+        }).catch(err => {
+            document.getElementById("sysStatus").innerText = "Gagal terhubung ke Database.";
+            document.getElementById("sysStatus").style.color = "var(--danger)";
+        });
+    };
+
+    function autoFillNIM() {
+        const nm = document.getElementById("nama").value;
+        document.getElementById("nim").value = (nm && dbMahasiswa[nm]) ? dbMahasiswa[nm] : "";
+    }
+
+    function nextSection(current) {
+        if (current === 1) {
+            if (!document.getElementById('nama').value) return showToast("Biodata belum lengkap!");
+            
+            if (uasDeadline && new Date().getTime() > uasDeadline) {
+                return showToast("Maaf, batas waktu pengumpulan UAS sudah lewat.");
+            }
+        }
+        
+        document.getElementById('section' + current).classList.remove('active');
+        document.getElementById('section' + (current + 1)).classList.add('active');
+    }
+
+    function prevSection(current) {
+        document.getElementById('section' + current).classList.remove('active');
+        document.getElementById('section' + (current - 1)).classList.add('active');
+    }
+
+    const overlay = document.getElementById('modalOverlay');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+
+    function showResult(isSuccess, message) {
+        loadingState.style.display = 'none'; resultState.style.display = 'block';
+        document.getElementById('resultIcon').innerText = isSuccess ? "✅" : "❌";
+        document.getElementById('resultTitle').innerText = isSuccess ? "Berhasil!" : "Gagal Submit";
+        document.getElementById('resultTitle').style.color = isSuccess ? "var(--success)" : "var(--danger)";
+        document.getElementById('resultMessage').innerText = message;
+        document.getElementById('closeModalBtn').style.display = 'block';
+        document.getElementById('closeModalBtn').style.background = isSuccess ? "var(--success)" : "var(--danger)";
+    }
+
+    function closeModal() {
+        overlay.classList.remove('active');
+        if(document.getElementById('resultTitle').innerText === "Berhasil!") {
+            document.getElementById('uploadForm').reset();
+            prevSection(2);
+        }
+    }
+
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            if (!file) return resolve("");
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('file').files[0];
+        const filePyInput = document.getElementById('filePy').files[0];
+        
+        if (fileInput.type !== "application/pdf") return showToast("File utama wajib berformat PDF!");
+        if (fileInput.size > 10485760) return showToast("Ukuran file PDF terlalu besar! Maks. 10 MB.");
+
+        if (filePyInput) {
+            if (!filePyInput.name.toLowerCase().endsWith(".py")) return showToast("File source code wajib berekstensi .py!");
+            if (filePyInput.size > 10485760) return showToast("Ukuran file Python terlalu besar! Maks. 10 MB.");
+        }
+
+        overlay.classList.add('active');
+        loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
+
+        try {
+            const submitTime = new Date().getTime();
+            const pdfBase64 = await readFileAsBase64(fileInput);
+            const pyBase64 = await readFileAsBase64(filePyInput);
+            
+            // Payload menggunakan 'UAS' sebagai pertemuan, dan 'Tugas' sebagai jenisTugas 
+            // agar script backend (GAS) bisa membaca batas waktu di kolom "Tugas" dan simpan di folder "Tugas"
+            const payload = {
+                pertemuan: "UAS",
+                jenisTugas: "Tugas",
+                nama: document.getElementById('nama').value,
+                nim: document.getElementById('nim').value,
+                feedback: "", 
+                saran: "",   
+                fileBase64: pdfBase64,
+                filePyBase64: pyBase64
+            };
+
+            const response = await fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) });
+            const result = await response.json();
+
+            if(result.status === "success") { 
+                let timeMessage = "";
+                if (uasDeadline) {
+                    let diff = uasDeadline - submitTime;
+                    if (diff > 0) {
+                        const h = Math.floor(diff / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        if (h > 0) timeMessage = `\n\nKamu mengumpulkan ${h} jam ${m} menit sebelum deadline. Semoga berhasil!`;
+                        else timeMessage = `\n\nKamu mengumpulkan ${m} menit sebelum deadline. Nyaris!`;
+                    }
+                }
+
+                showResult(true, "Jawaban UAS berhasil terkirim." + timeMessage); 
+            } else { 
+                showResult(false, result.message); 
+            } 
+        } catch (error) {
+            showResult(false, "Terjadi gangguan jaringan saat memproses atau mengunggah file.");
+        }
+    });
+
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); showToast("⚠️ Fitur klik kanan dimatikan."); });
+</script>
+</body>
+</html>

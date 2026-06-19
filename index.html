@@ -297,6 +297,7 @@
                 const selectPertemuan = document.getElementById("pertemuan");
                 selectPertemuan.innerHTML = '<option value="">-- Pilih Pertemuan --</option>';
                 Object.keys(dbConfig).forEach(week => {
+                    if (week.toUpperCase() === "UAS") return; // Sembunyikan UAS dari halaman reguler
                     let opt = document.createElement('option');
                     opt.value = week; opt.innerText = "Pertemuan " + week;
                     selectPertemuan.appendChild(opt);
