@@ -247,11 +247,6 @@
                 <p class="file-hint">Wajib berformat PDF. Maksimal ukuran file 10 MB.</p>
             </div>
 
-            <div class="form-group">
-                <label>File Source Code (.py) Opsional</label>
-                <input type="file" id="filePy" accept=".py">
-                <p class="file-hint">Lampirkan file Python (.py) jika diminta pada soal UAS.</p>
-            </div>
 
             <div class="btn-group">
                 <button type="button" class="btn-secondary" onclick="prevSection(2)">⬅ Kembali</button>
@@ -415,15 +410,9 @@
         e.preventDefault();
         
         const fileInput = document.getElementById('file').files[0];
-        const filePyInput = document.getElementById('filePy').files[0];
         
         if (fileInput.type !== "application/pdf") return showToast("File utama wajib berformat PDF!");
         if (fileInput.size > 10485760) return showToast("Ukuran file PDF terlalu besar! Maks. 10 MB.");
-
-        if (filePyInput) {
-            if (!filePyInput.name.toLowerCase().endsWith(".py")) return showToast("File source code wajib berekstensi .py!");
-            if (filePyInput.size > 10485760) return showToast("Ukuran file Python terlalu besar! Maks. 10 MB.");
-        }
 
         overlay.classList.add('active');
         loadingState.style.display = 'block'; resultState.style.display = 'none'; document.getElementById('closeModalBtn').style.display = 'none';
@@ -431,7 +420,6 @@
         try {
             const submitTime = new Date().getTime();
             const pdfBase64 = await readFileAsBase64(fileInput);
-            const pyBase64 = await readFileAsBase64(filePyInput);
             
             // Payload menggunakan 'UAS' sebagai pertemuan, dan 'Tugas' sebagai jenisTugas 
             // agar script backend (GAS) bisa membaca batas waktu di kolom "Tugas" dan simpan di folder "Tugas"
@@ -443,7 +431,7 @@
                 feedback: "", 
                 saran: "",   
                 fileBase64: pdfBase64,
-                filePyBase64: pyBase64
+                filePyBase64: ""
             };
 
             const response = await fetch(webAppUrl, { method: "POST", body: JSON.stringify(payload) });
