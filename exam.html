@@ -94,7 +94,42 @@
     /* Fullscreen Warning Overlay */
     #screen-fs-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(220, 38, 38, 0.95); backdrop-filter: blur(10px); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; color: white; }
     
-    /* Webcam View */
+
+    #webcam-view {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 180px;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+      transform: scaleX(-1); /* Mirror effect */
+    }
+
+    /* Custom Modal Popup */
+    #custom-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      z-index: 10000; justify-content: center; align-items: center; padding: 20px;
+    }
+    .custom-modal-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 2rem; max-width: 400px; width: 100%; text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .custom-modal-box h2 { color: #f8fafc; margin-bottom: 1rem; font-size: 1.5rem; }
+    .custom-modal-box p { color: var(--text-muted); margin-bottom: 2rem; line-height: 1.5; }
+    .custom-modal-actions { display: flex; gap: 10px; justify-content: center; }
+    .modal-btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+    .modal-btn-primary { background: var(--primary); color: white; }
+    .modal-btn-primary:hover { background: var(--primary-hover); }
+    .modal-btn-secondary { background: transparent; border: 1px solid var(--border); color: white; }
+    .modal-btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
     #webcam-view {
       position: fixed;
       bottom: 20px;
@@ -114,7 +149,19 @@
 </head>
 <body>
 
+<div id="custom-modal-overlay">
+  <div class="custom-modal-box">
+    <h2 id="custom-modal-title">Peringatan</h2>
+    <p id="custom-modal-message">Pesan peringatan akan muncul di sini.</p>
+    <div class="custom-modal-actions">
+      <button class="modal-btn modal-btn-secondary" id="custom-modal-cancel" style="display: none;">Batal</button>
+      <button class="modal-btn modal-btn-primary" id="custom-modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
 <div id="screen-fs-warning">
+
   <h1 style="font-size: 3rem; margin-bottom: 10px;">⚠️ PELANGGARAN TERDETEKSI ⚠️</h1>
   <p style="font-size: 1.2rem; margin-bottom: 30px;">Kamu keluar dari mode Fullscreen, pindah tab, atau membuka aplikasi lain!<br>Ujian dihentikan sementara. Aktivitas ini tercatat oleh sistem.</p>
   <p style="font-size: 1rem; font-weight: bold; color: #fecaca; margin-bottom: 20px;">Jumlah Pelanggaran: <span id="violation-count">0</span></p>
@@ -172,6 +219,37 @@
 </div>
 
 <script>
+  // --- CUSTOM MODAL SYSTEM ---
+  function showModal(title, message, isConfirm = false, onConfirm = null) {
+    document.getElementById('custom-modal-title').innerText = title;
+    document.getElementById('custom-modal-message').innerText = message;
+    
+    const btnCancel = document.getElementById('custom-modal-cancel');
+    const btnOk = document.getElementById('custom-modal-ok');
+    
+    const newBtnCancel = btnCancel.cloneNode(true);
+    const newBtnOk = btnOk.cloneNode(true);
+    btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+    btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+    
+    if (isConfirm) {
+      newBtnCancel.style.display = 'inline-block';
+      newBtnOk.innerText = 'Ya, Lanjutkan';
+    } else {
+      newBtnCancel.style.display = 'none';
+      newBtnOk.innerText = 'OK';
+    }
+    
+    const overlay = document.getElementById('custom-modal-overlay');
+    overlay.style.display = 'flex';
+    
+    newBtnCancel.addEventListener('click', () => { overlay.style.display = 'none'; });
+    newBtnOk.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      if (onConfirm) onConfirm();
+    });
+  }
+
   // --- SUPABASE INIT ---
   const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co'; 
   const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN'; 
@@ -192,7 +270,7 @@
         video.style.display = 'block';
       })
       .catch(err => {
-        alert("Akses kamera diwajibkan untuk pengawasan ujian! Silakan izinkan kamera dan muat ulang halaman.");
+        showModal("Izin Ditolak", "Akses kamera diwajibkan untuk pengawasan ujian! Silakan izinkan kamera dan muat ulang halaman.");
         location.reload();
       });
   }
@@ -233,7 +311,7 @@
   async function checkJadwal() {
     const nim = document.getElementById('inp-nim').value.trim();
     
-    if(!nim) return alert("NIM wajib diisi!");
+    if(!nim) return showModal("Perhatian", "NIM wajib diisi!");
     
     const btn = document.getElementById('btn-login');
     btn.innerText = "Memvalidasi... ⏳"; btn.disabled = true;
@@ -262,7 +340,7 @@
         startCamera(); // Nyalakan kamera saat masuk lobby
 
     } catch (err) {
-        alert("Gagal: " + err.message);
+        showModal("Error", "Gagal: " + err.message);
         btn.innerText = "Validasi Peserta"; 
         btn.disabled = false;
     }
@@ -336,7 +414,7 @@
         startTimer(120); // Set default timer 120 menit (Bisa disesuaikan nanti)
 
     } catch (err) {
-        alert("Gagal memuat soal: " + err.message);
+        showModal("Error", "Gagal memuat soal: " + err.message);
         btn.innerText = "Mulai Ujian Sekarang 🚀"; btn.disabled = false;
     }
   }
