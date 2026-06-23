@@ -275,7 +275,12 @@
     // ==========================================
     const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co'; 
     const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN'; 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let supabase = null;
+    try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch (e) {
+        console.warn("Supabase Init Error:", e);
+    }
 
     let sessionActive = false;
 
@@ -308,7 +313,9 @@
     // 3. AUTHENTICATION LOGIC
     // ==========================================
     async function checkAuth() {
-        const { data: { session } } = await supabase.auth.getSession();
+        if (!supabase) return; // Safety check
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
@@ -321,6 +328,8 @@
             } else {
                 await supabase.auth.signOut();
             }
+        } catch (e) {
+            console.warn("Auth check failed:", e);
         }
     }
 
@@ -345,6 +354,7 @@
             }
 
             // 1. Coba Login
+            if (!supabase) throw new Error("Supabase tidak terhubung. Hanya login bypass yang berfungsi.");
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
