@@ -334,7 +334,7 @@
 
         try {
             // 0. Emergency Bypass Login
-            if (email === "admin@kampus.id" && password === "admin123") {
+            if (email.toLowerCase() === "admin@kampus.id" && password === "admin123") {
                 sessionActive = true;
                 document.getElementById('view-login').classList.add('hidden');
                 document.getElementById('view-dashboard').classList.remove('hidden');
