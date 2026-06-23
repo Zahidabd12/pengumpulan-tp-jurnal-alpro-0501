@@ -184,7 +184,7 @@
   <div class="card" id="screen-login" style="max-width: 450px; margin: 80px auto; text-align: center;">
     <h2 style="margin-bottom: 8px; font-size: 24px;">Ujian Susulan Praktikum</h2>
     <p style="color: var(--text-muted); margin-bottom: 24px;">Silakan masuk untuk memulai ujian.</p>
-    <input type="text" class="std-input" id="inp-nim" placeholder="NIM Kamu..." required>
+    <input type="text" class="std-input" id="inp-nim" placeholder="NIM Kamu..." required autocomplete="new-password">
     
     <button class="btn" id="btn-login" onclick="checkJadwal()">Validasi Peserta</button>
   </div>
@@ -440,8 +440,16 @@
 
   // --- PENGUMPULAN ---
   async function submitAnswers(isForce = false) {
-      if (!isForce && !confirm("Apakah kamu yakin sudah selesai? Jawaban yang sudah dikumpulkan tidak bisa diubah!")) return;
-      
+      if (!isForce) {
+          showModal("Konfirmasi Pengumpulan", "Apakah kamu yakin sudah selesai? Jawaban yang sudah dikumpulkan tidak bisa diubah!", true, () => {
+              executeSubmit(false);
+          });
+          return;
+      }
+      executeSubmit(true);
+  }
+
+  async function executeSubmit(isForce) {
       isExamActive = false;
       if(examIntervalTimer) clearInterval(examIntervalTimer);
       
@@ -449,7 +457,14 @@
       if(btn) { btn.innerText = "Mengumpulkan... ⏳"; btn.disabled = true; }
 
       // Kumpulkan semua jawaban dari textarea
-      let combinedAnswers = `=== JAWABAN SUSULAN ===\nNIM: ${studentData.nim}\nNama: ${studentData.nama}\nSesi: ${studentData.sesi}\n\n`;
+      let combinedAnswers = `=== JAWABAN SUSULAN ===\nNIM: ${studentData.nim}\nNama: ${studentData.nama}\nSesi: ${studentData.sesi}\n`;
+      
+      // Sisipkan Laporan Pelanggaran
+      if (typeof violationCount !== 'undefined' && violationCount > 0) {
+          combinedAnswers += `[SISTEM WARNING: Terdeteksi ${violationCount}x Pelanggaran (Keluar tab/fullscreen)]\n\n`;
+      } else {
+          combinedAnswers += `[SISTEM INFO: Bersih, 0 Pelanggaran]\n\n`;
+      }
       
       let totalBenar = 0;
       let totalSoalDiperiksa = 0;
@@ -507,7 +522,7 @@
           }
 
       } catch (err) {
-          alert("GAGAL MENGUMPULKAN JAWABAN: " + err.message + "\n\nSilakan simpan kode kamu secara manual dan hubungi asisten!");
+          showModal("Error", "GAGAL MENGUMPULKAN JAWABAN: " + err.message + "\n\nSilakan simpan kode kamu secara manual dan hubungi asisten!");
           if(btn) { btn.innerText = "Kumpulkan Semua Jawaban"; btn.disabled = false; }
       }
   }
