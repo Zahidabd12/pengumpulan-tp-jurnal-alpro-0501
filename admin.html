@@ -128,6 +128,7 @@
                 <div class="menu-item" onclick="switchTab('tab-soal', this)">📝 Bank Soal</div>
                 <div class="menu-item" onclick="switchTab('tab-nilai', this)">💯 Input Nilai</div>
                 <div class="menu-item" onclick="switchTab('tab-import', this)">👥 Import Mahasiswa</div>
+                <div class="menu-item" onclick="switchTab('tab-susulan', this)">🔄 Manajemen Susulan</div>
             </nav>
         </aside>
 
@@ -214,6 +215,32 @@
                         <div class="flex" style="gap: 12px; margin-top: 16px;">
                             <button type="submit" class="btn btn-success">Simpan Nilai</button>
                             <button type="button" class="btn btn-outline" onclick="exportNilaiCSV()">Unduh Rekap Nilai (CSV)</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="tab-susulan" class="card tab-content hidden">
+                    <h2 class="section-title">Manajemen Izin Ujian Susulan</h2>
+                    <form onsubmit="submitData(event, 'Susulan')">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label" for="inp-susulan-nim">NIM Mahasiswa</label>
+                                <input type="text" id="inp-susulan-nim" class="form-control" placeholder="NIM" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="inp-susulan-nama">Nama Lengkap</label>
+                                <input type="text" id="inp-susulan-nama" class="form-control" placeholder="Nama Mahasiswa" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inp-susulan-status">Status Izin Akses</label>
+                            <select id="inp-susulan-status" class="form-control" required>
+                                <option value="Diizinkan">Diberikan Akses Ujian Susulan</option>
+                                <option value="Ditolak">Akses Ditutup / Dicabut</option>
+                            </select>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <button type="submit" class="btn btn-success">Simpan Izin Susulan</button>
                         </div>
                     </form>
                 </div>
@@ -383,6 +410,12 @@
                 sesi: document.getElementById('inp-nilai-sesi').value,
                 skor: document.getElementById('inp-nilai-skor').value,
                 catatan: document.getElementById('inp-nilai-catatan').value
+            };
+        } else if (tableName === 'Susulan') {
+            payload = {
+                nim: document.getElementById('inp-susulan-nim').value,
+                nama: document.getElementById('inp-susulan-nama').value,
+                status: document.getElementById('inp-susulan-status').value
             };
         }
 
