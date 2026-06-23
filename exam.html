@@ -82,8 +82,8 @@
         .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
     
     /* CBT Layout Enhancements */
-    .cbt-container { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
-    .cbt-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: sticky; top: 90px; backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .cbt-container { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+    .cbt-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: sticky; top: 90px; backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); height: fit-content; max-height: calc(100vh - 120px); overflow-y: auto; }
     .cbt-nav-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; font-weight: 600; border-radius: 8px; aspect-ratio: 1; cursor: pointer; transition: 0.2s; font-size: 15px; display: flex; justify-content: center; align-items: center; }
     .cbt-nav-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
     .cbt-nav-btn.answered { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #10b981; }
@@ -260,6 +260,16 @@
     </div>
 
   <div id="screen-soal" style="display: none;" class="cbt-container">
+    <!-- Main Content -->
+    <div class="cbt-main">
+      <div style="margin-bottom: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #bfdbfe; font-size: 14px; display: flex; gap: 10px; align-items: flex-start;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Tulis kodingan langsung di editor di bawah setiap soal. Sistem akan mendeteksi ketikanmu dan <strong>menyimpannya otomatis di memori perangkat</strong>. Jangan keluar dari sesi layar penuh.</span>
+      </div>
+      
+      <div id="questions-container"></div>
+    </div>
+
     <!-- Sidebar -->
     <div class="cbt-sidebar">
       <div style="font-weight: 600; color: #94a3b8; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">Navigasi Soal</div>
@@ -274,16 +284,6 @@
       </div>
       
       <button class="btn btn-success" id="btn-submit" onclick="confirmSubmit()" style="padding: 14px; width: 100%; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">Kumpulkan Ujian</button>
-    </div>
-
-    <!-- Main Content -->
-    <div class="cbt-main">
-      <div style="margin-bottom: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #bfdbfe; font-size: 14px; display: flex; gap: 10px; align-items: flex-start;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        <span>Tulis kodingan langsung di editor di bawah setiap soal. Sistem akan mendeteksi ketikanmu dan <strong>menyimpannya otomatis di memori perangkat</strong>. Jangan keluar dari sesi layar penuh.</span>
-      </div>
-      
-      <div id="questions-container"></div>
     </div>
   </div>
 
