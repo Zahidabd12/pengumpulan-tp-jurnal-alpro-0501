@@ -149,7 +149,7 @@
   // --- SUPABASE INIT ---
   const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co'; 
   const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN'; 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let studentData = { nim: '', nama: '', sesi: '' };
   let isExamActive = false;
@@ -213,7 +213,7 @@
     btn.innerText = "Memvalidasi... ⏳"; btn.disabled = true;
 
     try {
-        const { data, error } = await supabase.from('Susulan').select('*').eq('nim', nim).single();
+        const { data, error } = await supabaseClient.from('Susulan').select('*').eq('nim', nim).single();
         
         if (error || !data) {
             throw new Error("NIM tidak ditemukan dalam daftar peserta Susulan.");
@@ -245,7 +245,7 @@
     btn.innerText = "Memuat Soal... ⏳"; btn.disabled = true;
     
     try {
-        const { data, error } = await supabase.from('Soal').select('*').order('no_soal', { ascending: true });
+        const { data, error } = await supabaseClient.from('Soal').select('*').order('no_soal', { ascending: true });
         
         if (error) throw error;
         if (!data || data.length === 0) throw new Error("Tidak ada soal ditemukan untuk sesi ini.");
@@ -326,7 +326,7 @@
       });
 
       try {
-          const { error } = await supabase.from('Jawaban_Susulan').insert([{
+          const { error } = await supabaseClient.from('Jawaban_Susulan').insert([{
               nim: studentData.nim,
               sesi: studentData.sesi,
               kode_jawaban: combinedAnswers
