@@ -172,6 +172,10 @@
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; background: #1e1e1e; }
         .code-pre { margin: 0; font-family: 'Fira Code', monospace; font-size: 14px; color: #d4d4d4; white-space: pre-wrap; word-break: break-all; }
 </style>
+    <!-- KaTeX for Equation Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
 
@@ -340,7 +344,9 @@
                         <div class="grid-2">
                             <div class="form-group">
                                 <label class="form-label" for="inp-soal-sesi">Target Sesi</label>
-                                <input type="text" id="inp-soal-sesi" class="form-control" placeholder="Nama sesi tujuan" required>
+                                <select id="inp-soal-sesi" class="form-control" required>
+                                    <option value="">Memuat Sesi...</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="inp-soal-no">Nomor Soal</label>
@@ -359,6 +365,24 @@
                             <button type="submit" class="btn">Simpan ke Bank Soal</button>
                         </div>
                     </form>
+                    <div class="data-viewer" style="margin-top: 32px;">
+                        <h3 style="margin-bottom: 16px; font-size: 16px;">Daftar Bank Soal</h3>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-soal">
+                                <thead>
+                                    <tr>
+                                        <th>Sesi</th>
+                                        <th>No</th>
+                                        <th>Pertanyaan</th>
+                                        <th style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- TAB: NILAI -->
@@ -461,11 +485,32 @@
         if (tabId === 'tab-sesi') loadTableData('Sesi');
         if (tabId === 'tab-susulan') loadTableData('Susulan');
         if (tabId === 'tab-hasil-susulan') loadTableData('Jawaban_Susulan');
+        if (tabId === 'tab-soal') {
+            loadTableData('Soal');
+            populateSesiDropdown();
+        }
     }
 
     // ==========================================
     // 3. DATA FETCHING (VIEWER)
     // ==========================================
+
+    async function populateSesiDropdown() {
+        if (!supabaseClient) return;
+        try {
+            const { data, error } = await supabaseClient.from('Sesi').select('nama_sesi');
+            if (error) throw error;
+            const dropdown = document.getElementById('inp-soal-sesi');
+            dropdown.innerHTML = '<option value="">-- Pilih Sesi --</option>';
+            data.forEach(s => {
+                dropdown.innerHTML += `<option value="${s.nama_sesi}">${s.nama_sesi}</option>`;
+            });
+            dropdown.innerHTML += `<option value="Susulan">Susulan (Khusus Ujian Susulan)</option>`;
+        } catch (e) {
+            console.warn("Gagal memuat sesi", e);
+        }
+    }
+
     async function loadTableData(tableName) {
         if (!supabaseClient) return;
         const tableId = `table-${tableName.toLowerCase()}`;
@@ -514,10 +559,26 @@
                         </td>
                     `;
                 }
+                                } else if (tableName === 'Soal') {
+                    tr.innerHTML = `
+                        <td><strong>${row.sesi || '-'}</strong></td>
+                        <td>${row.no_soal || '-'}</td>
+                        <td class="soal-text-preview" style="white-space: pre-wrap; word-break: break-word;">${row.teks_soal || '-'}</td>
+                        <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
+                    `;
+                }
                 tbody.appendChild(tr);
             });
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--danger);">Gagal memuat: ${err.message}</td></tr>`;
+        }
+        
+        if (tableName === 'Soal' && window.renderMathInElement) {
+            setTimeout(() => {
+                renderMathInElement(document.getElementById('table-soal'), {
+                    delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}]
+                });
+            }, 100);
         }
     }
 
