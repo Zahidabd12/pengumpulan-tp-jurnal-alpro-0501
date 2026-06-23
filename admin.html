@@ -738,8 +738,26 @@
                 sesi: document.getElementById('inp-soal-sesi').value,
                 no_soal: document.getElementById('inp-soal-no').value,
                 url_gambar: document.getElementById('inp-soal-img').value,
-                teks_soal: document.getElementById('inp-soal-text').value
+                teks_soal: document.getElementById('inp-soal-text').value,
+                template_jawaban: document.getElementById('inp-soal-template').value || null,
+                kunci_jawaban: document.getElementById('inp-soal-kunci').value || null
             };
+            
+            if (typeof editSoalId !== 'undefined' && editSoalId) {
+                try {
+                    const { error } = await supabaseClient.from(tableName).update(payload).eq('id', editSoalId);
+                    if (error) throw error;
+                    showToast('Soal berhasil diperbarui!', 'success');
+                    e.target.reset();
+                    cancelEditSoal();
+                    loadTableData(tableName);
+                } catch (err) {
+                    showToast('Gagal memperbarui: ' + err.message, 'error');
+                } finally {
+                    btn.innerText = originalText; btn.disabled = false;
+                }
+                return;
+            }
         } else if (tableName === 'Nilai') {
             payload = {
                 nim: document.getElementById('inp-nilai-nim').value,
@@ -764,6 +782,7 @@
             // Refresh table view
             if (tableName === 'Sesi') loadTableData('Sesi');
             if (tableName === 'Susulan') loadTableData('Susulan');
+            if (tableName === 'Soal') loadTableData('Soal');
             
         } catch (err) {
             showToast(`Gagal menyimpan: ${err.message}`, 'error');
