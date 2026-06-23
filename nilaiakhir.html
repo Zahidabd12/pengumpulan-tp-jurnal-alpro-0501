@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transkrip Nilai Akhir Praktikum</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            margin: 0; padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header { text-align: center; margin-bottom: 32px; }
+        .header h1 { margin: 0 0 8px 0; font-size: 24px; color: #fff; }
+        .header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
+        .form-control {
+            width: 100%; padding: 12px 16px;
+            background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+            border-radius: 8px; color: #fff; font-size: 15px;
+            outline: none; transition: 0.3s;
+        }
+        .form-control:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+
+        .btn {
+            width: 100%; padding: 14px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* Scorecard */
+        .scorecard { display: none; }
+        .student-info { text-align: center; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .student-info h2 { margin: 0 0 4px 0; font-size: 20px; color: var(--primary); }
+        .student-info p { margin: 0; color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
+
+        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .score-item {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px; text-align: center;
+        }
+        .score-item .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+        .score-item .value { font-size: 24px; font-weight: 700; color: #fff; }
+
+        .final-score {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px; padding: 24px; text-align: center;
+            margin-bottom: 24px;
+        }
+        .final-score .label { font-size: 14px; font-weight: 600; color: #93c5fd; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .final-score .value { font-size: 48px; font-weight: 800; color: #fff; line-height: 1; }
+
+        .remedial-box {
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px; padding: 20px; text-align: center;
+            margin-top: 24px; display: none;
+        }
+        .remedial-box h3 { color: #fca5a5; margin: 0 0 10px 0; font-size: 16px; }
+        .remedial-box p { color: var(--text-muted); font-size: 13px; margin: 0 0 16px 0; line-height: 1.5; }
+        
+        .radio-group { display: flex; gap: 10px; margin-bottom: 16px; justify-content: center; }
+        .radio-label {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            padding: 10px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+            border-radius: 6px; font-size: 14px; transition: 0.2s;
+        }
+        .radio-label:hover { background: rgba(255,255,255,0.05); }
+        .radio-label input:checked + span { color: var(--primary); font-weight: 600; }
+        .radio-label input { accent-color: var(--primary); }
+
+        .alert { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; display: none; }
+        .alert.error { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
+        .alert.success { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #6ee7b7; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- LOGIN VIEW -->
+        <div class="card" id="view-login">
+            <div class="header">
+                <h1>Transkrip Nilai Akhir</h1>
+                <p>Masukkan NIM untuk melihat hasil evaluasi praktikum</p>
+            </div>
+            <div class="alert error" id="login-error"></div>
+            <form id="form-login" onsubmit="fetchNilai(event)">
+                <div class="form-group">
+                    <label class="form-label">Nomor Induk Mahasiswa (NIM)</label>
+                    <input type="text" id="inp-nim" class="form-control" placeholder="Contoh: 1081025..." required autocomplete="off">
+                </div>
+                <button type="submit" class="btn" id="btn-login">Lihat Nilai Saya</button>
+            </form>
+        </div>
+
+        <!-- SCORECARD VIEW -->
+        <div class="card scorecard" id="view-score">
+            <button class="btn btn-outline" style="background: transparent; border: 1px solid var(--border); padding: 8px 16px; width: auto; font-size: 13px; margin-bottom: 20px;" onclick="location.reload()">← Kembali</button>
+            
+            <div class="student-info">
+                <h2 id="disp-nama">Nama Praktikan</h2>
+                <p id="disp-nim">108102500000</p>
+            </div>
+
+            <div class="final-score">
+                <span class="label">Total Nilai Akhir</span>
+                <span class="value" id="disp-total">0.0</span>
+            </div>
+
+            <div class="score-grid">
+                <div class="score-item">
+                    <span class="label">Tugas Pendahuluan</span>
+                    <span class="value" id="disp-tp">-</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Jurnal</span>
+                    <span class="value" id="disp-jurnal">-</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Ujian Tengah Semester</span>
+                    <span class="value" id="disp-uts">-</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Ujian Akhir Semester</span>
+                    <span class="value" id="disp-uas">-</span>
+                </div>
+            </div>
+
+            <!-- REMEDIAL SECTION -->
+            <div class="remedial-box" id="remedial-section">
+                <h3>⚠️ Status Waspada (Remedial)</h3>
+                <p>Berdasarkan perolehan nilai, kamu <strong>wajib/berhak</strong> mengambil Ujian Remedial. Silakan konfirmasi keputusanmu di bawah ini agar asisten dapat mendata.</p>
+                
+                <div id="remedial-form-area">
+                    <form onsubmit="submitRemedial(event)">
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="pilihanRemedial" value="Ambil Remedial" required>
+                                <span>Ambil Remedial</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="pilihanRemedial" value="Tidak Ambil Remedial" required>
+                                <span>Tidak Ambil</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn" style="background: var(--danger);" id="btn-remedial">Kirim Keputusan</button>
+                    </form>
+                </div>
+                <div id="remedial-status-area" style="display: none; margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                    <span style="font-size: 13px; color: var(--text-muted);">Keputusan kamu:</span><br>
+                    <strong style="color: #fff; font-size: 15px;" id="disp-keputusan">Ambil Remedial</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GANTI URL INI JIKA ADA DEPLOYMENT BARU DARI GOOGLE APPS SCRIPT
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbwsHWGQEf5HDjOzuLdAFvdqUkvGuH-TQbEIgvrVgojsx7e_xzvsjcT1La5mmBH7iA/exec";
+        
+        let currentNim = "";
+
+        async function fetchNilai(e) {
+            e.preventDefault();
+            const nim = document.getElementById('inp-nim').value.trim();
+            if (!nim) return;
+
+            const btn = document.getElementById('btn-login');
+            const errBox = document.getElementById('login-error');
+            
+            btn.innerText = "Mencari Data... ⏳";
+            btn.disabled = true;
+            errBox.style.display = 'none';
+
+            try {
+                const response = await fetch(`${webAppUrl}?action=getNilaiAkhir&nim=${encodeURIComponent(nim)}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    currentNim = result.data.nim;
+                    renderScorecard(result.data);
+                } else {
+                    throw new Error(result.message || "Data tidak ditemukan.");
+                }
+            } catch (err) {
+                errBox.innerText = err.message;
+                errBox.style.display = 'block';
+            } finally {
+                btn.innerText = "Lihat Nilai Saya";
+                btn.disabled = false;
+            }
+        }
+
+        function renderScorecard(data) {
+            document.getElementById('view-login').style.display = 'none';
+            document.getElementById('view-score').style.display = 'block';
+
+            document.getElementById('disp-nama').innerText = data.nama;
+            document.getElementById('disp-nim').innerText = data.nim;
+            
+            document.getElementById('disp-total').innerText = data.total !== "" ? data.total : "-";
+            document.getElementById('disp-tp').innerText = data.tp !== "" ? data.tp : "-";
+            document.getElementById('disp-jurnal').innerText = data.jurnal !== "" ? data.jurnal : "-";
+            document.getElementById('disp-uts').innerText = data.uts !== "" ? data.uts : "-";
+            document.getElementById('disp-uas').innerText = data.uas !== "" ? data.uas : "-";
+
+            // Logika Remedial (Jika predikat D atau E)
+            const predikat = (data.predikat || "").toString().toUpperCase().trim();
+            if (predikat === "D" || predikat === "E") {
+                document.getElementById('remedial-section').style.display = 'block';
+                
+                // Jika sudah pernah memilih
+                if (data.statusRemedial && data.statusRemedial !== "") {
+                    document.getElementById('remedial-form-area').style.display = 'none';
+                    document.getElementById('remedial-status-area').style.display = 'block';
+                    document.getElementById('disp-keputusan').innerText = data.statusRemedial;
+                } else {
+                    document.getElementById('remedial-form-area').style.display = 'block';
+                    document.getElementById('remedial-status-area').style.display = 'none';
+                }
+            } else {
+                document.getElementById('remedial-section').style.display = 'none';
+            }
+        }
+
+        async function submitRemedial(e) {
+            e.preventDefault();
+            const pilihan = document.querySelector('input[name="pilihanRemedial"]:checked');
+            if (!pilihan) return alert("Pilih salah satu opsi!");
+
+            const btn = document.getElementById('btn-remedial');
+            btn.innerText = "Mengirim... ⏳";
+            btn.disabled = true;
+
+            const payload = {
+                action: "submitRemedial",
+                nim: currentNim,
+                pilihan: pilihan.value
+            };
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert("Keputusan berhasil disimpan! Terima kasih.");
+                    // Update UI
+                    document.getElementById('remedial-form-area').style.display = 'none';
+                    document.getElementById('remedial-status-area').style.display = 'block';
+                    document.getElementById('disp-keputusan').innerText = pilihan.value;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (err) {
+                alert("Gagal menyimpan: " + err.message);
+            } finally {
+                btn.innerText = "Kirim Keputusan";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
