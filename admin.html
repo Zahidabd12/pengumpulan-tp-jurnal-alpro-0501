@@ -558,8 +558,7 @@
                             <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px; margin-left: 5px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
                         </td>
                     `;
-                }
-                                } else if (tableName === 'Soal') {
+                } else if (tableName === 'Soal') {
                     tr.innerHTML = `
                         <td><strong>${row.sesi || '-'}</strong></td>
                         <td>${row.no_soal || '-'}</td>
