@@ -514,7 +514,8 @@
             data.forEach(s => {
                 dropdown.innerHTML += `<option value="${s.nama_sesi}">${s.nama_sesi}</option>`;
             });
-            dropdown.innerHTML += `<option value="Susulan">Susulan (Khusus Ujian Susulan)</option>`;
+            dropdown.innerHTML += `<option value="Susulan UTS">Susulan UTS</option>
+            <option value="Susulan UAS">Susulan UAS</option>`;
         } catch (e) {
             console.warn("Gagal memuat sesi", e);
         }
@@ -608,9 +609,8 @@
     }
 
 
-    async function toggleStatusSusulan(id, currentStatus) {
+    async function toggleStatusSusulan(id, newStatus) {
         if (!supabaseClient) return;
-        const newStatus = currentStatus === 'Diizinkan' ? 'Ditolak' : 'Diizinkan';
         try {
             const { error } = await supabaseClient.from('Susulan').update({ status: newStatus }).eq('id', id);
             if (error) throw error;

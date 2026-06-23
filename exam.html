@@ -220,11 +220,15 @@
             throw new Error("NIM tidak ditemukan dalam daftar peserta Susulan.");
         }
         
-        if (data.status !== 'Diizinkan') {
+        if (!data.status || !data.status.startsWith('Diizinkan')) {
             throw new Error("Akses ditolak. Status kamu: " + data.status);
         }
 
-        studentData = { nim: data.nim, nama: data.nama, sesi: "Susulan" };
+        let jenisUjian = 'UTS'; // Default legacy fallback
+        if (data.status.includes('UAS')) jenisUjian = 'UAS';
+        if (data.status.includes('Keduanya')) jenisUjian = 'Keduanya';
+
+        studentData = { nim: data.nim, nama: data.nama, sesi: "Susulan " + jenisUjian, jenis: jenisUjian };
         
         document.getElementById('screen-login').style.display = 'none';
         document.getElementById('screen-lobby').style.display = 'block';
@@ -246,7 +250,17 @@
     btn.innerText = "Memuat Soal... ⏳"; btn.disabled = true;
     
     try {
-        const { data, error } = await supabaseClient.from('Soal').select('*').order('no_soal', { ascending: true });
+        let query = supabaseClient.from('Soal').select('*').order('no_soal', { ascending: true });
+        
+        if (studentData.jenis === 'UTS') {
+            query = query.eq('sesi', 'Susulan UTS');
+        } else if (studentData.jenis === 'UAS') {
+            query = query.eq('sesi', 'Susulan UAS');
+        } else if (studentData.jenis === 'Keduanya') {
+            query = query.in('sesi', ['Susulan UTS', 'Susulan UAS']);
+        }
+        
+        const { data, error } = await query;
         
         if (error) throw error;
         if (!data || data.length === 0) throw new Error("Tidak ada soal ditemukan untuk sesi ini.");
