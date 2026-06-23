@@ -552,11 +552,18 @@
                         </td>
                     `;
                 } else if (tableName === 'Susulan') {
-                    const badgeClass = row.status === 'Diizinkan' ? 'badge-success' : 'badge-error';
                     tr.innerHTML = `
                         <td>${row.nim || '-'}</td>
                         <td><strong>${row.nama || '-'}</strong></td>
-                        <td><span class="badge ${badgeClass}" style="cursor: pointer;" onclick="toggleStatusSusulan(${row.id}, '${row.status}')" title="Klik untuk mengubah status">${row.status || '-'} 🔄</span></td>
+                        <td>
+                            <select class="form-control" style="padding: 4px 8px; font-size: 13px;" onchange="toggleStatusSusulan(${row.id}, this.value)">
+                                <option value="Ditolak" ${row.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+                                <option value="Diizinkan (UTS)" ${row.status === 'Diizinkan (UTS)' ? 'selected' : ''}>Diizinkan (UTS)</option>
+                                <option value="Diizinkan (UAS)" ${row.status === 'Diizinkan (UAS)' ? 'selected' : ''}>Diizinkan (UAS)</option>
+                                <option value="Diizinkan (Keduanya)" ${row.status === 'Diizinkan (Keduanya)' ? 'selected' : ''}>Diizinkan (Keduanya)</option>
+                                <option value="Diizinkan" ${row.status === 'Diizinkan' ? 'selected' : ''}>Diizinkan (Legacy)</option>
+                            </select>
+                        </td>
                         <td>
                             <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
                         </td>
