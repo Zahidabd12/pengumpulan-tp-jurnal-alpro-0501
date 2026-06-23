@@ -493,7 +493,6 @@
                         <td><span class="badge ${badgeClass}">${row.status || '-'}</span></td>
                         <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
                     `;
-                }
                 } else if (tableName === 'Jawaban_Susulan') {
                     tr.innerHTML = `
                         <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
