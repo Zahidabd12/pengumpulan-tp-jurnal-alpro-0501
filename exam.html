@@ -211,18 +211,19 @@
     <h2 style="margin-bottom: 8px; font-size: 24px;">Ujian Susulan Praktikum</h2>
     <p style="color: var(--text-muted); margin-bottom: 24px;">Silakan masuk untuk memulai ujian.</p>
     <input type="text" class="std-input" id="inp-nim" placeholder="NIM Kamu..." required autocomplete="new-password">
-    <select class="std-input" id="inp-sesi-pilihan" required style="margin-bottom: 24px;">
-      <option value="">-- Pilih Sesi Ujian --</option>
-    </select>
+    
     
     <button class="btn" id="btn-login" onclick="checkJadwal()">Validasi Peserta</button>
   </div>
 
-  <div class="card" id="screen-lobby" style="display: none; text-align: center; margin-top: 80px;">
+    <div class="card" id="screen-lobby" style="display: none; text-align: center; margin-top: 80px;">
     <h3 id="lobby-msg" style="font-size: 24px; color: #818cf8;">Halo!</h3>
-    <p style="color: var(--text-muted); margin-top: 10px;">Kamu terdaftar untuk mengikuti ujian susulan ini.</p>
+    <p style="color: var(--text-muted); margin-top: 10px;">Kamu terdaftar untuk mengikuti ujian ini. Silakan pilih sesi yang ingin kamu kerjakan:</p>
+    <select class="std-input" id="inp-sesi-pilihan" required style="margin: 20px auto; display: block; max-width: 300px;">
+      <option value="">-- Pilih Sesi Ujian --</option>
+    </select>
     <div style="margin: 30px 0;">
-        <button class="btn" id="btn-start" onclick="fetchSoal()">Mulai Ujian Sekarang 🚀</button>
+        <button class="btn" id="btn-start" onclick="confirmStartExam()">Mulai Ujian Sekarang 🚀</button>
     </div>
   </div>
 
@@ -341,9 +342,20 @@
   });
 
   // --- VALIDASI PESERTA ---
+  window.addEventListener('DOMContentLoaded', async () => {
+      try {
+          const { data, error } = await supabaseClient.from('Sesi').select('nama_sesi');
+          if (data) {
+              const dd = document.getElementById('inp-sesi-pilihan');
+              data.forEach(s => {
+                  dd.innerHTML += `<option value="${s.nama_sesi}">${s.nama_sesi}</option>`;
+              });
+          }
+      } catch(e) {}
+  });
+
   async function checkJadwal() {
     const nim = document.getElementById('inp-nim').value.trim();
-    
     if(!nim) return showModal("Perhatian", "NIM wajib diisi!");
     
     const btn = document.getElementById('btn-login');
@@ -351,27 +363,16 @@
 
     try {
         const { data, error } = await supabaseClient.from('Susulan').select('*').eq('nim', nim).single();
-        
-        if (error || !data) {
-            throw new Error("NIM tidak ditemukan dalam daftar peserta Susulan.");
-        }
-        
-        if (!data.status || !data.status.startsWith('Diizinkan')) {
-            throw new Error("Akses ditolak. Status kamu: " + data.status);
-        }
+        if (error || !data) throw new Error("NIM tidak ditemukan dalam daftar peserta.");
+        if (!data.status || !data.status.startsWith('Diizinkan')) throw new Error("Akses ditolak. Status kamu: " + data.status);
 
-        let jenisUjian = 'UTS'; // Default legacy fallback
-        if (data.status.includes('UAS')) jenisUjian = 'UAS';
-        if (data.status.includes('Keduanya')) jenisUjian = 'Keduanya';
-
-        studentData = { nim: data.nim, nama: data.nama, sesi: "Susulan " + jenisUjian, jenis: jenisUjian };
+        studentData = { nim: data.nim, nama: data.nama, sesi: '' };
         
         document.getElementById('screen-login').style.display = 'none';
         document.getElementById('screen-lobby').style.display = 'block';
         document.getElementById('lobby-msg').innerText = `Halo, ${data.nama}!`;
         
-        startCamera(); // Nyalakan kamera saat masuk lobby
-
+        startCamera();
     } catch (err) {
         showModal("Error", "Gagal: " + err.message);
         btn.innerText = "Validasi Peserta"; 
@@ -380,29 +381,55 @@
   }
 
   // --- AMBIL SOAL ---
-  async function fetchSoal() {
+
+  function confirmStartExam() {
+      const sesiPilihan = document.getElementById('inp-sesi-pilihan').value;
+      if (!sesiPilihan) return showModal("Perhatian", "Silakan pilih sesi ujian terlebih dahulu!");
+      
+      studentData.sesi = sesiPilihan;
+      
+      const now = new Date();
+      const secondsUntilDeadline = (EXAM_DEADLINE - now) / 1000;
+      
+      if (secondsUntilDeadline <= 0) {
+          return showModal("Ujian Ditutup", "Batas akhir waktu pengerjaan ujian ini telah berakhir.");
+      }
+      
+      let actualMinutes = EXAM_MAX_MINUTES;
+      if (secondsUntilDeadline < EXAM_MAX_MINUTES * 60) {
+          actualMinutes = Math.floor(secondsUntilDeadline / 60);
+      }
+      if (actualMinutes < 1) actualMinutes = 1;
+      
+      showModal("Konfirmasi Mulai", `Kamu memilih sesi ${sesiPilihan}. Waktu maksimal yang diberikan adalah ${actualMinutes} menit. Waktu akan langsung berjalan setelah menekan tombol Ya. Apakah kamu yakin ingin memulai sekarang?`, true, () => {
+          fetchSoal(actualMinutes);
+      });
+  }
+
+  async function fetchSoal(minutesDuration) {
     enterFullscreen();
     const btn = document.getElementById('btn-start');
     btn.innerText = "Memuat Soal... ⏳"; btn.disabled = true;
     
     try {
-        let query = supabaseClient.from('Soal').select('*').order('no_soal', { ascending: true });
-        
-        if (studentData.jenis === 'UTS') {
-            query = query.eq('sesi', 'Susulan UTS');
-        } else if (studentData.jenis === 'UAS') {
-            query = query.eq('sesi', 'Susulan UAS');
-        } else if (studentData.jenis === 'Keduanya') {
-            query = query.in('sesi', ['Susulan UTS', 'Susulan UAS']);
-        }
-        
-        const { data, error } = await query;
+        const { data, error } = await supabaseClient.from('Soal').select('*').eq('sesi', studentData.sesi).order('no_soal', { ascending: true });
         
         if (error) throw error;
-        if (!data || data.length === 0) throw new Error("Tidak ada soal ditemukan untuk sesi ini.");
+        if (!data || data.length === 0) throw new Error("Tidak ada soal ditemukan untuk sesi " + studentData.sesi);
 
         soalList = data;
         
+        // Setup Watermark
+        const wmContainer = document.getElementById('security-watermark');
+        wmContainer.innerHTML = '';
+        const wmString = `${studentData.nim} - ${studentData.nama} - `;
+        for(let i=0; i<50; i++) {
+            const span = document.createElement('div');
+            span.className = 'watermark-text';
+            span.innerText = wmString;
+            wmContainer.appendChild(span);
+        }
+
         isExamActive = true;
         document.getElementById('screen-lobby').style.display = 'none';
         document.getElementById('exam-header').style.display = 'flex';
@@ -425,7 +452,7 @@
               </div>
             </div>`;
         });
-                document.getElementById('questions-container').innerHTML = html;
+        document.getElementById('questions-container').innerHTML = html;
         
         // --- ADD TAB INDENTATION LOGIC ---
         document.querySelectorAll('.code-editor').forEach(editor => {
@@ -448,7 +475,8 @@
 
     } catch (err) {
         showModal("Error", "Gagal memuat soal: " + err.message);
-        btn.innerText = "Mulai Ujian Sekarang 🚀"; btn.disabled = false;
+        btn.innerText = "Mulai Ujian Sekarang 🚀"; 
+        btn.disabled = false;
     }
   }
 
