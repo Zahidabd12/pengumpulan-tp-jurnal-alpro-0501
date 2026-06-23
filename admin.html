@@ -702,9 +702,9 @@
     function downloadTemplate() {
         const wb = XLSX.utils.book_new();
         const wsData = [
-            ["Nama", "Email", "Password", "NIM", "Sesi"],
-            ["Bagas Bintang", "bagas@kampus.id", "Pass123!", "130120001", "Sesi 1"],
-            ["Ilman Baruna", "ilman@kampus.id", "Pass456!", "130120002", "Sesi 1"]
+            ["Nama", "Password", "NIM", "Sesi"],
+            ["Bagas Bintang", "Pass123!", "130120001", "Sesi 1"],
+            ["Ilman Baruna", "Pass456!", "130120002", "Sesi 1"]
         ];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         XLSX.utils.book_append_sheet(wb, ws, "Template_User");
@@ -729,9 +729,12 @@
             logBox.innerHTML += `<div>🚀 Ditemukan ${json.length} baris data. Sinkronisasi dimulai...</div><br>`;
 
             for (const row of json) {
+                // Supabase Auth wajib menggunakan email, jadi kita buat email otomatis dari NIM
+                const generatedEmail = row.NIM + '@kampus.id';
+                
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: row.Email,
-                    password: row.Password,
+                    email: generatedEmail,
+                    password: row.Password || '123456', // default password jika kosong
                     options: { data: { full_name: row.Nama } }
                 });
 
