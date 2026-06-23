@@ -498,8 +498,10 @@
                     tr.innerHTML = `
                         <td>${row.nim || '-'}</td>
                         <td><strong>${row.nama || '-'}</strong></td>
-                        <td><span class="badge ${badgeClass}">${row.status || '-'}</span></td>
-                        <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
+                        <td><span class="badge ${badgeClass}" style="cursor: pointer;" onclick="toggleStatusSusulan(${row.id}, '${row.status}')" title="Klik untuk mengubah status">${row.status || '-'} 🔄</span></td>
+                        <td>
+                            <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
+                        </td>
                     `;
                 } else if (tableName === 'Jawaban_Susulan') {
                     tr.innerHTML = `
@@ -528,6 +530,20 @@
             document.getElementById('modal-code').innerText = data.kode_jawaban;
             document.getElementById('code-modal').classList.add('show');
         });
+    }
+
+
+    async function toggleStatusSusulan(id, currentStatus) {
+        if (!supabaseClient) return;
+        const newStatus = currentStatus === 'Diizinkan' ? 'Ditolak' : 'Diizinkan';
+        try {
+            const { error } = await supabaseClient.from('Susulan').update({ status: newStatus }).eq('id', id);
+            if (error) throw error;
+            showToast('Status berhasil diubah menjadi ' + newStatus, 'success');
+            loadTableData('Susulan');
+        } catch (err) {
+            showToast('Gagal mengubah status: ' + err.message, 'error');
+        }
     }
 
     function closeModal() {
