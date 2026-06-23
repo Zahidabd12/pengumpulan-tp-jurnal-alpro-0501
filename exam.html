@@ -506,16 +506,13 @@
           html += `
             <div class="q-card" id="soal-box-${no}">
               <span class="q-number">SOAL ${no}</span>
-              <div class="q-text">${q.teks_soal.replace(/
-/g, '<br>')}</div>
+              <div class="q-text">${q.teks_soal.replace(/\\n/g, '<br>')}</div>
               ${q.url_gambar ? `<img src="${q.url_gambar}" class="q-img">` : ""}
               <div style="margin-top: 25px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <div style="font-weight: 600; color: #60a5fa; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">IDE Koding (Python)</div>
                 </div>
-                <textarea class="code-editor" id="answer-${no}" oninput="checkAnswered(${no}, this)" placeholder="# Tulis kodemu di sini, jangan lupa indentasi
-def solusi():
-    pass">${q.template_jawaban || ""}</textarea>
+                <textarea class="code-editor" id="answer-${no}" oninput="checkAnswered(${no}, this)" placeholder="# Tulis kodemu di sini, jangan lupa indentasi\ndef solusi():\n    pass">${q.template_jawaban || ""}</textarea>
               </div>
             </div>`;
         });
