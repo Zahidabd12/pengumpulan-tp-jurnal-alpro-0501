@@ -397,6 +397,14 @@
                         <button class="btn btn-outline" onclick="downloadTemplate()">Unduh Template</button>
                     </div>
                     
+                                        <div class="form-group">
+                        <label class="form-label" for="import-target">Target Import</label>
+                        <select id="import-target" class="form-control">
+                            <option value="susulan">Daftar Ujian Susulan (Tanpa Limit)</option>
+                            <option value="utama">Daftar Ujian Utama (Bisa kena limit Supabase Auth)</option>
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label class="form-label" for="excel-file">Unggah File Data (.xlsx)</label>
                         <input type="file" id="excel-file" class="form-control" accept=".xlsx, .xls" style="padding: 10px;">
@@ -728,34 +736,52 @@
             let successCount = 0;
             logBox.innerHTML += `<div>🚀 Ditemukan ${json.length} baris data. Sinkronisasi dimulai...</div><br>`;
 
-            for (const row of json) {
-                // Supabase Auth wajib menggunakan email, jadi kita buat email otomatis dari NIM
-                const generatedEmail = row.NIM + '@kampus.id';
+            const importTarget = document.getElementById('import-target').value;
+            
+            if (importTarget === 'susulan') {
+                logBox.innerHTML += `<div>🔄 Memasukkan data langsung ke tabel Ujian Susulan...</div>`;
+                const payload = json.map(row => ({
+                    nim: String(row.NIM),
+                    nama: row.Nama,
+                    status: 'Diizinkan'
+                }));
                 
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: generatedEmail,
-                    password: row.Password || '123456', // default password jika kosong
-                    options: { data: { full_name: row.Nama } }
-                });
-
-                if (authError) {
-                    logBox.innerHTML += `<div style="color: var(--danger)">❌ [${row.NIM}] ${row.Nama}: ${authError.message}</div>`;
-                    continue;
-                }
-
-                const { error: profError } = await supabaseClient.from('profiles').insert([{
-                    id: authData.user.id,
-                    full_name: row.Nama,
-                    nim: row.NIM,
-                    session_name: row.Sesi,
-                    role: 'mahasiswa'
-                }]);
-
-                if (profError) {
-                    logBox.innerHTML += `<div style="color: #ca8a04">⚠️ [${row.NIM}] ${row.Nama}: Auth dibuat, data profil gagal (${profError.message})</div>`;
+                // Bulk insert to Susulan
+                const { error } = await supabaseClient.from('Susulan').insert(payload);
+                if (error) {
+                    logBox.innerHTML += `<div style="color: var(--danger)">❌ Gagal bulk insert: ${error.message}</div>`;
                 } else {
-                    successCount++;
-                    logBox.innerHTML += `<div style="color: var(--success)">✅ [${row.NIM}] ${row.Nama}: Berhasil diimpor.</div>`;
+                    successCount = json.length;
+                    logBox.innerHTML += `<div style="color: var(--success)">✅ Seluruh ${successCount} data berhasil dimasukkan ke Daftar Ujian Susulan!</div>`;
+                }
+            } else {
+                for (const row of json) {
+                    const generatedEmail = row.NIM + '@kampus.id';
+                    const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                        email: generatedEmail,
+                        password: row.Password || '123456',
+                        options: { data: { full_name: row.Nama } }
+                    });
+
+                    if (authError) {
+                        logBox.innerHTML += `<div style="color: var(--danger)">❌ [${row.NIM}] ${row.Nama}: ${authError.message}</div>`;
+                        continue;
+                    }
+
+                    const { error: profError } = await supabaseClient.from('profiles').insert([{
+                        id: authData.user.id,
+                        full_name: row.Nama,
+                        nim: row.NIM,
+                        session_name: row.Sesi,
+                        role: 'mahasiswa'
+                    }]);
+
+                    if (profError) {
+                        logBox.innerHTML += `<div style="color: #ca8a04">⚠️ [${row.NIM}] ${row.Nama}: Auth dibuat, data profil gagal (${profError.message})</div>`;
+                    } else {
+                        successCount++;
+                        logBox.innerHTML += `<div style="color: var(--success)">✅ [${row.NIM}] ${row.Nama}: Berhasil diimpor.</div>`;
+                    }
                 }
             }
             
