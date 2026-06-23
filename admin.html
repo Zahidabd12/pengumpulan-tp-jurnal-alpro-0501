@@ -275,9 +275,9 @@
     // ==========================================
     const SUPABASE_URL = 'https://lbpliaujrmovkbeuabrh.supabase.co'; 
     const SUPABASE_KEY = 'sb_publishable_BpzuBXSNG5u4eJU14KJeZg_CGGtP4UN'; 
-    let supabase = null;
+    let supabaseClient = null;
     try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     } catch (e) {
         console.warn("Supabase Init Error:", e);
     }
@@ -313,12 +313,12 @@
     // 3. AUTHENTICATION LOGIC
     // ==========================================
     async function checkAuth() {
-        if (!supabase) return; // Safety check
+        if (!supabaseClient) return; // Safety check
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
         
             if (session) {
-                const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
                 
                 if (profile && profile.role === 'admin') {
                     sessionActive = true;
@@ -326,7 +326,7 @@
                     document.getElementById('view-dashboard').classList.remove('hidden');
                     document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
                 } else {
-                    await supabase.auth.signOut();
+                    await supabaseClient.auth.signOut();
                 }
             }
         } catch (e) {
@@ -355,8 +355,8 @@
             }
 
             // 1. Coba Login
-            if (!supabase) throw new Error("Supabase tidak terhubung. Hanya login bypass yang berfungsi.");
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (!supabaseClient) throw new Error("Supabase tidak terhubung. Hanya login bypass yang berfungsi.");
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
                 alert("❌ LOGIN GAGAL: Email atau Password salah.\nDetail: " + error.message);
@@ -365,21 +365,21 @@
             }
 
             // 2. Cek Profil & Role
-            const { data: profile, error: profileError } = await supabase.from('profiles')
+            const { data: profile, error: profileError } = await supabaseClient.from('profiles')
                 .select('*')
                 .eq('id', data.user.id)
                 .single();
 
             if (profileError) {
                 alert("⚠️ LOGIN SUKSES, TAPI PROFIL DIBLOKIR!\nPastikan Anda sudah mematikan RLS pada tabel 'profiles'.\nDetail Error: " + profileError.message);
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 btn.innerText = "Masuk Sistem"; btn.disabled = false;
                 return;
             }
 
             if (!profile || profile.role !== 'admin') {
                 alert("⛔ AKSES DITOLAK!\nRole akun ini bukan 'admin'.");
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 btn.innerText = "Masuk Sistem"; btn.disabled = false;
                 return;
             }
@@ -398,7 +398,7 @@
     }
 
     async function handleLogout() {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         location.reload();
     }
 
@@ -442,7 +442,7 @@
         }
 
         try {
-            const { error } = await supabase.from(tableName).insert([payload]);
+            const { error } = await supabaseClient.from(tableName).insert([payload]);
             if (error) throw error;
             showToast(`Data ${tableName} berhasil disimpan!`, 'success');
             e.target.reset();
@@ -459,7 +459,7 @@
     async function exportNilaiCSV() {
         try {
             showToast('Menyiapkan file CSV...', 'info');
-            const { data, error } = await supabase.from('Nilai').select('*');
+            const { data, error } = await supabaseClient.from('Nilai').select('*');
             if (error) throw error;
             if (!data || data.length === 0) return showToast('Belum ada data nilai', 'error');
 
@@ -511,7 +511,7 @@
 
             for (const row of json) {
                 // Create User in Auth
-                const { data: authData, error: authError } = await supabase.auth.signUp({
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: row.Email,
                     password: row.Password,
                     options: { data: { full_name: row.Nama } }
@@ -523,7 +523,7 @@
                 }
 
                 // Insert into Profiles table
-                const { error: profError } = await supabase.from('profiles').insert([{
+                const { error: profError } = await supabaseClient.from('profiles').insert([{
                     id: authData.user.id,
                     full_name: row.Nama,
                     nim: row.NIM,
