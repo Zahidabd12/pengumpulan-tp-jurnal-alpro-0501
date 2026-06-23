@@ -348,7 +348,7 @@
     }
     
     try {
-        navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 10, max: 15 } } })
+        navigator.mediaDevices.getUserMedia({ video: { width: { max: 640 }, height: { max: 480 }, facingMode: "user" } })
           .then(s => {
             stream = s;
             const video = document.getElementById('webcam-view');
