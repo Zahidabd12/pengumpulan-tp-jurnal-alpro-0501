@@ -342,7 +342,7 @@
   let soalList = [];
 
   function startCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, frameRate: { ideal: 10, max: 15 } } })
       .then(s => {
         stream = s;
         const video = document.getElementById('webcam-view');
@@ -422,6 +422,7 @@
         document.getElementById('screen-lobby').style.display = 'block';
         document.getElementById('lobby-msg').innerText = `Halo, ${data.nama}!`;
         
+        enterFullscreen(); // Auto Fullscreen saat masuk lobby
         startCamera();
     } catch (err) {
         showModal("Error", "Gagal: " + err.message);
@@ -563,9 +564,9 @@
   }
 
   function confirmSubmit() {
-    const total = currentQuestions.length;
+    const total = soalList.length;
     let answered = 0;
-    currentQuestions.forEach((q, i) => {
+    soalList.forEach((q, i) => {
       const val = document.getElementById('answer-' + q.no_soal).value;
       if (val && val.trim().length > 0) answered++;
     });
