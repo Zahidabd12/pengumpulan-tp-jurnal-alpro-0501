@@ -101,7 +101,7 @@
   <div class="hdr-container">
     <div>
         <div style="font-weight: 700; font-size: 1.1rem;" id="user-display">Praktikan</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted);" id="sesi-display">Sesi Ujian</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);" id="sesi-display">Ujian Susulan</div>
     </div>
     <div class="exam-timer" id="main-timer">00:00:00</div>
   </div>
@@ -112,7 +112,7 @@
     <h2 style="margin-bottom: 8px; font-size: 24px;">Ujian Susulan Praktikum</h2>
     <p style="color: var(--text-muted); margin-bottom: 24px;">Silakan masuk untuk memulai ujian.</p>
     <input type="text" class="std-input" id="inp-nim" placeholder="NIM Kamu..." required>
-    <input type="text" class="std-input" id="inp-sesi" placeholder="Nama Sesi (Contoh: Sesi 1)" required>
+    
     <button class="btn" id="btn-login" onclick="checkJadwal()">Validasi Peserta</button>
   </div>
 
@@ -206,9 +206,8 @@
   // --- VALIDASI PESERTA ---
   async function checkJadwal() {
     const nim = document.getElementById('inp-nim').value.trim();
-    const sesi = document.getElementById('inp-sesi').value.trim();
     
-    if(!nim || !sesi) return alert("NIM dan Sesi wajib diisi!");
+    if(!nim) return alert("NIM wajib diisi!");
     
     const btn = document.getElementById('btn-login');
     btn.innerText = "Memvalidasi... ⏳"; btn.disabled = true;
@@ -224,7 +223,7 @@
             throw new Error("Akses ditolak. Status kamu: " + data.status);
         }
 
-        studentData = { nim: data.nim, nama: data.nama, sesi: sesi };
+        studentData = { nim: data.nim, nama: data.nama, sesi: "Susulan" };
         
         document.getElementById('screen-login').style.display = 'none';
         document.getElementById('screen-lobby').style.display = 'block';
@@ -246,7 +245,7 @@
     btn.innerText = "Memuat Soal... ⏳"; btn.disabled = true;
     
     try {
-        const { data, error } = await supabase.from('Soal').select('*').eq('sesi', studentData.sesi).order('no_soal', { ascending: true });
+        const { data, error } = await supabase.from('Soal').select('*').order('no_soal', { ascending: true });
         
         if (error) throw error;
         if (!data || data.length === 0) throw new Error("Tidak ada soal ditemukan untuk sesi ini.");
