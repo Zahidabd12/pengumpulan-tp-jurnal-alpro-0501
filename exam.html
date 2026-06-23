@@ -344,13 +344,17 @@
   // --- VALIDASI PESERTA ---
   window.addEventListener('DOMContentLoaded', async () => {
       try {
+          const dd = document.getElementById('inp-sesi-pilihan');
           const { data, error } = await supabaseClient.from('Sesi').select('nama_sesi');
           if (data) {
-              const dd = document.getElementById('inp-sesi-pilihan');
               data.forEach(s => {
                   dd.innerHTML += `<option value="${s.nama_sesi}">${s.nama_sesi}</option>`;
               });
           }
+          // Tambahkan sesi default
+          dd.innerHTML += `<option value="Susulan UTS">Susulan UTS</option>
+                           <option value="Susulan UAS">Susulan UAS</option>
+                           <option value="Remedial">Remedial</option>`;
       } catch(e) {}
   });
 
