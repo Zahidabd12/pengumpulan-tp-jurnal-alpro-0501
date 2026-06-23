@@ -342,20 +342,26 @@
   let soalList = [];
 
   function startCamera() {
-    navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 10, max: 15 } } })
-      .then(s => {
-        stream = s;
-        const video = document.getElementById('webcam-view');
-        video.srcObject = stream;
-        video.style.display = 'block';
-      })
-      .catch(err => {
-        showModal("Izin Kamera Ditolak", "Gagal mengakses webcam: " + err.message + ". Silakan izinkan kamera dan muat ulang halaman.");
-        document.getElementById('screen-lobby').style.display = 'none';
-        document.getElementById('screen-login').style.display = 'block';
-        document.getElementById('btn-login').innerText = "Validasi Peserta";
-        document.getElementById('btn-login').disabled = false;
-      });
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showModal("Peringatan Kamera", "Browser ini (atau SEB) tidak mendukung akses kamera secara langsung. Ujian tetap dilanjutkan tanpa webcam pengawas.");
+        return;
+    }
+    
+    try {
+        navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 10, max: 15 } } })
+          .then(s => {
+            stream = s;
+            const video = document.getElementById('webcam-view');
+            video.srcObject = stream;
+            video.style.display = 'block';
+          })
+          .catch(err => {
+            showModal("Izin Kamera", "Gagal mengakses webcam (" + err.message + "). Pastikan kamera diizinkan atau tidak dipakai aplikasi lain.");
+            // Tidak perlu diblokir jika gagal, biarkan saja mereka ujian tanpa webcam kalau memang hardwarenya bermasalah.
+          });
+    } catch(err) {
+        console.error("Camera API Error:", err);
+    }
   }
 
   let violationCount = 0;
