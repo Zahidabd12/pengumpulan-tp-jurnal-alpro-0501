@@ -65,9 +65,10 @@
 <body>
 
 <div id="screen-fs-warning">
-  <h1 style="font-size: 3rem; margin-bottom: 10px;">⚠️ PELANGGARAN ⚠️</h1>
-  <p style="font-size: 1.2rem; margin-bottom: 30px;">Kamu keluar dari mode Fullscreen! Ujian dihentikan sementara.<br>Klik tombol di bawah untuk melanjutkan.</p>
-  <button class="btn" style="background: white; color: var(--danger); max-width: 300px;" onclick="resumeFullscreen()">Kembali ke Ujian</button>
+  <h1 style="font-size: 3rem; margin-bottom: 10px;">⚠️ PELANGGARAN TERDETEKSI ⚠️</h1>
+  <p style="font-size: 1.2rem; margin-bottom: 30px;">Kamu keluar dari mode Fullscreen, pindah tab, atau membuka aplikasi lain!<br>Ujian dihentikan sementara. Aktivitas ini tercatat oleh sistem.</p>
+  <p style="font-size: 1rem; font-weight: bold; color: #fecaca; margin-bottom: 20px;">Jumlah Pelanggaran: <span id="violation-count">0</span></p>
+  <button class="btn" style="background: white; color: var(--danger); max-width: 300px;" onclick="resumeFullscreen()">Saya Mengerti & Kembali ke Ujian</button>
 </div>
 
 <div class="sticky-hdr" id="exam-header">
@@ -118,7 +119,16 @@
   let examIntervalTimer = null;
   let isExamActive = false;
 
-  // --- FULLSCREEN LOGIC ---
+  let violationCount = 0;
+
+  function handleViolation() {
+    if (!isExamActive) return;
+    violationCount++;
+    document.getElementById('violation-count').innerText = violationCount;
+    document.getElementById('screen-fs-warning').style.display = 'flex';
+  }
+
+  // --- FULLSCREEN & FOCUS LOGIC ---
   function enterFullscreen() {
     const elem = document.documentElement;
     if (elem.requestFullscreen) elem.requestFullscreen();
@@ -132,9 +142,15 @@
   }
 
   document.addEventListener('fullscreenchange', () => {
-    if (isExamActive && !document.fullscreenElement) {
-      document.getElementById('screen-fs-warning').style.display = 'flex';
-    }
+    if (isExamActive && !document.fullscreenElement) handleViolation();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (isExamActive && document.hidden) handleViolation();
+  });
+
+  window.addEventListener('blur', () => {
+    if (isExamActive) handleViolation();
   });
 
   // --- SISTEM JADWAL ---
@@ -248,11 +264,15 @@
     document.getElementById('timeout-desc').innerText = desc;
   }
 
-  // Anti-Inspect
+  // Anti-Inspect & Anti-Cheating
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) e.preventDefault();
   });
+  document.addEventListener('copy', e => e.preventDefault());
+  document.addEventListener('cut', e => e.preventDefault());
+  document.addEventListener('paste', e => e.preventDefault());
+  document.addEventListener('dragstart', e => e.preventDefault());
 </script>
 </body>
 </html>
