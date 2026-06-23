@@ -333,6 +333,17 @@
         const password = document.getElementById('login-pass').value;
 
         try {
+            // 0. Emergency Bypass Login
+            if (email === "admin@kampus.id" && password === "admin123") {
+                sessionActive = true;
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('user-display').innerText = 'Administrator (Darurat)';
+                showToast('Berhasil Login Mode Darurat!', 'success');
+                btn.innerText = "Masuk Sistem"; btn.disabled = false;
+                return;
+            }
+
             // 1. Coba Login
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
