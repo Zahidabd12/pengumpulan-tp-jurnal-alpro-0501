@@ -159,7 +159,19 @@
         .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
 
         .log-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #cbd5e1; margin-top: 16px; }
-    </style>
+    
+        /* Modal for Code Viewer */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        .modal-content { background: #1e1e1e; border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; transform: translateY(20px); transition: 0.3s; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-header { padding: 16px 24px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #252526; }
+        .modal-header h3 { color: #d4d4d4; font-size: 16px; margin: 0; }
+        .modal-close { background: none; border: none; color: #858585; font-size: 24px; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; background: #1e1e1e; }
+        .code-pre { margin: 0; font-family: 'Fira Code', monospace; font-size: 14px; color: #d4d4d4; white-space: pre-wrap; word-break: break-all; }
+</style>
 </head>
 <body>
 
@@ -191,6 +203,7 @@
             <nav class="sidebar-menu">
                 <div class="menu-item active" onclick="switchTab('tab-sesi', this)">🕒 Manajemen Sesi</div>
                 <div class="menu-item" onclick="switchTab('tab-susulan', this)">🔄 Ujian Susulan</div>
+                <div class="menu-item" onclick="switchTab('tab-hasil-susulan', this)">💻 Hasil Susulan</div>
                 <div class="menu-item" onclick="switchTab('tab-soal', this)">📝 Bank Soal</div>
                 <div class="menu-item" onclick="switchTab('tab-nilai', this)">💯 Input Nilai</div>
                 <div class="menu-item" onclick="switchTab('tab-import', this)">👥 Import Mahasiswa</div>
@@ -287,6 +300,29 @@
                                         <th>Nama Lengkap</th>
                                         <th>Status</th>
                                         <th style="width: 100px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- TAB: HASIL SUSULAN -->
+                <div id="tab-hasil-susulan" class="card tab-content hidden">
+                    <h2 class="section-title">Hasil Jawaban Susulan</h2>
+                    <div class="data-viewer">
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-jawaban_susulan">
+                                <thead>
+                                    <tr>
+                                        <th>Waktu Kumpul</th>
+                                        <th>NIM</th>
+                                        <th>Sesi</th>
+                                        <th style="width: 150px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -416,6 +452,7 @@
         // Fetch table data when switching to relevant tabs
         if (tabId === 'tab-sesi') loadTableData('Sesi');
         if (tabId === 'tab-susulan') loadTableData('Susulan');
+        if (tabId === 'tab-hasil-susulan') loadTableData('Jawaban_Susulan');
     }
 
     // ==========================================
@@ -457,11 +494,37 @@
                         <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
                     `;
                 }
+                } else if (tableName === 'Jawaban_Susulan') {
+                    tr.innerHTML = `
+                        <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
+                        <td><strong>${row.nim || '-'}</strong></td>
+                        <td>${row.sesi || '-'}</td>
+                        <td>
+                            <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; border-color: var(--primary); color: var(--primary);" onclick="viewCode(${row.id})">Lihat Kode</button>
+                            <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px; margin-left: 5px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
+                        </td>
+                    `;
+                }
                 tbody.appendChild(tr);
             });
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--danger);">Gagal memuat: ${err.message}</td></tr>`;
         }
+    }
+
+    
+    function viewCode(id) {
+        if (!supabaseClient) return;
+        supabaseClient.from('Jawaban_Susulan').select('*').eq('id', id).single().then(({data, error}) => {
+            if (error) return showToast("Gagal memuat kode", "error");
+            document.getElementById('modal-title').innerText = "Jawaban: " + data.nim;
+            document.getElementById('modal-code').innerText = data.kode_jawaban;
+            document.getElementById('code-modal').classList.add('show');
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('code-modal').classList.remove('show');
     }
 
     async function deleteData(tableName, id) {
@@ -702,5 +765,17 @@
 
     window.onload = checkAuth;
 </script>
+
+<div class="modal-overlay" id="code-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Jawaban Susulan</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <pre class="code-pre" id="modal-code"></pre>
+        </div>
+    </div>
+</div>
 </body>
 </html>
