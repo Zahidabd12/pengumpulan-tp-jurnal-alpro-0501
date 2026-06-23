@@ -621,8 +621,84 @@
         if (!supabaseClient) return;
         supabaseClient.from('Jawaban_Susulan').select('*').eq('id', id).single().then(({data, error}) => {
             if (error) return showToast("Gagal memuat kode", "error");
-            document.getElementById('modal-title').innerText = "Jawaban: " + data.nim;
-            document.getElementById('modal-code').innerText = data.kode_jawaban;
+            
+            document.getElementById('modal-title').innerText = "Detail Jawaban: " + data.nim;
+            
+            let raw = data.kode_jawaban || "";
+            let htmlContent = "";
+            
+            // Coba parsing struktur baru
+            if (raw.includes("=== JAWABAN SUSULAN ===")) {
+                // 1. Parse Nilai
+                let nilaiMatch = raw.match(/NILAI AKHIR: (.*?)\n/);
+                if (nilaiMatch) {
+                    let nilaiColor = "var(--danger)";
+                    let nilaiAngka = parseInt(nilaiMatch[1].split("/")[0]);
+                    if(nilaiAngka >= 80) nilaiColor = "var(--success)";
+                    else if(nilaiAngka >= 50) nilaiColor = "#eab308";
+                    
+                    htmlContent += `
+                    <div style="padding: 16px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid ${nilaiColor};">
+                        <h2 style="color: ${nilaiColor}; font-size: 24px; margin: 0;">NILAI: ${nilaiMatch[1]}</h2>
+                    </div>`;
+                }
+
+                // 2. Parse Info Peserta
+                let infoMatch = raw.match(/=== JAWABAN SUSULAN ===\nNIM: (.*?)\nNama: (.*?)\nSesi: (.*?)\n\[(.*?)\]/);
+                if (infoMatch) {
+                    let statusColor = infoMatch[4].includes("Bersih") ? "var(--success)" : "var(--danger)";
+                    htmlContent += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; padding: 15px; background: #252526; border-radius: 8px; border: 1px solid #333;">
+                        <div><span style="color:#858585; font-size:12px; text-transform: uppercase;">NIM</span><br><strong style="font-size: 15px;">${infoMatch[1]}</strong></div>
+                        <div><span style="color:#858585; font-size:12px; text-transform: uppercase;">Nama</span><br><strong style="font-size: 15px; color: #e2e8f0;">${infoMatch[2]}</strong></div>
+                        <div><span style="color:#858585; font-size:12px; text-transform: uppercase;">Sesi Ujian</span><br><strong style="font-size: 15px; color: #94a3b8;">${infoMatch[3]}</strong></div>
+                        <div><span style="color:#858585; font-size:12px; text-transform: uppercase;">Status Pengawasan</span><br><strong style="font-size: 15px; color: ${statusColor};">${infoMatch[4]}</strong></div>
+                    </div>`;
+                }
+
+                // 3. Parse Soal
+                let soalParts = raw.split(/--- SOAL (\d+) ---/);
+                if (soalParts.length > 1) {
+                    for (let i = 1; i < soalParts.length; i += 2) {
+                        let noSoal = soalParts[i];
+                        let contentBlock = soalParts[i+1].trim();
+                        
+                        let kHTML = "";
+                        let kMatch = contentBlock.match(/^\[KOREKSI OTOMATIS: (.*?)\]\n/);
+                        if (kMatch) {
+                            let isBenar = kMatch[1].includes("BENAR");
+                            let kColor = isBenar ? "var(--success)" : "var(--danger)";
+                            let kBg = isBenar ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)";
+                            kHTML = `<div style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; background: ${kBg}; color: ${kColor}; margin-bottom: 12px; border: 1px solid ${kColor}40;">Koreksi: ${kMatch[1]}</div>`;
+                            contentBlock = contentBlock.replace(/^\[KOREKSI OTOMATIS: (.*?)\]\n/, "");
+                        } else {
+                            let kMatch2 = contentBlock.match(/^\[TIDAK ADA KUNCI JAWABAN\]\n/);
+                            if (kMatch2) {
+                                kHTML = `<div style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); color: #94a3b8; margin-bottom: 12px; border: 1px solid #333;">Menunggu Koreksi Manual</div>`;
+                                contentBlock = contentBlock.replace(/^\[TIDAK ADA KUNCI JAWABAN\]\n/, "");
+                            }
+                        }
+
+                        // Escape html to prevent XSS and formatting issues
+                        contentBlock = contentBlock.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                        htmlContent += `
+                        <div style="margin-bottom: 25px; border-bottom: 1px dashed #333; padding-bottom: 20px;">
+                            <h4 style="color: #60a5fa; margin-bottom: 8px; font-size: 16px;">Jawaban Soal ${noSoal}</h4>
+                            ${kHTML}
+                            <pre style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #1e293b; overflow-x: auto; color: #e2e8f0; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.5; margin-top: 5px;">${contentBlock}</pre>
+                        </div>`;
+                    }
+                } else {
+                    // Fallback
+                    htmlContent += `<pre style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #1e293b; overflow-x: auto; color: #e2e8f0; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.5;">${raw}</pre>`;
+                }
+            } else {
+                // Legacy Format Fallback
+                htmlContent = `<pre style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #1e293b; overflow-x: auto; color: #e2e8f0; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.5;">${raw}</pre>`;
+            }
+            
+            document.getElementById('modal-code').innerHTML = htmlContent;
             document.getElementById('code-modal').classList.add('show');
         });
     }
@@ -1003,7 +1079,7 @@
             <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <pre class="code-pre" id="modal-code"></pre>
+            <div class="code-pre" id="modal-code" style="white-space: normal;"></div>
         </div>
     </div>
 </div>
