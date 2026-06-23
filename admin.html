@@ -537,7 +537,10 @@
                         <td><strong>${row.nama_sesi || '-'}</strong></td>
                         <td>${row.waktu_mulai ? new Date(row.waktu_mulai).toLocaleString('id-ID') : '-'}</td>
                         <td>${row.waktu_selesai ? new Date(row.waktu_selesai).toLocaleString('id-ID') : '-'}</td>
-                        <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
+                        <td>
+                            <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; margin-right: 4px; border-color: var(--primary); color: var(--primary);" onclick="editSoal(${row.id})">Edit</button>
+                            <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
+                        </td>
                     `;
                 } else if (tableName === 'Susulan') {
                     const badgeClass = row.status === 'Diizinkan' ? 'badge-success' : 'badge-error';
@@ -564,7 +567,10 @@
                         <td><strong>${row.sesi || '-'}</strong></td>
                         <td>${row.no_soal || '-'}</td>
                         <td class="soal-text-preview" style="white-space: pre-wrap; word-break: break-word;">${row.teks_soal ? marked.parse(row.teks_soal) : '-'}</td>
-                        <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
+                        <td>
+                            <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; margin-right: 4px; border-color: var(--primary); color: var(--primary);" onclick="editSoal(${row.id})">Edit</button>
+                            <button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button>
+                        </td>
                     `;
                 }
                 tbody.appendChild(tr);
@@ -796,6 +802,56 @@
         XLSX.writeFile(wb, "Template_Import_Mahasiswa.xlsx");
     }
 
+
+
+    let editSoalId = null;
+
+    async function editSoal(id) {
+        if (!supabaseClient) return;
+        try {
+            const { data, error } = await supabaseClient.from('Soal').select('*').eq('id', id).single();
+            if (error) throw error;
+            
+            document.getElementById('inp-soal-sesi').value = data.sesi;
+            document.getElementById('inp-soal-no').value = data.no_soal;
+            document.getElementById('inp-soal-img').value = data.gambar || '';
+            document.getElementById('inp-soal-text').value = data.teks_soal;
+            
+            editSoalId = data.id;
+            
+            const btn = document.querySelector('#tab-soal button[type="submit"]');
+            btn.innerText = "Perbarui Soal";
+            
+            if (!document.getElementById('btn-batal-edit')) {
+                const btnBatal = document.createElement('button');
+                btnBatal.type = 'button';
+                btnBatal.id = 'btn-batal-edit';
+                btnBatal.className = 'btn btn-outline';
+                btnBatal.style.marginLeft = '8px';
+                btnBatal.innerText = 'Batal Edit';
+                btnBatal.onclick = cancelEditSoal;
+                btn.parentNode.appendChild(btnBatal);
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch(err) {
+            showToast('Gagal memuat data soal: ' + err.message, 'error');
+        }
+    }
+
+    function cancelEditSoal() {
+        editSoalId = null;
+        document.getElementById('inp-soal-sesi').value = '';
+        document.getElementById('inp-soal-no').value = '';
+        document.getElementById('inp-soal-img').value = '';
+        document.getElementById('inp-soal-text').value = '';
+        
+        const btn = document.querySelector('#tab-soal button[type="submit"]');
+        btn.innerText = "Simpan ke Bank Soal";
+        
+        const btnBatal = document.getElementById('btn-batal-edit');
+        if (btnBatal) btnBatal.remove();
+    }
 
     // Auto Numbering
     document.getElementById('inp-soal-sesi').addEventListener('change', async (e) => {
