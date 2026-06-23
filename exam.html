@@ -472,6 +472,13 @@
     btn.innerText = "Memuat Soal... ⏳"; btn.disabled = true;
     
     try {
+        // --- CEK APAKAH SUDAH PERNAH MENGERJAKAN ---
+        const { data: existingJawaban, error: cekError } = await supabaseClient.from('Jawaban_Susulan').select('nim').eq('nim', studentData.nim).eq('sesi', studentData.sesi);
+        if (cekError) throw cekError;
+        if (existingJawaban && existingJawaban.length > 0) {
+            throw new Error(`Kamu sudah pernah mengerjakan ujian untuk sesi ${studentData.sesi}! Ujian hanya dapat disubmit 1 (satu) kali.`);
+        }
+        
         const { data, error } = await supabaseClient.from('Soal').select('*').eq('sesi', studentData.sesi).order('no_soal', { ascending: true });
         
         if (error) throw error;
