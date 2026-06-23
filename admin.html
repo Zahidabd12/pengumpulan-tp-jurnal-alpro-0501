@@ -411,7 +411,7 @@
                             <h3 style="font-size: 16px; margin: 0;">Daftar Bank Soal</h3>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <label style="color: var(--text-muted); font-size: 14px;">Filter Kategori:</label>
-                                <select id="filter-soal-sesi" class="form-control" style="padding: 6px 12px; width: auto;" onchange="loadTableData('Bank_Soal')">
+                                <select id="filter-soal-sesi" class="form-control" style="padding: 6px 12px; width: auto;" onchange="loadTableData('Soal')">
                                     <option value="">Semua Kategori</option>
                                     <option value="Susulan UTS">Susulan UTS</option>
                                     <option value="Susulan UAS">Susulan UAS</option>
@@ -597,7 +597,13 @@
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>`;
 
         try {
-            const { data, error } = await supabaseClient.from(tableName).select('*').order('id', { ascending: false });
+            let query = supabaseClient.from(tableName).select('*');
+            if (tableName === 'Soal') {
+                const filterVal = document.getElementById('filter-soal-sesi').value;
+                if (filterVal) query = query.eq('sesi', filterVal);
+            }
+            query = query.order('id', { ascending: false });
+            const { data, error } = await query;
             if (error) throw error;
 
             if (!data || data.length === 0) {
