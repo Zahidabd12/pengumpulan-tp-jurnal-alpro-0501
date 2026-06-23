@@ -816,6 +816,8 @@
             document.getElementById('inp-soal-no').value = data.no_soal;
             document.getElementById('inp-soal-img').value = data.gambar || '';
             document.getElementById('inp-soal-text').value = data.teks_soal;
+            document.getElementById('inp-soal-template').value = data.template_jawaban || '';
+            document.getElementById('inp-soal-kunci').value = data.kunci_jawaban || '';
             
             editSoalId = data.id;
             
@@ -845,6 +847,8 @@
         document.getElementById('inp-soal-no').value = '';
         document.getElementById('inp-soal-img').value = '';
         document.getElementById('inp-soal-text').value = '';
+        document.getElementById('inp-soal-template').value = '';
+        document.getElementById('inp-soal-kunci').value = '';
         
         const btn = document.querySelector('#tab-soal button[type="submit"]');
         btn.innerText = "Simpan ke Bank Soal";

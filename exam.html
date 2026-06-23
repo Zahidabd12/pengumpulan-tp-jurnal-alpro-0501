@@ -271,7 +271,7 @@
               
               <div style="margin-top: 20px;">
                   <label style="color: #94a3b8; font-size: 13px; font-weight: 600;">Tulis Kode Jawaban Di Sini:</label>
-                  <textarea class="code-editor" id="answer-${q.no_soal}" placeholder="// Ketik kode jawaban untuk Soal ${q.no_soal} di sini..."></textarea>
+                  <textarea class="code-editor" id="answer-${q.no_soal}" placeholder="// Ketik kode jawaban untuk Soal ${q.no_soal} di sini...">${q.template_jawaban || ""}</textarea>
               </div>
             </div>`;
         });
@@ -334,10 +334,39 @@
       // Kumpulkan semua jawaban dari textarea
       let combinedAnswers = `=== JAWABAN SUSULAN ===\nNIM: ${studentData.nim}\nNama: ${studentData.nama}\nSesi: ${studentData.sesi}\n\n`;
       
+      let totalBenar = 0;
+      let totalSoalDiperiksa = 0;
+
+      const normalizeCode = (str) => {
+          if (!str) return "";
+          return str.replace(/\r\n/g, '\n').trim();
+      };
+
       soalList.forEach(q => {
-          const answerText = document.getElementById(`answer-${q.no_soal}`).value || "// Tidak ada jawaban";
-          combinedAnswers += `--- SOAL ${q.no_soal} ---\n${answerText}\n\n`;
+          const rawAnswer = document.getElementById(`answer-${q.no_soal}`).value || "";
+          let gradingMark = "";
+          
+          if (q.kunci_jawaban) {
+              totalSoalDiperiksa++;
+              const isCorrect = normalizeCode(rawAnswer) === normalizeCode(q.kunci_jawaban);
+              if (isCorrect) {
+                  totalBenar++;
+                  gradingMark = "[KOREKSI OTOMATIS: BENAR ✅]\n";
+              } else {
+                  gradingMark = "[KOREKSI OTOMATIS: SALAH ❌]\n";
+              }
+          } else {
+              gradingMark = "[TIDAK ADA KUNCI JAWABAN]\n";
+          }
+          
+          combinedAnswers += `--- SOAL ${q.no_soal} ---\n${gradingMark}${rawAnswer || "// Tidak ada jawaban"}\n\n`;
       });
+      
+      if (totalSoalDiperiksa > 0) {
+          const nilaiAkhir = Math.round((totalBenar / totalSoalDiperiksa) * 100);
+          combinedAnswers = `NILAI AKHIR: ${nilaiAkhir}/100 (${totalBenar} dari ${totalSoalDiperiksa} Benar)\n=========================\n` + combinedAnswers;
+      }
+      
 
       try {
           const { error } = await supabaseClient.from('Jawaban_Susulan').insert([{
