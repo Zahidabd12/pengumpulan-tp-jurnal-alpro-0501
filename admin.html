@@ -375,7 +375,18 @@
                         </div>
                     </form>
                     <div class="data-viewer" style="margin-top: 32px;">
-                        <h3 style="margin-bottom: 16px; font-size: 16px;">Daftar Bank Soal</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 16px; margin: 0;">Daftar Bank Soal</h3>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <label style="color: var(--text-muted); font-size: 14px;">Filter Kategori:</label>
+                                <select id="filter-soal-sesi" class="form-control" style="padding: 6px 12px; width: auto;" onchange="loadTableData('Bank_Soal')">
+                                    <option value="">Semua Kategori</option>
+                                    <option value="Susulan UTS">Susulan UTS</option>
+                                    <option value="Susulan UAS">Susulan UAS</option>
+                                    <option value="Remedial">Remedial</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-soal">
                                 <thead>
@@ -515,7 +526,8 @@
                 dropdown.innerHTML += `<option value="${s.nama_sesi}">${s.nama_sesi}</option>`;
             });
             dropdown.innerHTML += `<option value="Susulan UTS">Susulan UTS</option>
-            <option value="Susulan UAS">Susulan UAS</option>`;
+            <option value="Susulan UAS">Susulan UAS</option>
+            <option value="Remedial">Remedial</option>`;
         } catch (e) {
             console.warn("Gagal memuat sesi", e);
         }
@@ -557,11 +569,11 @@
                         <td><strong>${row.nama || '-'}</strong></td>
                         <td>
                             <select class="form-control" style="padding: 4px 8px; font-size: 13px;" onchange="toggleStatusSusulan(${row.id}, this.value)">
+                                <option value="Diizinkan" ${row.status === 'Diizinkan' ? 'selected' : ''}>Diizinkan (Bebas Memilih)</option>
                                 <option value="Ditolak" ${row.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
                                 <option value="Diizinkan (UTS)" ${row.status === 'Diizinkan (UTS)' ? 'selected' : ''}>Diizinkan (UTS)</option>
                                 <option value="Diizinkan (UAS)" ${row.status === 'Diizinkan (UAS)' ? 'selected' : ''}>Diizinkan (UAS)</option>
                                 <option value="Diizinkan (Keduanya)" ${row.status === 'Diizinkan (Keduanya)' ? 'selected' : ''}>Diizinkan (Keduanya)</option>
-                                <option value="Diizinkan" ${row.status === 'Diizinkan' ? 'selected' : ''}>Diizinkan (Legacy)</option>
                             </select>
                         </td>
                         <td>
