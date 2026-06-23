@@ -317,16 +317,17 @@
         try {
             const { data: { session } } = await supabase.auth.getSession();
         
-        if (session) {
-            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-            
-            if (profile && profile.role === 'admin') {
-                sessionActive = true;
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
-            } else {
-                await supabase.auth.signOut();
+            if (session) {
+                const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                
+                if (profile && profile.role === 'admin') {
+                    sessionActive = true;
+                    document.getElementById('view-login').classList.add('hidden');
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = profile.full_name || 'Administrator';
+                } else {
+                    await supabase.auth.signOut();
+                }
             }
         } catch (e) {
             console.warn("Auth check failed:", e);
