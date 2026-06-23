@@ -79,7 +79,24 @@
       text-transform: uppercase;
     }
     
-    .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+    
+    /* CBT Layout Enhancements */
+    .cbt-container { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+    .cbt-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: sticky; top: 90px; backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .cbt-nav-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; font-weight: 600; border-radius: 8px; aspect-ratio: 1; cursor: pointer; transition: 0.2s; font-size: 15px; display: flex; justify-content: center; align-items: center; }
+    .cbt-nav-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+    .cbt-nav-btn.answered { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #10b981; }
+    .cbt-main { flex: 1; min-width: 0; }
+    
+    .code-editor { width: 100%; min-height: 250px; background: #0d1117; color: #c9d1d9; font-family: 'Fira Code', Consolas, monospace; font-size: 14px; padding: 16px; border: 1px solid #30363d; border-radius: 8px; resize: vertical; outline: none; line-height: 1.6; transition: border-color 0.2s, box-shadow 0.2s; }
+    .code-editor:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2); }
+    .code-editor.has-code { border-left: 3px solid #10b981; }
+    
+    @media (max-width: 900px) {
+      .cbt-container { grid-template-columns: 1fr; }
+      .cbt-sidebar { position: static; margin-bottom: 20px; }
+    }
     
     /* Card Styles */
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-bottom: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); backdrop-filter: blur(16px); }
@@ -216,28 +233,57 @@
     <button class="btn" id="btn-login" onclick="checkJadwal()">Validasi Peserta</button>
   </div>
 
-    <div class="card" id="screen-lobby" style="display: none; text-align: center; margin-top: 80px;">
-    <h3 id="lobby-msg" style="font-size: 24px; color: #818cf8;">Halo!</h3>
-    <p style="color: var(--text-muted); margin-top: 10px;">Kamu terdaftar untuk mengikuti ujian ini. Silakan pilih sesi yang ingin kamu kerjakan:</p>
-    <select class="std-input" id="inp-sesi-pilihan" required style="margin: 20px auto; display: block; max-width: 300px;">
-      <option value="">-- Pilih Sesi Ujian --</option>
-    </select>
-    <div style="margin: 30px 0;">
-        <button class="btn" id="btn-start" onclick="confirmStartExam()">Mulai Ujian Sekarang 🚀</button>
-    </div>
-  </div>
+    <div class="card" id="screen-lobby" style="display: none; text-align: left; margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+      <h3 id="lobby-msg" style="font-size: 24px; color: #818cf8; text-align: center; margin-bottom: 24px;">Halo!</h3>
+      
+      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+        <h4 style="color: #f87171; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Tata Tertib & Ketentuan Ujian
+        </h4>
+        <ul style="color: #e2e8f0; font-size: 14px; margin-left: 20px; line-height: 1.8;">
+          <li>Ujian ini dilindungi oleh <strong>Sistem Pengawasan Otomatis</strong> (Fullscreen Lock & Watermark Keamanan).</li>
+          <li><strong>Dilarang keras keluar dari mode layar penuh (Fullscreen)</strong> atau membuka tab/aplikasi lain.</li>
+          <li>Setiap pelanggaran akan dicatat oleh sistem secara diam-diam dan dilaporkan kepada Asisten Praktikum.</li>
+          <li>Sistem menyimpan jawabanmu secara otomatis saat kamu mengetik.</li>
+          <li>Jika batas waktu ujian telah habis, jawaban akan dikumpulkan secara otomatis.</li>
+        </ul>
+      </div>
 
-  <div id="screen-soal" style="display: none;">
-    <div style="margin-bottom: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #bfdbfe;">
-        <strong>Instruksi:</strong> Tulis kodingan kamu langsung di dalam kotak editor yang disediakan di bawah setiap soal. Jangan tutup halaman ini sebelum mengklik tombol kumpul!
+      <div style="text-align: center;">
+        <p style="color: var(--text-muted); margin-bottom: 15px;">Pilih sesi ujian yang telah ditugaskan kepadamu:</p>
+        <select class="std-input" id="inp-sesi-pilihan" required style="margin: 0 auto 25px auto; display: block; max-width: 350px;">
+          <option value="">-- Pilih Sesi Ujian --</option>
+        </select>
+        <button class="btn" id="btn-start" onclick="confirmStartExam()" style="max-width: 350px; padding: 16px; font-size: 1.1rem; box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);">Setuju & Mulai Ujian Sekarang 🚀</button>
+      </div>
     </div>
-    
-    <div id="questions-container"></div>
-    
-    <div class="card" style="text-align: center; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
-        <h3 style="color: #34d399; margin-bottom: 15px;">Sudah Selesai Mengoding?</h3>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Pastikan semua kode sudah ditulis dengan benar. Jawaban tidak bisa diedit setelah dikumpulkan.</p>
-        <button class="btn btn-success" id="btn-submit" onclick="submitAnswers()" style="font-size: 1.1rem; padding: 16px;">Kumpulkan Semua Jawaban</button>
+
+  <div id="screen-soal" style="display: none;" class="cbt-container">
+    <!-- Sidebar -->
+    <div class="cbt-sidebar">
+      <div style="font-weight: 600; color: #94a3b8; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">Navigasi Soal</div>
+      <div id="cbt-nav-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px;">
+        <!-- Filled by JS -->
+      </div>
+      
+      <div style="font-weight: 600; color: #94a3b8; font-size: 12px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">Keterangan</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #cbd5e1; margin-bottom: 30px;">
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 4px;"></span> Sudah Dijawab</div>
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid #475569; border-radius: 4px;"></span> Belum Dijawab</div>
+      </div>
+      
+      <button class="btn btn-success" id="btn-submit" onclick="confirmSubmit()" style="padding: 14px; width: 100%; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">Kumpulkan Ujian</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="cbt-main">
+      <div style="margin-bottom: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; color: #bfdbfe; font-size: 14px; display: flex; gap: 10px; align-items: flex-start;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Tulis kodingan langsung di editor di bawah setiap soal. Sistem akan mendeteksi ketikanmu dan <strong>menyimpannya otomatis di memori perangkat</strong>. Jangan keluar dari sesi layar penuh.</span>
+      </div>
+      
+      <div id="questions-container"></div>
     </div>
   </div>
 
@@ -252,7 +298,7 @@
   // --- CUSTOM MODAL SYSTEM ---
   function showModal(title, message, isConfirm = false, onConfirm = null) {
     document.getElementById('custom-modal-title').innerText = title;
-    document.getElementById('custom-modal-message').innerText = message;
+    document.getElementById('custom-modal-message').innerHTML = message;
     
     const btnCancel = document.getElementById('custom-modal-cancel');
     const btnOk = document.getElementById('custom-modal-ok');
@@ -503,15 +549,45 @@
     }, 1000);
   }
 
+  
+  function checkAnswered(index, el) {
+    const btn = document.getElementById('nav-btn-' + index);
+    if (!btn) return;
+    if (el.value.trim().length > 0) {
+      btn.classList.add('answered');
+      el.classList.add('has-code');
+    } else {
+      btn.classList.remove('answered');
+      el.classList.remove('has-code');
+    }
+  }
+
+  function confirmSubmit() {
+    const total = currentQuestions.length;
+    let answered = 0;
+    currentQuestions.forEach((q, i) => {
+      const val = document.getElementById('answer-' + q.no_soal).value;
+      if (val && val.trim().length > 0) answered++;
+    });
+    
+    let msg = `Kamu telah menjawab <strong style="color: white; font-size: 1.1rem;">${answered} dari ${total} soal</strong>.<br><br>`;
+    if (answered < total) {
+      msg += `<span style="color: var(--danger); font-weight: bold; background: rgba(239,68,68,0.1); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(239,68,68,0.3); display: inline-block; margin-bottom: 10px;">⚠️ Masih ada soal yang kosong!</span><br><br>`;
+    }
+    msg += `Apakah kamu yakin ingin mengumpulkan ujian sekarang? Jawaban yang sudah masuk tidak bisa diubah lagi.`;
+    
+    showModal("Konfirmasi Pengumpulan", msg, true, () => {
+      executeSubmit(false);
+    });
+  }
+
   // --- PENGUMPULAN ---
   async function submitAnswers(isForce = false) {
-      if (!isForce) {
-          showModal("Konfirmasi Pengumpulan", "Apakah kamu yakin sudah selesai? Jawaban yang sudah dikumpulkan tidak bisa diubah!", true, () => {
-              executeSubmit(false);
-          });
-          return;
+      if (isForce) {
+          executeSubmit(true);
+      } else {
+          confirmSubmit();
       }
-      executeSubmit(true);
   }
 
   async function executeSubmit(isForce) {

@@ -206,7 +206,8 @@
                 <h2>LAB PRAKTIKUM</h2>
             </div>
             <nav class="sidebar-menu">
-                <div class="menu-item active" onclick="switchTab('tab-sesi', this)">🕒 Manajemen Sesi</div>
+                                <div class="menu-item active" onclick="switchTab('tab-overview', this)">📊 Overview</div>
+                <div class="menu-item" onclick="switchTab('tab-sesi', this)">🕒 Manajemen Sesi</div>
                 <div class="menu-item" onclick="switchTab('tab-susulan', this)">🔄 Ujian Susulan</div>
                 <div class="menu-item" onclick="switchTab('tab-hasil-susulan', this)">💻 Hasil Susulan</div>
                 <div class="menu-item" onclick="switchTab('tab-soal', this)">📝 Bank Soal</div>
@@ -226,8 +227,39 @@
 
             <div class="content-area">
                 
+                <!-- TAB: OVERVIEW -->
+                <div id="tab-overview" class="tab-content">
+                    <h2 class="section-title">Overview Dashboard</h2>
+                    <div class="grid-2" style="margin-bottom: 24px;">
+                        <div class="card" style="padding: 20px; text-align: center; border-color: rgba(59, 130, 246, 0.3);">
+                            <h3 style="color: #94a3b8; font-size: 14px; text-transform: uppercase;">Total Peserta Susulan</h3>
+                            <div id="metric-peserta" style="font-size: 36px; font-weight: 700; color: #60a5fa; margin-top: 10px;">-</div>
+                        </div>
+                        <div class="card" style="padding: 20px; text-align: center; border-color: rgba(16, 185, 129, 0.3);">
+                            <h3 style="color: #94a3b8; font-size: 14px; text-transform: uppercase;">Jawaban Terkumpul</h3>
+                            <div id="metric-jawaban" style="font-size: 36px; font-weight: 700; color: #34d399; margin-top: 10px;">-</div>
+                        </div>
+                        <div class="card" style="padding: 20px; text-align: center; border-color: rgba(239, 68, 68, 0.3);">
+                            <h3 style="color: #94a3b8; font-size: 14px; text-transform: uppercase;">Akses Ditolak</h3>
+                            <div id="metric-ditolak" style="font-size: 36px; font-weight: 700; color: #f87171; margin-top: 10px;">-</div>
+                        </div>
+                        <div class="card" style="padding: 20px; text-align: center; border-color: rgba(167, 139, 250, 0.3);">
+                            <h3 style="color: #94a3b8; font-size: 14px; text-transform: uppercase;">Bank Soal</h3>
+                            <div id="metric-soal" style="font-size: 36px; font-weight: 700; color: #a78bfa; margin-top: 10px;">-</div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 24px;">
+                        <h3 style="margin-bottom: 15px; color: #f8fafc;">Panduan Cepat Admin</h3>
+                        <ul style="color: #94a3b8; line-height: 1.8; margin-left: 20px;">
+                            <li>Gunakan menu <strong>Ujian Susulan</strong> untuk mengelola daftar nama mahasiswa dan izin akses.</li>
+                            <li>Gunakan menu <strong>Bank Soal</strong> untuk menambah/mengedit pertanyaan ujian.</li>
+                            <li>Gunakan menu <strong>Hasil Susulan</strong> untuk melihat kode yang dikumpulkan peserta.</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- TAB: SESI -->
-                <div id="tab-sesi" class="card tab-content">
+                <div id="tab-sesi" class="card tab-content hidden">
                     <h2 class="section-title">Konfigurasi Jadwal Sesi</h2>
                     <form onsubmit="submitData(event, 'Sesi')">
                         <div class="form-group">
@@ -505,6 +537,7 @@
         if (tabId === 'tab-sesi') loadTableData('Sesi');
         if (tabId === 'tab-susulan') loadTableData('Susulan');
         if (tabId === 'tab-hasil-susulan') loadTableData('Jawaban_Susulan');
+        if (tabId === 'tab-overview') loadMetrics();
         if (tabId === 'tab-soal') {
             loadTableData('Soal');
             populateSesiDropdown();
@@ -530,6 +563,28 @@
             <option value="Remedial">Remedial</option>`;
         } catch (e) {
             console.warn("Gagal memuat sesi", e);
+        }
+    }
+
+    async function loadMetrics() {
+        if (!supabaseClient) return;
+        try {
+            const resSusulan = await supabaseClient.from('Susulan').select('status', { count: 'exact' });
+            if (resSusulan.data) {
+                document.getElementById('metric-peserta').innerText = resSusulan.data.length;
+                const ditolak = resSusulan.data.filter(d => d.status === 'Ditolak').length;
+                document.getElementById('metric-ditolak').innerText = ditolak;
+            }
+            const resJawaban = await supabaseClient.from('Jawaban_Susulan').select('id', { count: 'exact' });
+            if (resJawaban.data) {
+                document.getElementById('metric-jawaban').innerText = resJawaban.data.length;
+            }
+            const resSoal = await supabaseClient.from('Soal').select('id', { count: 'exact' });
+            if (resSoal.data) {
+                document.getElementById('metric-soal').innerText = resSoal.data.length;
+            }
+        } catch(e) {
+            console.warn("Metrics Error", e);
         }
     }
 
@@ -568,12 +623,12 @@
                         <td>${row.nim || '-'}</td>
                         <td><strong>${row.nama || '-'}</strong></td>
                         <td>
-                            <select class="form-control" style="padding: 4px 8px; font-size: 13px;" onchange="toggleStatusSusulan(${row.id}, this.value)">
-                                <option value="Diizinkan" ${row.status === 'Diizinkan' ? 'selected' : ''}>Diizinkan (Bebas Memilih)</option>
-                                <option value="Ditolak" ${row.status === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
-                                <option value="Diizinkan (UTS)" ${row.status === 'Diizinkan (UTS)' ? 'selected' : ''}>Diizinkan (UTS)</option>
-                                <option value="Diizinkan (UAS)" ${row.status === 'Diizinkan (UAS)' ? 'selected' : ''}>Diizinkan (UAS)</option>
-                                <option value="Diizinkan (Keduanya)" ${row.status === 'Diizinkan (Keduanya)' ? 'selected' : ''}>Diizinkan (Keduanya)</option>
+                            <select class="form-control" style="padding: 4px 8px; font-size: 13px; font-weight: 600; border-radius: 20px; text-align: center; background-color: ${row.status.includes('Diizinkan') ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${row.status.includes('Diizinkan') ? '#34d399' : '#f87171'}; border: 1px solid ${row.status.includes('Diizinkan') ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)'};" onchange="toggleStatusSusulan(${row.id}, this.value)">
+                                <option value="Diizinkan" ${row.status === 'Diizinkan' ? 'selected' : ''} style="color: black;">Diizinkan (Bebas)</option>
+                                <option value="Ditolak" ${row.status === 'Ditolak' ? 'selected' : ''} style="color: black;">Ditolak</option>
+                                <option value="Diizinkan (UTS)" ${row.status === 'Diizinkan (UTS)' ? 'selected' : ''} style="color: black;">Diizinkan (UTS)</option>
+                                <option value="Diizinkan (UAS)" ${row.status === 'Diizinkan (UAS)' ? 'selected' : ''} style="color: black;">Diizinkan (UAS)</option>
+                                <option value="Diizinkan (Keduanya)" ${row.status === 'Diizinkan (Keduanya)' ? 'selected' : ''} style="color: black;">Diizinkan (Keduanya)</option>
                             </select>
                         </td>
                         <td>
@@ -714,6 +769,16 @@
         } catch (err) {
             showToast('Gagal mengubah status: ' + err.message, 'error');
         }
+    }
+
+
+    function filterTable(tableId, query) {
+        const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+        const lowerQuery = query.toLowerCase();
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(lowerQuery) ? '' : 'none';
+        });
     }
 
     function closeModal() {
