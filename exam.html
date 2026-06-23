@@ -17,12 +17,21 @@
     // SEB DETECTOR (Safe Exam Browser Lock)
     const ua = navigator.userAgent;
     if (!ua.includes("SEB") && !ua.includes("SafeExamBrowser")) {
+      const currentUrl = window.location.href;
+      const sebUrl = currentUrl.replace(/^https:\/\//i, 'sebs://').replace(/^http:\/\//i, 'seb://');
+
       document.documentElement.innerHTML = `
         <head><title>Akses Ditolak - Wajib SEB</title></head>
         <body style="background: #0f172a; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; text-align: center; padding: 20px;">
           <h1 style="color: #ef4444; font-size: 3rem; margin-bottom: 10px;">Akses Ditolak!</h1>
-          <p style="font-size: 1.2rem; line-height: 1.6;">Halaman ujian ini <b>HANYA</b> dapat diakses melalui aplikasi<br><span style="color: #3b82f6; font-weight: bold; font-size: 1.5rem;">Safe Exam Browser (SEB)</span>.</p>
-          <p style="color: #94a3b8; margin-top: 30px; font-size: 0.9rem;">Silakan tutup browser biasa ini dan buka tautan ujian dari dalam aplikasi SEB.</p>
+          <p style="font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px;">Halaman ujian ini <b>HANYA</b> dapat diakses melalui aplikasi<br><span style="color: #3b82f6; font-weight: bold; font-size: 1.5rem;">Safe Exam Browser (SEB)</span>.</p>
+          
+          <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center;">
+            <a href="https://safeexambrowser.org/download_en.html" target="_blank" style="background: #334155; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; border: 1px solid #475569;">📥 Download SEB</a>
+            <a href="${sebUrl}" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">🚀 Launch SEB</a>
+          </div>
+
+          <p style="color: #94a3b8; font-size: 0.9rem; max-width: 500px; line-height: 1.5;">Jika tombol Launch tidak merespons, pastikan aplikasi SEB sudah diunduh dan dipasang di komputermu.</p>
         </body>
       `;
       throw new Error("Akses dihentikan: Bukan Safe Exam Browser");
