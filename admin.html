@@ -176,6 +176,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -562,7 +563,7 @@
                     tr.innerHTML = `
                         <td><strong>${row.sesi || '-'}</strong></td>
                         <td>${row.no_soal || '-'}</td>
-                        <td class="soal-text-preview" style="white-space: pre-wrap; word-break: break-word;">${row.teks_soal || '-'}</td>
+                        <td class="soal-text-preview" style="white-space: pre-wrap; word-break: break-word;">${row.teks_soal ? marked.parse(row.teks_soal) : '-'}</td>
                         <td><button type="button" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteData('${tableName}', ${row.id})">Hapus</button></td>
                     `;
                 }
@@ -794,6 +795,25 @@
         XLSX.utils.book_append_sheet(wb, ws, "Template_User");
         XLSX.writeFile(wb, "Template_Import_Mahasiswa.xlsx");
     }
+
+
+    // Auto Numbering
+    document.getElementById('inp-soal-sesi').addEventListener('change', async (e) => {
+        const sesi = e.target.value;
+        if (!sesi || !supabaseClient) return;
+        try {
+            const { data, error } = await supabaseClient.from('Soal')
+                .select('no_soal')
+                .eq('sesi', sesi)
+                .order('no_soal', { ascending: false })
+                .limit(1);
+            if (error) throw error;
+            const nextNo = data.length > 0 ? (parseInt(data[0].no_soal) || 0) + 1 : 1;
+            document.getElementById('inp-soal-no').value = nextNo;
+        } catch(err) {
+            console.warn("Gagal mendapat nomor urut", err);
+        }
+    });
 
     async function processExcel() {
         const file = document.getElementById('excel-file').files[0];
