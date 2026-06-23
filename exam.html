@@ -128,6 +128,14 @@
     .q-text { font-size: 1.05rem; white-space: pre-wrap; line-height: 1.7; margin-bottom: 20px; }
     .q-img { max-width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); }
 
+    /* Markdown Styling */
+    .markdown-body p { margin-bottom: 1em; }
+    .markdown-body ul { padding-left: 1.5em; margin-bottom: 1em; }
+    .markdown-body li { margin-bottom: 0.5em; }
+    .markdown-body code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'Fira Code', monospace; color: #fca5a5; }
+    .markdown-body pre code { background: none; padding: 0; color: inherit; }
+    .markdown-body pre { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; overflow-x: auto; margin-bottom: 1em; border: 1px solid var(--border); }
+
     /* Code Editor */
     .code-editor { width: 100%; height: 300px; background: #1e1e1e; color: #d4d4d4; font-family: 'Fira Code', monospace; font-size: 14px; padding: 16px; border: 1px solid #333; border-radius: 8px; resize: vertical; margin-top: 10px; outline: none; }
     .code-editor:focus { border-color: var(--primary); }
@@ -514,7 +522,7 @@
           html += `
             <div class="q-card" id="soal-box-${no}">
               <span class="q-number">SOAL ${no}</span>
-              <div class="q-text">${q.teks_soal.replace(/\\n/g, '<br>')}</div>
+              <div class="q-text markdown-body">${marked.parse(q.teks_soal, { breaks: true })}</div>
               ${q.url_gambar ? `<img src="${q.url_gambar}" class="q-img">` : ""}
               <div style="margin-top: 25px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
