@@ -6,66 +6,61 @@
     <title>Feedback Praktikum - Alpro 05-01</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --border: #e2e8f0; }
+        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --success: #10b981; --border: #e2e8f0; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 30px 15px; }
         
-        .container { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; animation: slideIn 0.4s ease; }
+        .container { background: var(--card-bg); width: 100%; max-width: 800px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 30px; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
-        .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px dashed var(--border); padding-bottom: 20px; }
+        .header h2 { font-weight: 700; color: var(--text-main); font-size: 22px; line-height: 1.3; }
+        .header p { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
         
-        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group { margin-bottom: 20px; }
         label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
         
-        select, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; font-family: 'Poppins', sans-serif;}
+        select, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text-main); transition: 0.2s; background: #fff; outline: none; }
         select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         textarea { resize: vertical; min-height: 120px; }
         
-        /* Star Rating System */
-        .rating-container { display: flex; justify-content: center; gap: 15px; margin-top: 10px; margin-bottom: 10px; flex-direction: row-reverse; }
-        .rating-container input[type="radio"] { display: none; }
-        .rating-container label { cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 65px; border-radius: 12px; background: #f1f5f9; border: 2px solid transparent; transition: 0.2s; color: var(--text-muted); }
-        .rating-container label .emoji { font-size: 24px; margin-bottom: 4px; filter: grayscale(100%); transition: 0.2s; }
-        .rating-container label .text { font-size: 10px; font-weight: 600; text-align: center; line-height: 1.1; }
+        /* Table Styles */
+        .table-responsive { overflow-x: auto; margin-bottom: 25px; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: #f8fafc; padding: 12px 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); text-align: center; position: sticky; top: 0; z-index: 10; }
+        th.th-q { text-align: left; width: 45%; }
+        td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid var(--border); }
+        .q-td { font-weight: 500; color: var(--text-main); line-height: 1.5; }
+        .radio-td { text-align: center; vertical-align: middle; }
         
-        .rating-container label:hover,
-        .rating-container label:hover ~ label { background: #e0e7ff; }
-        .rating-container label:hover .emoji,
-        .rating-container label:hover ~ label .emoji { filter: grayscale(0%); transform: scale(1.1); }
+        input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
         
-        .rating-container input[type="radio"]:checked ~ label { background: #e0e7ff; border-color: var(--primary); color: var(--primary); }
-        .rating-container input[type="radio"]:checked ~ label .emoji { filter: grayscale(0%); }
-        .rating-container input[type="radio"]:checked + label { background: #e0e7ff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-        
-        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; gap: 8px; background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); margin-top: 10px;}
-        button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
+        button { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
         button:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
         
         .back-link { display: inline-flex; align-items: center; margin-bottom: 15px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; }
         .back-link:hover { color: var(--primary); }
 
-        #successMessage { display: none; text-align: center; padding: 30px 10px; }
-        #successMessage h3 { color: var(--success); font-size: 20px; margin-bottom: 10px; }
-        #successMessage p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+        #successMessage { display: none; text-align: center; padding: 40px 20px; }
+        #successMessage h3 { color: var(--success); font-size: 22px; margin-bottom: 10px; }
+        #successMessage p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width: 500px; padding: 25px 30px;">
+    <div class="container">
         <a href="index.html" class="back-link">⬅ Kembali ke Beranda</a>
         
         <div id="formSection">
-            <div class="header" style="margin-bottom: 25px;">
-                <h2 style="font-size: 22px;">Kuesioner Praktikum</h2>
-                <p>Kritik & saran kamu <strong>100% anonim</strong> dan sangat berarti untuk evaluasi asisten praktikum.</p>
+            <div class="header">
+                <h2>Evaluasi Kinerja Asisten Praktikum</h2>
+                <p>Kuesioner ini bersifat <strong>100% anonim</strong>. Mohon isi dengan jujur dan objektif untuk evaluasi perbaikan praktikum ke depannya.</p>
             </div>
             
             <form id="feedbackForm" onsubmit="submitFeedback(event)">
-                <div class="form-group">
-                    <label>Pilih Pekan / Sesi *</label>
+                <div class="form-group" style="max-width: 300px; margin: 0 auto 25px auto;">
+                    <label style="text-align: center;">Pilih Pekan / Target Evaluasi *</label>
                     <select id="pekan" required>
                         <option value="">-- Pilih Pekan --</option>
                         <option value="Week 1">Week 1</option>
@@ -88,37 +83,148 @@
                     </select>
                 </div>
                 
-                <div class="form-group" style="text-align: center; margin-top: 25px;">
-                    <label style="text-align: center; font-size: 14px;">Tingkat Kepuasan Kamu? *</label>
-                    <div class="rating-container">
-                        <!-- Order reversed so ~ selector selects lower stars when hovering higher ones -->
-                        <input type="radio" id="star4" name="rating" value="Sangat Puas" required>
-                        <label for="star4"><span class="emoji">😍</span><span class="text">Sangat<br>Puas</span></label>
-                        
-                        <input type="radio" id="star3" name="rating" value="Puas">
-                        <label for="star3"><span class="emoji">🙂</span><span class="text">Puas</span></label>
-                        
-                        <input type="radio" id="star2" name="rating" value="Tidak Puas">
-                        <label for="star2"><span class="emoji">🙁</span><span class="text">Tidak<br>Puas</span></label>
-                        
-                        <input type="radio" id="star1" name="rating" value="Sangat Tidak Puas">
-                        <label for="star1"><span class="emoji">😠</span><span class="text">Sangat<br>Kecewa</span></label>
-                    </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="th-q">Pertanyaan / Pernyataan</th>
+                                <th>Sangat<br>Tidak Puas</th>
+                                <th>Tidak<br>Puas</th>
+                                <th>Puas</th>
+                                <th>Sangat<br>Puas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">1. Pada awal praktikum, asprak menyampaikan rencana dan target modul pembelajaran, materi, referensi, dan aturan.</td>
+                        <td class="radio-td"><input type="radio" name="q1" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q1" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q1" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q1" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">2. Asprak memfasilitasi dalam proses pemecahan masalah / error saat coding di praktikum.</td>
+                        <td class="radio-td"><input type="radio" name="q2" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q2" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q2" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q2" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">3. Asprak bersikap responsif dalam berkomunikasi (via grup/japri) dalam rangka menunjang proses pembelajaran.</td>
+                        <td class="radio-td"><input type="radio" name="q3" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q3" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q3" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q3" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">4. Asprak bersikap terbuka terhadap masukan dari praktikan mengenai kegiatan belajar mengajar.</td>
+                        <td class="radio-td"><input type="radio" name="q4" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q4" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q4" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q4" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">5. Asprak memfasilitasi proses pembelajaran dengan kreatif menggunakan alat bantu (internet, live coding, papan tulis, dll).</td>
+                        <td class="radio-td"><input type="radio" name="q5" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q5" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q5" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q5" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">6. Asprak memanfaatkan platform website ini / LMS untuk memenuhi capaian praktikum.</td>
+                        <td class="radio-td"><input type="radio" name="q6" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q6" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q6" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q6" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">7. Asprak mendorong mahasiswa dalam eksplorasi mandiri melalui berbagai dokumentasi atau sumber belajar.</td>
+                        <td class="radio-td"><input type="radio" name="q7" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q7" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q7" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q7" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">8. Asprak menerapkan berbagai macam metode pengajaran yang disesuaikan dengan kemampuan praktikan.</td>
+                        <td class="radio-td"><input type="radio" name="q8" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q8" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q8" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q8" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">9. Asprak memanfaatkan jadwal praktikum secara efektif untuk melaksanakan proses pembelajaran.</td>
+                        <td class="radio-td"><input type="radio" name="q9" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q9" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q9" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q9" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">10. Asprak memberikan asesmen (tugas pendahuluan/ jurnal/ kuis) yang sesuai dengan capaian modul pembelajaran.</td>
+                        <td class="radio-td"><input type="radio" name="q10" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q10" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q10" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q10" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">11. Asprak menyelenggarakan praktikum sesuai dengan silabus / modul pembelajaran.</td>
+                        <td class="radio-td"><input type="radio" name="q11" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q11" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q11" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q11" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">12. Asprak memberikan penilaian yang objektif dan umpan balik (feedback) terhadap asesmen yang diberikan.</td>
+                        <td class="radio-td"><input type="radio" name="q12" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q12" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q12" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q12" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">13. Asprak memberikan kesempatan kepada praktikan untuk mengklarifikasi perolehan nilai.</td>
+                        <td class="radio-td"><input type="radio" name="q13" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q13" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q13" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q13" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">14. Asprak memotivasi praktikan untuk memenuhi capaian praktikum.</td>
+                        <td class="radio-td"><input type="radio" name="q14" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q14" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q14" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q14" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #ffffff;">
+                        <td class="q-td">15. Asprak memberikan feedback terhadap perkembangan kemampuan koding praktikan.</td>
+                        <td class="radio-td"><input type="radio" name="q15" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q15" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q15" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q15" value="Sangat Puas"></td>
+                    </tr>
+                    <tr style="background: #f8fafc;">
+                        <td class="q-td">16. Asprak memberikan kesempatan kepada praktikan untuk melakukan perbaikan (remedial/susulan).</td>
+                        <td class="radio-td"><input type="radio" name="q16" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td"><input type="radio" name="q16" value="Tidak Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q16" value="Puas"></td>
+                        <td class="radio-td"><input type="radio" name="q16" value="Sangat Puas"></td>
+                    </tr>
+                        </tbody>
+                    </table>
                 </div>
                 
                 <div class="form-group">
-                    <label>Kritik & Saran untuk Asisten Praktikum *</label>
-                    <textarea id="saran" required placeholder="Tulis keluhan, keluh kesah, pujian, atau masukan yang membangun untuk asisten praktikum di sini..."></textarea>
+                    <label>17. Kritik & Saran Tambahan untuk Asisten Praktikum *</label>
+                    <textarea id="saran" required placeholder="Tulis masukan, kritik membangun, atau apresiasi untuk asisten praktikum di sini..."></textarea>
                 </div>
                 
-                <button type="submit" id="btnSubmit">Kirim Secara Anonim 🚀</button>
+                <button type="submit" id="btnSubmit">Kirim Kuesioner Secara Anonim 🚀</button>
             </form>
         </div>
 
         <div id="successMessage">
             <h3>Terima Kasih! 🎉</h3>
-            <p>Feedback kamu telah berhasil dikirimkan secara anonim. Masukanmu sangat berarti bagi pengembangan praktikum.</p>
-            <button onclick="location.reload()" style="margin-top: 25px; background: #f1f5f9; color: var(--text-main); box-shadow: none;">Kirim Feedback Lain</button>
+            <p>Data evaluasi kamu telah berhasil direkam secara anonim. Masukanmu sangat berharga bagi kami.</p>
+            <button onclick="location.reload()" style="max-width: 250px; margin: 0 auto; background: #f1f5f9; color: var(--text-main); box-shadow: none;">Kirim Evaluasi Lain</button>
         </div>
     </div>
 
@@ -129,24 +235,29 @@
             e.preventDefault();
             const btn = document.getElementById("btnSubmit");
             
-            const pekan = document.getElementById("pekan").value;
-            const saran = document.getElementById("saran").value;
-            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const payload = {
+                action: "submitFeedbackStandalone",
+                pekan: document.getElementById("pekan").value,
+                saran: document.getElementById("saran").value
+            };
             
-            if (!pekan || !saran || !ratingInput) {
-                alert("Mohon lengkapi semua isian.");
+            // Collect answers for Q1 to Q16
+            for (let i = 1; i <= 16; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    alert(`Pernyataan No. ${i} belum diisi!`);
+                    return;
+                }
+                payload[`q${i}`] = selected.value;
+            }
+            
+            if (!payload.pekan || !payload.saran) {
+                alert("Mohon lengkapi pilihan pekan dan saran.");
                 return;
             }
             
-            btn.innerHTML = "Mengirim... ⏳";
+            btn.innerHTML = "Menyimpan Data... ⏳";
             btn.disabled = true;
-            
-            const payload = {
-                action: "submitFeedbackStandalone",
-                pekan: pekan,
-                rating: ratingInput.value,
-                saran: saran
-            };
             
             try {
                 const response = await fetch(webAppUrl, {
@@ -158,15 +269,16 @@
                 if (result.status === "success") {
                     document.getElementById("formSection").style.display = "none";
                     document.getElementById("successMessage").style.display = "block";
+                    window.scrollTo(0, 0);
                 } else {
                     alert("Gagal mengirim feedback: " + (result.message || "Unknown error"));
-                    btn.innerHTML = "Kirim Secara Anonim 🚀";
+                    btn.innerHTML = "Kirim Kuesioner Secara Anonim 🚀";
                     btn.disabled = false;
                 }
             } catch (error) {
                 console.error("Error:", error);
                 alert("Terjadi kesalahan jaringan saat mengirim data. Pastikan koneksi internet stabil.");
-                btn.innerHTML = "Kirim Secara Anonim 🚀";
+                btn.innerHTML = "Kirim Kuesioner Secara Anonim 🚀";
                 btn.disabled = false;
             }
         }
