@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Praktikum - Alpro 05-01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4f46e5; --primary-hover: #4338ca; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --danger: #ef4444; --success: #10b981; --border: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .container { background: var(--card-bg); width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); padding: 40px 30px; position: relative; overflow: hidden; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h2 { font-weight: 700; color: var(--text-main); font-size: 24px; line-height: 1.3; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
+        
+        select, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff; outline: none; font-family: 'Poppins', sans-serif;}
+        select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        textarea { resize: vertical; min-height: 120px; }
+        
+        /* Star Rating System */
+        .rating-container { display: flex; justify-content: center; gap: 15px; margin-top: 10px; margin-bottom: 10px; flex-direction: row-reverse; }
+        .rating-container input[type="radio"] { display: none; }
+        .rating-container label { cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 65px; border-radius: 12px; background: #f1f5f9; border: 2px solid transparent; transition: 0.2s; color: var(--text-muted); }
+        .rating-container label .emoji { font-size: 24px; margin-bottom: 4px; filter: grayscale(100%); transition: 0.2s; }
+        .rating-container label .text { font-size: 10px; font-weight: 600; text-align: center; line-height: 1.1; }
+        
+        .rating-container label:hover,
+        .rating-container label:hover ~ label { background: #e0e7ff; }
+        .rating-container label:hover .emoji,
+        .rating-container label:hover ~ label .emoji { filter: grayscale(0%); transform: scale(1.1); }
+        
+        .rating-container input[type="radio"]:checked ~ label { background: #e0e7ff; border-color: var(--primary); color: var(--primary); }
+        .rating-container input[type="radio"]:checked ~ label .emoji { filter: grayscale(0%); }
+        .rating-container input[type="radio"]:checked + label { background: #e0e7ff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; gap: 8px; background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); margin-top: 10px;}
+        button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .back-link { display: inline-flex; align-items: center; margin-bottom: 15px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .back-link:hover { color: var(--primary); }
+
+        #successMessage { display: none; text-align: center; padding: 30px 10px; }
+        #successMessage h3 { color: var(--success); font-size: 20px; margin-bottom: 10px; }
+        #successMessage p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 500px; padding: 25px 30px;">
+        <a href="index.html" class="back-link">⬅ Kembali ke Beranda</a>
+        
+        <div id="formSection">
+            <div class="header" style="margin-bottom: 25px;">
+                <h2 style="font-size: 22px;">Kuesioner Praktikum</h2>
+                <p>Kritik & saran kamu <strong>100% anonim</strong> dan sangat berarti untuk evaluasi asisten praktikum.</p>
+            </div>
+            
+            <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                <div class="form-group">
+                    <label>Pilih Pekan / Sesi *</label>
+                    <select id="pekan" required>
+                        <option value="">-- Pilih Pekan --</option>
+                        <option value="Week 1">Week 1</option>
+                        <option value="Week 2">Week 2</option>
+                        <option value="Week 3">Week 3</option>
+                        <option value="Week 4">Week 4</option>
+                        <option value="Week 5">Week 5</option>
+                        <option value="Week 6">Week 6</option>
+                        <option value="Week 7">Week 7</option>
+                        <option value="Week 8">Week 8 (UTS)</option>
+                        <option value="Week 9">Week 9</option>
+                        <option value="Week 10">Week 10</option>
+                        <option value="Week 11">Week 11</option>
+                        <option value="Week 12">Week 12</option>
+                        <option value="Week 13">Week 13</option>
+                        <option value="Week 14">Week 14</option>
+                        <option value="Week 15">Week 15</option>
+                        <option value="Week 16">Week 16 (UAS)</option>
+                        <option value="Umum (1 Semester)">Evaluasi Umum (1 Semester)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="text-align: center; margin-top: 25px;">
+                    <label style="text-align: center; font-size: 14px;">Tingkat Kepuasan Kamu? *</label>
+                    <div class="rating-container">
+                        <!-- Order reversed so ~ selector selects lower stars when hovering higher ones -->
+                        <input type="radio" id="star4" name="rating" value="Sangat Puas" required>
+                        <label for="star4"><span class="emoji">😍</span><span class="text">Sangat<br>Puas</span></label>
+                        
+                        <input type="radio" id="star3" name="rating" value="Puas">
+                        <label for="star3"><span class="emoji">🙂</span><span class="text">Puas</span></label>
+                        
+                        <input type="radio" id="star2" name="rating" value="Tidak Puas">
+                        <label for="star2"><span class="emoji">🙁</span><span class="text">Tidak<br>Puas</span></label>
+                        
+                        <input type="radio" id="star1" name="rating" value="Sangat Tidak Puas">
+                        <label for="star1"><span class="emoji">😠</span><span class="text">Sangat<br>Kecewa</span></label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Kritik & Saran untuk Asisten Praktikum *</label>
+                    <textarea id="saran" required placeholder="Tulis keluhan, keluh kesah, pujian, atau masukan yang membangun untuk asisten praktikum di sini..."></textarea>
+                </div>
+                
+                <button type="submit" id="btnSubmit">Kirim Secara Anonim 🚀</button>
+            </form>
+        </div>
+
+        <div id="successMessage">
+            <h3>Terima Kasih! 🎉</h3>
+            <p>Feedback kamu telah berhasil dikirimkan secara anonim. Masukanmu sangat berarti bagi pengembangan praktikum.</p>
+            <button onclick="location.reload()" style="margin-top: 25px; background: #f1f5f9; color: var(--text-main); box-shadow: none;">Kirim Feedback Lain</button>
+        </div>
+    </div>
+
+    <script>
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbx3yF2QKnO7XwVfh6iZ1itbKrCDg4IucVR1m9-eH6YYOmxaU1tQoO7lfD0KUENwpQDb/exec";
+        
+        async function submitFeedback(e) {
+            e.preventDefault();
+            const btn = document.getElementById("btnSubmit");
+            
+            const pekan = document.getElementById("pekan").value;
+            const saran = document.getElementById("saran").value;
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            
+            if (!pekan || !saran || !ratingInput) {
+                alert("Mohon lengkapi semua isian.");
+                return;
+            }
+            
+            btn.innerHTML = "Mengirim... ⏳";
+            btn.disabled = true;
+            
+            const payload = {
+                action: "submitFeedbackStandalone",
+                pekan: pekan,
+                rating: ratingInput.value,
+                saran: saran
+            };
+            
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.status === "success") {
+                    document.getElementById("formSection").style.display = "none";
+                    document.getElementById("successMessage").style.display = "block";
+                } else {
+                    alert("Gagal mengirim feedback: " + (result.message || "Unknown error"));
+                    btn.innerHTML = "Kirim Secara Anonim 🚀";
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi kesalahan jaringan saat mengirim data. Pastikan koneksi internet stabil.");
+                btn.innerHTML = "Kirim Secara Anonim 🚀";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
