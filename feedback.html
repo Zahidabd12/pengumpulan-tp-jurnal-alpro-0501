@@ -46,6 +46,53 @@
         #successMessage { display: none; text-align: center; padding: 40px 20px; }
         #successMessage h3 { color: var(--success); font-size: 22px; margin-bottom: 10px; }
         #successMessage p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        
+        /* Glassmorphism & Premium UI Enhancements */
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #cbebff 100%);
+            background-attachment: fixed;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.03);
+        }
+        
+        /* Custom Radio Buttons for better Touch Targets */
+        .radio-td label {
+            display: inline-flex;
+            width: 100%;
+            height: 100%;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        input[type="radio"] { width: 20px; height: 20px; cursor: pointer; margin: 0; }
+
+        /* Responsive Table to Cards for Mobile */
+        @media (max-width: 768px) {
+            .table-responsive { border: none; overflow: visible; background: transparent; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; background: #fff !important; box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden; }
+            .q-td { padding: 16px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid var(--border); }
+            .radio-td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            .radio-td:last-child { border-bottom: none; }
+            .radio-td::before {
+                content: attr(data-label);
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
+        }
     </style>
 </head>
 <body>
@@ -76,115 +123,115 @@
                             
                     <tr style="background: #ffffff;">
                         <td class="q-td">1. Pada awal praktikum, asprak menyampaikan rencana dan target modul pembelajaran, materi, referensi, dan aturan.</td>
-                        <td class="radio-td"><input type="radio" name="q1" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q1" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q1" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q1" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q1" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q1" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q1" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q1" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">2. Asprak memfasilitasi dalam proses pemecahan masalah / error saat coding di praktikum.</td>
-                        <td class="radio-td"><input type="radio" name="q2" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q2" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q2" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q2" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q2" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q2" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q2" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q2" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">3. Asprak bersikap responsif dalam berkomunikasi (via grup/japri) dalam rangka menunjang proses pembelajaran.</td>
-                        <td class="radio-td"><input type="radio" name="q3" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q3" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q3" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q3" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q3" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q3" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q3" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q3" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">4. Asprak bersikap terbuka terhadap masukan dari praktikan mengenai kegiatan belajar mengajar.</td>
-                        <td class="radio-td"><input type="radio" name="q4" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q4" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q4" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q4" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q4" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q4" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q4" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q4" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">5. Asprak memfasilitasi proses pembelajaran dengan kreatif menggunakan alat bantu (internet, live coding, papan tulis, dll).</td>
-                        <td class="radio-td"><input type="radio" name="q5" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q5" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q5" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q5" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q5" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q5" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q5" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q5" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">6. Asprak memanfaatkan platform website ini / LMS untuk memenuhi capaian praktikum.</td>
-                        <td class="radio-td"><input type="radio" name="q6" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q6" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q6" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q6" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q6" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q6" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q6" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q6" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">7. Asprak mendorong mahasiswa dalam eksplorasi mandiri melalui berbagai dokumentasi atau sumber belajar.</td>
-                        <td class="radio-td"><input type="radio" name="q7" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q7" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q7" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q7" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q7" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q7" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q7" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q7" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">8. Asprak menerapkan berbagai macam metode pengajaran yang disesuaikan dengan kemampuan praktikan.</td>
-                        <td class="radio-td"><input type="radio" name="q8" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q8" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q8" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q8" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q8" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q8" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q8" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q8" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">9. Asprak memanfaatkan jadwal praktikum secara efektif untuk melaksanakan proses pembelajaran.</td>
-                        <td class="radio-td"><input type="radio" name="q9" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q9" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q9" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q9" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q9" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q9" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q9" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q9" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">10. Asprak memberikan asesmen (tugas pendahuluan/ jurnal/ kuis) yang sesuai dengan capaian modul pembelajaran.</td>
-                        <td class="radio-td"><input type="radio" name="q10" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q10" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q10" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q10" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q10" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q10" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q10" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q10" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">11. Asprak menyelenggarakan praktikum sesuai dengan silabus / modul pembelajaran.</td>
-                        <td class="radio-td"><input type="radio" name="q11" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q11" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q11" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q11" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q11" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q11" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q11" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q11" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">12. Asprak memberikan penilaian yang objektif dan umpan balik (feedback) terhadap asesmen yang diberikan.</td>
-                        <td class="radio-td"><input type="radio" name="q12" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q12" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q12" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q12" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q12" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q12" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q12" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q12" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">13. Asprak memberikan kesempatan kepada praktikan untuk mengklarifikasi perolehan nilai.</td>
-                        <td class="radio-td"><input type="radio" name="q13" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q13" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q13" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q13" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q13" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q13" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q13" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q13" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">14. Asprak memotivasi praktikan untuk memenuhi capaian praktikum.</td>
-                        <td class="radio-td"><input type="radio" name="q14" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q14" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q14" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q14" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q14" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q14" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q14" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q14" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #ffffff;">
                         <td class="q-td">15. Asprak memberikan feedback terhadap perkembangan kemampuan koding praktikan.</td>
-                        <td class="radio-td"><input type="radio" name="q15" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q15" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q15" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q15" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q15" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q15" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q15" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q15" value="Sangat Puas"></td>
                     </tr>
                     <tr style="background: #f8fafc;">
                         <td class="q-td">16. Asprak memberikan kesempatan kepada praktikan untuk melakukan perbaikan (remedial/susulan).</td>
-                        <td class="radio-td"><input type="radio" name="q16" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q16" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q16" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q16" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q16" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q16" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q16" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q16" value="Sangat Puas"></td>
                     </tr>
                                             <tr style="background: #f8fafc;">
                         <td class="q-td">17. Asprak secara adil memberikan penilaian, menjaga integritas sesuai prinsip HEI.<br><br>
@@ -195,10 +242,10 @@
                         3. <b>INTEGRITY (Integrity in Independence):</b> Bertindak jujur, transparan, dan bertanggung jawab atas hasil kerja sendiri tanpa melakukan kecurangan.
                         </small>
                         </td>
-                        <td class="radio-td"><input type="radio" name="q17" value="Sangat Tidak Puas" required></td>
-                        <td class="radio-td"><input type="radio" name="q17" value="Tidak Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q17" value="Puas"></td>
-                        <td class="radio-td"><input type="radio" name="q17" value="Sangat Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q17" value="Sangat Tidak Puas" required></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q17" value="Tidak Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q17" value="Puas"></td>
+                        <td class="radio-td" data-label="Sangat Tidak Puas"><input type="radio" name="q17" value="Sangat Puas"></td>
                     </tr>
                         </tbody>
                     </table>
@@ -216,11 +263,23 @@
         <div id="successMessage">
             <h3>Terima Kasih! 🎉</h3>
             <p>Data evaluasi kamu telah berhasil direkam secara anonim. Masukanmu sangat berharga bagi kami.</p>
-            <button onclick="location.reload()" style="max-width: 250px; margin: 0 auto; background: #f1f5f9; color: var(--text-main); box-shadow: none;">Kirim Evaluasi Lain</button>
+            
         </div>
     </div>
 
     <script>
+        // Check if already submitted
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("evaluasi_final_submitted")) {
+                document.getElementById("formSection").style.display = "none";
+                document.getElementById("successMessage").style.display = "block";
+                document.getElementById("successMessage").innerHTML = `
+                    <h3>Kamu Sudah Mengisi Evaluasi! ✅</h3>
+                    <p>Terima kasih telah berpartisipasi. Kuesioner evaluasi final hanya dapat diisi satu kali per perangkat.</p>
+                `;
+            }
+        });
+
         const webAppUrl = "https://script.google.com/macros/s/AKfycbxelZSGDNph_xzCmTrCmT8yp9vCFq8xuuTsGLfV1ubkhJ_DoOCAitE_H17PvSuc5DGx/exec";
         
         async function submitFeedback(e) {
@@ -259,6 +318,7 @@
                 
                 const result = await response.json();
                 if (result.status === "success") {
+                    localStorage.setItem("evaluasi_final_submitted", "true");
                     document.getElementById("formSection").style.display = "none";
                     document.getElementById("successMessage").style.display = "block";
                     window.scrollTo(0, 0);
